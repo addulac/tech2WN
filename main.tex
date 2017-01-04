@@ -1,0 +1,78 @@
+\documentclass[a4paper, 12pt]{article}
+%\documentclass[a4paper, 12pt, draft]{article} % don't include images, leave a border of same size...great
+%\documentclass[journal]{IEEEtran}
+
+
+
+%\usepackage[cmex10]{amsmath, mathtools}
+\usepackage{amsmath,amssymb,amsbsy,amsfonts,amsthm}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{fancyvrb}
+\usepackage{yfonts}
+
+\usepackage{wrapfig}
+\usepackage{tikz}
+%\input{../tikz.conf}
+
+\usetikzlibrary{bayesnet}
+
+%%%%%%%%%%% Box 
+\usepackage{calc}%    For the \widthof macro
+\usepackage{xparse}%  For \NewDocumentCommand
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+
+
+%\input{./header.tex}
+%%%%%%%%%% Math
+\renewcommand{\text}{\textnormal}
+%\newcommand{\pr}{\mathbf{p}}
+\newcommand{\pr}{p}
+\newcommand{\p}{p}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\divkk}{\mathbb{K}}
+\newcommand{\entropy}{\mathbb{H}}
+\newcommand{\gem}{\mathrm{GEM}}
+\newcommand{\Mult}{\mathrm{Mult}}
+\newcommand{\DP}{\mathrm{DP}}
+\newcommand{\IBP}{\mathrm{IBP}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\h}{\mathcal{H}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\unit}{1\!\!1}
+
+%\renewcommand{\Phi}{\mat{\Phi}}
+
+\title{Mixed-Membership Inference in Sparse Weigted Networks.}
+
+%\date{avril 2015}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[section]
+
+\begin{document}
+	
+\maketitle
+\begin{abstract}
+\end{abstract}
+
+
+
+\input{intro.tex}
+\input{approach.tex}
+\clearpage
+
+\bibliographystyle{unsrt}
+\bibliography{./a}
+
+\appendix
+
+\end{document}
+

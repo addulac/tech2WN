@@ -1,0 +1,65 @@
+
+\section{Weighted Networks or Time exchangeability}
+
+% dense - unrealistic
+The literature for link prediction models \cite{review1,review2} usually represent networks by a graph $G=(V,E)$ where the edges $E$ are either $0$ or $1$ for accounting respectively the absence or the presence of an edge between two nodes. Formally the likelihood of such model is characterized by a Bernoulli density such that $y_{ij} \sim \mathrm{y_{ij} |\theta_{ij}}$. Moreover all of those models are in a setting of static graphs which is formally traduced by the assumption of exchangeability. It means that the joint probability of a graph do not depend on the order of which we observe the nodes such that. %? $echangeability$
+
+% sparse - real
+The main limitation of such models is that it can't handle sparse networks, which is a corollary of the Aldous-Hoover theorem \cite{orbanz2015bayesian}. The models has been said to be misspecified. A way to alleviate this limitations is to weight edges instead of considering binary one. This can be understood, in some way, as smoothing the networks. The raison why sparsity can be handle this way is because by considering a weighted networks, it makes all non-edges between nodes (0 entries in the adjacency matrix) having a weak contribution to the degree distribution of a node (see section \ref{todo}). Thus, the inference process can take advantage of this fact because, in sparse networks, most of the interactions are unrealized.
+
+In this paper we will consider the weighted relations as a measure for the number of times each nodes has interacted. Thus, a natural prior for such assumptions is a Poisson distribution. It follows that we will define the likelihood to generate a weighted edge such that $y_{ij} \sim \mathrm{\theta_{ij})}$. Moreover,  this representation can take advantage of relational data that arise in various scenario, summarised by the two following:
+\begin{itemize}
+\item Weighted Networks, where weights represent a \emph{strength} of the relations between individuals,
+\item Sum of \emph{snapshot} of binary (or weighted) networks.
+\end{itemize}
+
+In the second case the weights can also be seen as a \emph{strength} of connection between individuals, since it represents a count/number of times they interacted together. There is a number of situations where such a case arise. One can think for example to the count of clicks that one user makes during a session. Or the number of time that a individual send a message to another in a social network or again the number of transportation between two cities. Thus modelling weighted networks is a way to take into account the strength of relations that arise in a temporal context, but by keeping the excheangeabilty assumptions ie the order in which pairs of individual interacts. Or says differently, we loose the time order in which each individual connections took place. That is the reason why we use the term \emph{time exchangeability}.
+
+The use of a Poisson law as an aggregator for single snapshots is primarily justified by the two following fundamental properties \cite{orbanz2012lecture}:
+\begin{itemize}
+\item{Additivity}: If $K_1 \sim \mathrm{Poisson}(\alpha_1)$ and $K_2 \sim \mathrm{Poisson}(\alpha_2)$ then:
+    \begin{equation}
+        K_1 + k_2 = \mathrm{Poisson}(\alpha_1 + \alpha_2)
+    \end{equation}
+\item {Thinning}: The number of successes in a Poisson number of coin flips is Poisson, namely if $K \sim \mathrm{Poisson}(\alpha)$ and $X_1,...,X_2 \sim_{iid} \mathrm{Bern}(p)$, then:
+    \begin{equation}
+        \sum_{i=1}^K X_i = \mathrm{Poisson}(p\alpha)
+    \end{equation}
+\end{itemize}
+
+Those two properties of the Poisson distribution constitute the justification of building weighted networks datasets from sequence of either weighted graphs or binary graph and making inference with Poisson based likelihood. 
+
+\section{Model -- WMMSB}
+A powerful model for binary exchangeable networks is the Mixed Membership Stochastic Blockmodel (MMSB). In order to keep the strength behind the MMSB models, we propose a generalisation of it for weighted networks such as described in the previous section.
+
+The proposed model is a weighted extension of MMSB, named WMMSB. The main design difference is that the likelihood is drawn from a Poisson distribution, and the correlations between the shared classes are drawn from independent Gamma distribution. The models first draw latent class membership for each nodes from a shared Dirichlet distribution. Then for each interactions, each node draw a single membership. The observation level is then draw from Poisson distribution taking is rate parameter according to two classes that summarize the interaction between the two underlying nodes. The observation corresponds to the strength of the relationship. The generative model (along  with the graphical model) is summarized as follows:
+
+\begin{figure}[h]
+\begin{minipage}[h]{0.45\linewidth}
+\begin{align*}
+	&\textrm{For each } i \in \{1, .., N\}  \\
+	&\qquad\bm{f}_i \sim \textrm{Dir}(\alpha)\\
+	&\textrm{For each }  (m,n) \in \{1,..,K\}^2 \\
+	&\qquad\phi_{mn} \sim \mathrm{Gamma}(k,\theta)\\
+	&\textrm{For each } (i,j) \in V^2 \\
+	&\qquad z_{i \rightarrow j} \sim \mbox{Cat}(\bm{f}_i)\\
+	&\qquad z_{i \leftarrow j} \sim \mbox{Cat}(\bm{f}_j)\\
+    &\qquad y_{ij} \sim \mathrm{Poisson}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})
+\end{align*}
+\end{minipage}
+\begin{minipage}[h]{0.45\linewidth}
+	\scalebox{0.88}{\input{img/mmsb2-v0}}
+\end{minipage}
+    \caption{Generative models and Bayesian graph of WMMSB.}
+\end{figure}
+
+Note that the group membership of each node is context dependent. That is, each node may assume different membership when interacting or being interacted with by different peers. Statistically, each node is an admixture of group-specific interactions. The two sets of latent group indicators are denoted by $\{z_{p\rightarrow q} : p, q \in E\}  =: Z\rightarrow$ and $\{z_{p\leftarrow q} : p, q \in E\}  =: Z\leftarrow$. Also note that the pairs of group memberships that underlie interactions need not be equal; this fact is useful for characterizing asymmetric interaction networks. Equality may be enforced when modeling symmetric interactions. \ref{goldenberg2010survey}.
+
+%In the rest of this paper  we will note the set of hyperparameters as $\H = (\alpha, \theta, k)$.
+
+For simplicity, the marginal likelihood (or evidence), takes the following form:
+\begin{equation}
+    \p(Y | \alpha, \Phi) = \int_F \int_Z \p(Y| Z, \Phi) \p(Z|F) \p(F| \alpha) dZ dF
+\end{equation}
+
+Unfortunately this equation is intractable, which make the inference procedure hard. In the next section, we propose an efficient approximate inference procedure for WMMSB.
