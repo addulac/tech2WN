@@ -2,18 +2,18 @@
 \section{Weighted Networks or Time exchangeability}
 
 % dense - unrealistic
-The literature for link prediction models \cite{review1,review2} usually represent networks by a graph $G=(V,E)$ where the edges $E$ are either $0$ or $1$ for accounting respectively the absence or the presence of an edge between two nodes. Formally the likelihood of such model is characterized by a Bernoulli density such that $y_{ij} \sim \mathrm{y_{ij} |\theta_{ij}}$. Moreover all of those models are in a setting of static graphs which is formally traduced by the assumption of exchangeability. It means that the joint probability of a graph do not depend on the order of which we observe the nodes such that. %? $echangeability$
+The link prediction models, in the literature \cite{review1,review2}, usually represents networks by a graph $G=(V,E)$ where the edges in the set $E$ are either $0$ or $1$ to account respectively for the absence or the presence of an edge between two nodes. Formally the likelihood of such model is characterized by a Bernoulli density such that $y_{ij} \sim \mathrm{y_{ij} |\theta_{ij}}$. Moreover all of those models are in a setting of static graphs which is formally traduced by the assumption of exchangeability. It means that the joint probability of a graph do not depend on the order of which we observes the nodes. %? $echangeability$
 
 % sparse - real
-The main limitation of such models is that it can't handle sparse networks, which is a corollary of the Aldous-Hoover theorem \cite{orbanz2015bayesian}. The models has been said to be misspecified. A way to alleviate this limitations is to weight edges instead of considering binary one. This can be understood, in some way, as smoothing the networks. The raison why sparsity can be handle this way is because by considering a weighted networks, it makes all non-edges between nodes (0 entries in the adjacency matrix) having a weak contribution to the degree distribution of a node (see section \ref{todo}). Thus, the inference process can take advantage of this fact because, in sparse networks, most of the interactions are unrealized.
+The main limitation of such models is that they can't handle sparse networks, which is a corollary of the Aldous-Hoover theorem \cite{orbanz2015bayesian}. The models has been said to be misspecified. A way to alleviate this limitation is to weight edges instead of considering binary one. This weighting can be understood, in some way, as smoothing the networks. Additionally, a weighted network is a binary networks where information has bee added under the for of node labeling. The reason why sparsity could be handle this way is because, by considering a weighted networks, it makes all non-edges in a network (0 entries in the adjacency matrix) having a weak contribution to the degree distribution of associated node (see section \ref{todo}). Thus, the inference process can take advantage of this fact because, in sparse networks, most of the interactions are unrealized.
 
-In this paper we will consider the weighted relations as a measure for the number of times each nodes has interacted. Thus, a natural prior for such assumptions is a Poisson distribution. It follows that we will define the likelihood to generate a weighted edge such that $y_{ij} \sim \mathrm{\theta_{ij})}$. Moreover,  this representation can take advantage of relational data that arise in various scenario, summarised by the two following:
+In this paper we will consider the weighted relations as a measure for the number of times each nodes have interacted. Thus, a natural prior for such assumptions is a Poisson distribution. It follows that we will define the likelihood to generate a weighted edge such that $y_{ij} \sim \mathrm{\theta_{ij})}$. Moreover, this representation can take advantage of relational data that arise in various scenario, summarized by the two following:
 \begin{itemize}
-\item Weighted Networks, where weights represent a \emph{strength} of the relations between individuals,
+\item Weighted Networks, where weights represent the \emph{strength} of the relations between individuals,
 \item Sum of \emph{snapshot} of binary (or weighted) networks.
 \end{itemize}
 
-In the second case the weights can also be seen as a \emph{strength} of connection between individuals, since it represents a count/number of times they interacted together. There is a number of situations where such a case arise. One can think for example to the count of clicks that one user makes during a session. Or the number of time that a individual send a message to another in a social network or again the number of transportation between two cities. Thus modelling weighted networks is a way to take into account the strength of relations that arise in a temporal context, but by keeping the excheangeabilty assumptions ie the order in which pairs of individual interacts. Or says differently, we loose the time order in which each individual connections took place. That is the reason why we use the term \emph{time exchangeability}.
+In the second case the weights can also be seen as a \emph{strength} of connection between individuals, since it represents a count/number of times they interacted together. There is a number of situations where such a case arise. One can think for example to the count of clicks that one user makes during a session. Or the number of time that a individual send a message to another in a social network or again the number of transportation between two cities. Thus modeling weighted networks is a way to take into account the strength of relations that arise in a temporal context, but by keeping the exchangeability assumptions. Or say differently, we loose the time order in which each individual connections took place. That is the reason why we use the term \emph{time exchangeability}.
 
 The use of a Poisson law as an aggregator for single snapshots is primarily justified by the two following fundamental properties \cite{orbanz2012lecture}:
 \begin{itemize}
@@ -27,10 +27,10 @@ The use of a Poisson law as an aggregator for single snapshots is primarily just
     \end{equation}
 \end{itemize}
 
-Those two properties of the Poisson distribution constitute the justification of building weighted networks datasets from sequence of either weighted graphs or binary graph and making inference with Poisson based likelihood. 
+Those two properties of the Poisson distribution constitute the justification of building weighted networks datasets from sequence of either weighted graphs or binary graphs and making inference with Poisson based likelihood.
 
 \section{Model -- WMMSB}
-A powerful model for binary exchangeable networks is the Mixed Membership Stochastic Blockmodel (MMSB). In order to keep the strength behind the MMSB models, we propose a generalisation of it for weighted networks such as described in the previous section.
+A powerful model for binary exchangeable networks is the Mixed Membership Stochastic Blockmodel (MMSB). In order to keep the strength behind the MMSB models, we propose a generalization of it for weighted networks such as described in the previous section.
 
 The proposed model is a weighted extension of MMSB, named WMMSB. The main design difference is that the likelihood is drawn from a Poisson distribution, and the correlations between the shared classes are drawn from independent Gamma distribution. The models first draw latent class membership for each nodes from a shared Dirichlet distribution. Then for each interactions, each node draw a single membership. The observation level is then draw from Poisson distribution taking is rate parameter according to two classes that summarize the interaction between the two underlying nodes. The observation corresponds to the strength of the relationship. The generative model (along  with the graphical model) is summarized as follows:
 
@@ -53,13 +53,101 @@ The proposed model is a weighted extension of MMSB, named WMMSB. The main design
     \caption{Generative models and Bayesian graph of WMMSB.}
 \end{figure}
 
-Note that the group membership of each node is context dependent. That is, each node may assume different membership when interacting or being interacted with by different peers. Statistically, each node is an admixture of group-specific interactions. The two sets of latent group indicators are denoted by $\{z_{p\rightarrow q} : p, q \in E\}  =: Z\rightarrow$ and $\{z_{p\leftarrow q} : p, q \in E\}  =: Z\leftarrow$. Also note that the pairs of group memberships that underlie interactions need not be equal; this fact is useful for characterizing asymmetric interaction networks. Equality may be enforced when modeling symmetric interactions. \ref{goldenberg2010survey}.
+Note that the group membership of each node is context dependent. That is, each node may assume different membership when interacting or being interacted with by different peers. Statistically, each node is an admixture of group-specific interactions. The two sets of latent group indicators are denoted by $\{z_{p\rightarrow q} : p, q \in V\}  =: Z_\rightarrow$ and $\{z_{p\leftarrow q} : p, q \in V\}  =: Z_\leftarrow$. Also note that the pairs of group memberships that underlie interactions need not be equal; this fact is useful for characterizing asymmetric interaction networks. Equality may be enforced when modeling symmetric interactions. \ref{goldenberg2010survey}.
 
 %In the rest of this paper  we will note the set of hyperparameters as $\H = (\alpha, \theta, k)$.
 
 For simplicity, the marginal likelihood (or evidence), takes the following form:
 \begin{equation}
-    \p(Y | \alpha, \Phi) = \int_F \int_Z \p(Y| Z, \Phi) \p(Z|F) \p(F| \alpha) dZ dF
+    \p(Y | \alpha, \Phi) = \int_F \sum_Z \p(Y| Z, \Phi) \p(Z|F) \p(F| \alpha) dF
 \end{equation}
 
-Unfortunately this equation is intractable, which make the inference procedure hard. In the next section, we propose an efficient approximate inference procedure for WMMSB.
+Furthermore, observed links are conditionally independant given the parameters for nodes ($F$) and for classes ($\Phi$) and by marginalizing over the class membership. Thus the likelihood can be written as a matrix decomposition :
+\begin{equation}
+P(Y | F, \Phi) = \prod_{i,j \in V^2} f_i \Phi f_j^T
+\end{equation} 
+
+Unfortunately the evidence is intractable, and conducts the practitioner to resort to approximate inference. In the next section, we propose a Stochastic Collapsed Variationnal inference method.
+
+\section{Inference}
+
+\textcolor{red}{Erics/Chrsitine Note's : Until the double column below wich deal with both network models type, weighted and binary (poisson/bernoulli), the variational derivation holds for both. Just the structure of the Bayesian Graph matter, the familly of the parameter's distribution does not. Furthermore, if the familly distribution of parameters falls into the exponential familly wth conjugate prior, there is closed form updates for the variational inference.}
+
+The Variational Baye's (VB) method is an inference method where the parameters of the Bayesian model, $(F, \Phi, Z)$, are approximated with some free variational parameters $(\nu, \epsilon, \gamma)$. It consists of an iterating algorithm which updates the variational parameters. Those updates are found by maximizing the lower bound arising from the Jensen Inequality. This is equivalent to  minimize the Kullback-Leibler divergence between the variational (posterior) distribution over the variational parameters denoted $q(F, \Phi, Z | \nu, \epsilon, \gamma)$ (we will suppress reference to the variational parameters in the variational posterior for brevity) and the true (posterior) distribution $p(F, \Phi, Z | \tau)$ where $\tau = (\alpha, k, \theta)$ denotes the set of hyperparameters of the model. The evidence lower bound (ELBO) takes the following form :
+
+\begin{equation}
+\log p(Y | \tau) = \mathcal{L}(q(F, \Phi, Z)) \geq E_q[\log p(Y, F, \Phi, Z | \tau)] + E_q[\log q(F, \Phi, Z)]
+\end{equation}
+
+In classical VB, the variational parameters are taken in the same familly of the true parameters and by assuming that they are fully independent such that :
+\begin{equation}
+q(F, \Phi, Z) = \prod_{i\in V}q(f_i | \nu_i) \prod_{k,k' \in K^2}q(\phi_{kk'} | \epsilon_{kk'})\prod_{i,j \in V^2}q(\zij, \zji | \gamma_{ij})
+\end{equation}
+
+In the Collapsed Variational Baye's (CVB), the assumption on the variational distribution is much weaker. We only assume that the $Z$ variables are mutually independent, thus the variational posterior becomes : 
+\begin{align}
+q(F, \Phi, Z) &= q(F,\Phi) \prod_{(i,j)\in V^2}q(\zij, \zji | \gamma_{ij}) \\
+	&= q(F, \Phi | Z)q(Z)
+\end{align}
+
+The ELBO can be split by separating both independent contributions of the variational posterior. Since we do not restrict the form of $q(F, \Phi | Z)$, the ELBO maximum is achieved when the true posterior is reached at $p(F, \Phi | Y, Z,  \tau) = q(F, \Phi | Z)$. The ELBO simplifies in the following collapsed form :
+\begin{equation}
+\mathcal{L}(q(Z)) = \max_{q(F,\Phi|Z)} \mathcal{L}(q(F, \Phi|Z)q(Z)) = E_q[\log p(Y,Z|\tau)] - E_q[q(Z)]
+\end{equation}
+
+The variational parameters are chosen in the same family than the true distribution, thus $q(\zij=k, \zji=k' | \gamma_{ij})$ are multinomial with parameters $\gamma_{ijkk'}$.
+
+Finally, the CVB updates are obtained by minimizing the collapsed ELBO with respect to $\gamma_{ijkk'}$ and it takes the following general form :
+\begin{equation} \label{eq:cvb_update}
+    \gamma_{ijkk'} \propto \exp \left( E_{q(Z^{\neg ij})} [log(\zij=k, \zji=k' |Y, Z^{\neg ij}, \tau)] \right)
+\end{equation}
+
+Where the superscript $\neg ij$ means that the corresponding variables (or counts) are excluded.
+This equation is not directly tractable, therefore it is possible to approximate equation \eqref{eq:cvb_update} by noting its relation with the collapse gibbs update. Then,  the closed form expression for the CVB update can be obtain by using a central limit theorem approximation followed by a Taylor expansion.
+
+
+
+%\setlength{\columnseprule}{1pt}
+%\def\columnseprulecolor{\color{blue}}
+%\begin{multicols}{2}[]
+
+
+The collapse Gibbs update for both models are given by the following equations :
+
+\begin{itemize}
+    \item Bernoulli Kernel (MMSB) : \[p(\zij=k, \zji=k' | Y, Z^{\neg ij}, \tau) \propto \quad \frac{ n^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{n^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}} (n^{F\neg j}_{ik} + \alpha_k) (n^{F\neg i}_{jk} + \alpha_{k'})\]
+    \item Poisson Kernel (WMMSB) : \[p(\zij=k, \zji=k' | Y, Z^{\neg ij}, \tau) \propto \quad  NB(n^{\Phi\neg ij}_{y_{ij}kk'} + k, \widehat{n}^{\Phi\neg ij}_{y_{ij}kk'} + \theta ) (n^{F\neg j}_{ik} + \alpha_k) (n^{F\neg i}_{jk} + \alpha_{k'})\]
+\end{itemize}
+
+Where $NB(a, b)$ represents the pdf of a negative binomial distribution.
+
+The collapse Gibbs Sampler only need to update the counts $n^{n^{\Phi\neg ij}}_{xkk'}, n^{F\neg j}_{ik}, n^{F\neg i}_{jk}$ and $x$ takes its support respectively in $(0,1)$ and $\mathbb{N}$ for MMSB and WMMSB.
+
+In order to compute equation \eqref{eq:cvb_update}, one can approximate the variational distribution with a zero order Taylor expansion under a Gaussian approximation. This is know as the CVB0 algorithm, which gives the following updates :
+
+\begin{itemize}
+    \item MMSB : \[ \gamma_{ijkk'} \propto \quad \frac{ N^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}} (N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'})\]
+    \item WMMSB : \textcolor{red}{Todo}
+\end{itemize}
+
+    One can remark the similarity with the Collapse Gibbs update. The difference lives in the counts who now correspond to the means over the variational distribution $q$. The means are approximated trough the central limit theorem of the sum of independent Bernoulli variables with mean $\gamma_{ijkk'}$ such that :
+\begin{itemize}
+    \item $N^{\Phi}_{xkk'} = \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  \approx   E_q[n^{\Phi}_{xkk'}] $
+    \item $N^{F}_{ik}  =  \sum_{j, k'} \gamma_{ijkk'} \approx   E_q[n^{F}_{ik}]$
+\end{itemize}
+
+
+~\\
+\textcolor{red}{To complete down here  : ~\\
+SCVB update - presents algorithms with noisy gradients and stepsize, minibatch setc.
+}
+
+
+
+\section{Experiments}
+
+%WMMSB compare it with LDA (a mask)i vs a bipartite networks (Document)
+%D (doc) x W (Voc) -- entry count
+%
+%the bag of word VS the networks representation of document
+%* it adds a parameter the document modelization !!!!!!!

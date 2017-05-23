@@ -1,18 +1,19 @@
 \documentclass[a4paper, 12pt]{article}
 %\documentclass[a4paper, 12pt, draft]{article} % don't include images, leave a border of same size...great
-%\documentclass[journal]{IEEEtran}
-
 
 
 %\usepackage[cmex10]{amsmath, mathtools}
 \usepackage{amsmath,amssymb,amsbsy,amsfonts,amsthm}
-\usepackage{multirow}
 \usepackage{bm}
 \usepackage{enumerate}
 \usepackage{url}
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{fancyvrb}
 \usepackage{yfonts}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage[margin=6.5em]{geometry}
+
 
 \usepackage{wrapfig}
 \usepackage{tikz}
@@ -42,9 +43,11 @@
 \newcommand{\M}{\mathcal{M}}
 \newcommand{\V}{\mathcal{V}}
 \newcommand{\N}{\mathcal{N}}
-\newcommand{\h}{\mathcal{H}}
+\renewcommand{\L}{\mathcal{L}}
 \newcommand{\mat}[1]{\mathbf{#1}}
 \newcommand{\unit}{1\!\!1}
+\newcommand{\zij}{z_{i\rightarrow j}}
+\newcommand{\zji}{z_{i\leftarrow j}}
 
 %\renewcommand{\Phi}{\mat{\Phi}}
 

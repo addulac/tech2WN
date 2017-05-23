@@ -1,4 +1,4 @@
-SRC=main
+SRC=wmmsb
 TEST=test
 CC=latex
 CONV=dvipdf
