@@ -1,9 +1,11 @@
-\documentclass[a4paper, 12pt]{article}
+\documentclass[twocolumn]{article}
+%\documentclass[a4paper, 12pt]{article}
 %\documentclass[a4paper, 12pt, draft]{article} % don't include images, leave a border of same size...great
 
 
 %\usepackage[cmex10]{amsmath, mathtools}
-\usepackage{amsmath,amssymb,amsbsy,amsfonts,amsthm}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb,amsbsy,amsfonts,amsthm}
 \usepackage{bm}
 \usepackage{enumerate}
 \usepackage{url}
@@ -12,7 +14,7 @@
 \usepackage{yfonts}
 \usepackage{multirow}
 \usepackage{multicol}
-\usepackage[margin=6.5em]{geometry}
+%\usepackage[margin=6.5em]{geometry}
 
 
 \usepackage{wrapfig}
@@ -51,7 +53,7 @@
 
 %\renewcommand{\Phi}{\mat{\Phi}}
 
-\title{Mixed-Membership Inference in Sparse Weigted Networks.}
+\title{Mixed-Membership Inference in (Sparse?) Weigted Networks.}
 
 %\date{avril 2015}
 
@@ -65,8 +67,6 @@
 \maketitle
 \begin{abstract}
 \end{abstract}
-
-
 
 \input{intro.tex}
 \input{approach.tex}
