@@ -2,7 +2,7 @@
 \section{Weighted Networks and Time exchangeability}
 
 % dense - unrealistic
-The link prediction models, in the literature \cite{goldenberg2010survey,lu2011link}, usually represents a network by a graph $G=(V,E)$, where $V$ are a set of vertex and $E$ a set of edges between the vertex. It can be represented by its adjacency matrix $(Y_{ij})_{(ij) \in V^2} \in \mathcal{Y}$. For a binary network, the support of the edges is $\mathcal{Y} = (0,1)$ to account respectively for the absence or the presence of an edge between two nodes. Formally the likelihood of such model is characterized by a Bernoulli density such that $y_{ij} \sim \mathrm{Bern}(\theta)$. If $\theta$ is a constant, this an Erdö-Réniy model. Relaxing this unrealistic assumptions with latent model, gives the Stochastic Blockmodel, and more recently , relaxing the hard assignment to blocks gives the Mixed-Membership Stochastic Blockmodel (MMSB) \cite{MMSB}. Moreover all of those models are in a setting of static graphs which is formally traduced by the assumption of exchangeability. It means that the joint probability of a graph do not depend on the order of which we observes the nodes. %? $echangeability$
+The link prediction models, in the literature \cite{goldenberg2010survey,lu2011link}, usually represent a network by a graph $G=(V,E)$, where $V$ is a set of vertex and $E$ a set of edges between the vertex. It can be represented by its adjacency matrix $(Y_{ij})_{(ij) \in V^2} \in \mathcal{Y}$. For a binary network, the support of the edges is $\mathcal{Y} = (0,1)$ to account respectively for the absence or the presence of an edge between two nodes. Formally the likelihood of such model is characterized by a Bernoulli density such that $y_{ij} \sim \mathrm{Bern}(\theta)$. If $\theta$ is a constant, this is an Erd\"o-R\'eniy model. Relaxing this unrealistic assumptions with a latent model gives the Stochastic Blockmodel, and more recently, by relaxing the hard assignment to blocks, gives the Mixed-Membership Stochastic Blockmodel (MMSB) \cite{MMSB}. Moreover all of those models are in a setting of binary networks and  static graphs which is formally traduced by an assumption of exchangeability. It means that the joint probability of a graph do not depend on the order of which we observes the nodes. %? $echangeability$
 
 \textcolor{red}{\paragraph{cette sous section sur la sparsite a revoir et aligner avec les update SCVB ! The weighted model is still exchangeable ?}~\\
 % sparse - real
@@ -85,7 +85,7 @@ The Variational Bayes (VB) method is an inference method based on the approximat
     &= E_q[\log p(Y, F, \Phi, Z | \tau)] - E_q[\log q(F, \Phi, Z)] \nonumber \nonumber
 \end{align}
 
-In classical VB, the variational parameters are taken in the same family than the true parameters and by assuming that they are fully independent such that :
+In classical VB, the variational parameters are taken in the same family than the true parameters and by assuming that they are fully independent, this is know as the mean-field approximation :
 \begin{equation}
 q(F, \Phi, Z) = \prod_{i\in V}q(f_i | \nu_i) \prod_{k,k' \in K^2}q(\phi_{kk'} | \epsilon_{kk'})\prod_{i,j \in V^2}q(\zij, \zji | \gamma_{ij})
 \end{equation}
@@ -104,13 +104,13 @@ The ELBO can be split by separating both independent contributions of the variat
 
 The variational parameters are chosen in the same family of distribution than the true distribution, thus $q(\zij=k, \zji=k' | \gamma_{ij})$ are multinomial with parameters $\gamma_{ij}$.
 
-Finally, the CVB update is obtain by maximizing the collapsed ELBO with respect to $\gamma_{ijkk'}$ and it takes the following general form :
+Finally, the CVB update is obtained by maximizing the collapsed ELBO with respect to $\gamma_{ijkk'}$ and it takes the following general form :
 \begin{equation} \label{eq:cvb_update}
     \gamma_{ijkk'} \propto \exp \left( E_{q(Z^{\neg ij})} [\log(\zij=k, \zji=k' |Y, Z^{\neg ij}, \tau)] \right)
 \end{equation}
 
 Where the superscript $\neg ij$ means that the corresponding variables (or counts) are excluded.
-This equation is not directly tractable, therefore it is possible to approximate equation \eqref{eq:cvb_update} by noting its relation with the collapse Gibbs update. Then,  the closed form expression for the CVB update can be obtain by using a central limit theorem approximation followed by a Taylor expansion.
+This equation is not directly tractable, therefore it is possible to approximate equation \eqref{eq:cvb_update} by noting its relation with the collapse Gibbs update. Then,  the closed form expression for the CVB update can be obtained by using a central limit theorem approximation followed by a Taylor expansion.
 
 The Collapse Gibbs Sampler (CGS) for both models are given by the following update rule :
 
@@ -155,7 +155,7 @@ The collapse Gibbs Samplers only need to update the various counts $n^*$ that em
 
 In order to compute equation \eqref{eq:cvb_update}, one can approximate the variational distribution with a zero Taylor expansion under a Gaussian approximation. 
 
-By the central limit theorem, one can compute the expectations of the counts statistics under the variational distribution, that we will refer as $N^* \approx E_q[n^*]$. They are given by a sum of independent variables, where each token is the result of a Bernoulli trial with mean $\gamma_{ijkk'}$. The variational counts statistics can be obtain as follow:
+By the central limit theorem, one can compute the expectations of the counts statistics under the variational distribution, that we will refer as $N^* \approx E_q[n^*]$. They are given by a sum of independent variables, where each token is the result of a Bernoulli trial with mean $\gamma_{ijkk'}$. The variational counts statistics can be obtained as follow:
 
 \begin{align} \label{eq:stat_cvb}
     &N^{F}_{ik} = \sum_{j, k'} \gamma_{ijkk'} \qquad\quad  N^{Y}_{kk'} = \sum_{ij} y_{ij}\gamma_{ijkk'} \\
