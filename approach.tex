@@ -19,13 +19,13 @@ In the second case the weights can also be seen as a \emph{strength} of connecti
 The use of a Poisson law as an aggregator for single snapshots is primarily justified by the two following fundamental properties \cite{orbanz2015bayesian}:
 \begin{itemize}
 \item{Additivity}: If $K_1 \sim \mathrm{Poisson}(\alpha_1)$ and $K_2 \sim \mathrm{Poisson}(\alpha_2)$ then:
-    \begin{equation}
+    \begin{equation*}
         K_1 + K_2 = \mathrm{Poisson}(\alpha_1 + \alpha_2)
-    \end{equation}
+    \end{equation*}
 \item {Thinning}: The number of successes in a Poisson number of coin flips is Poisson, namely if $K \sim \mathrm{Poisson}(\alpha)$ and $X_1,...,X_2 \sim_{iid} \mathrm{Bern}(p)$, then:
-    \begin{equation}
+    \begin{equation*}
         \sum_{i=1}^K X_i = \mathrm{Poisson}(p\alpha)
-    \end{equation}
+    \end{equation*}
 \end{itemize}
 
 Those two properties of the Poisson distribution constitute the justification of building weighted networks datasets from sequence of either weighted graphs or binary graphs and making inference with Poisson based likelihood.
@@ -62,14 +62,14 @@ Note that the group membership of each node is context dependent. That is, each 
 %In the rest of this paper  we will note the set of hyperparameters as $\H = (\alpha, \theta, k)$.
 
 For simplicity, the marginal likelihood (or evidence), takes the following form:
-\begin{equation}
+\begin{equation*}
     \p(Y | \alpha, \Phi) = \int_F \sum_Z \p(Y| Z, \Phi) \p(Z|F) \p(F| \alpha) dF
-\end{equation}
+\end{equation*}
 
 Furthermore, observed links are conditionally independent given the parameters for nodes ($F$) and for classes ($\Phi$) and by marginalizing over the class membership. Thus the likelihood can be written as a matrix decomposition :
-\begin{equation}
+\begin{equation*}
 P(Y | F, \Phi) = \prod_{i,j \in V^2} f_i \Phi f_j^T
-\end{equation} 
+\end{equation*} 
 
 Unfortunately the evidence is intractable, and conducts the practitioner to resort to approximate inference. In the next section, we propose a Stochastic Collapsed Variational inference method.
 
@@ -80,44 +80,45 @@ Unfortunately the evidence is intractable, and conducts the practitioner to reso
 
 The Variational Bayes (VB) method is an inference method based on the approximation of the Bayesian model's parameters, $(F, \Phi, Z)$, with free variational parameters $(\nu, \epsilon, \gamma)$ usually taken in the same family than the true parameters. It consists of an iterating algorithm which updates the variational parameters by maximizing the lower bound arising from the Jensen Inequality. This is equivalent to  minimize the Kullback-Leibler divergence between the variational (posterior) distribution over the variational parameters denoted $q(F, \Phi, Z | \nu, \epsilon, \gamma)$ (we will suppress reference to the variational parameters in the variational posterior for brevity) and the true (posterior) distribution $p(F, \Phi, Z | \tau)$ where $\tau = (\alpha, \eta, \theta)$ denotes the set of hyperparameters of the model. The evidence lower bound (ELBO) takes the following form :
 
-\begin{align}
+\begin{align*}
     \log p(Y | \tau) &\geq \mathcal{L}(q(F, \Phi, Z)) \\
     &= E_q[\log p(Y, F, \Phi, Z | \tau)] - E_q[\log q(F, \Phi, Z)] \nonumber \nonumber
-\end{align}
+\end{align*}
 
 In classical VB, the variational parameters are taken in the same family than the true parameters and by assuming that they are fully independent, this is know as the mean-field approximation :
-\begin{equation}
-q(F, \Phi, Z) = \prod_{i\in V}q(f_i | \nu_i) \prod_{k,k' \in K^2}q(\phi_{kk'} | \epsilon_{kk'})\prod_{i,j \in V^2}q(\zij, \zji | \gamma_{ij})
-\end{equation}
+\begin{align*}
+q(F, \Phi, Z) &= \prod_{i\in V}q(f_i | \nu_i) \prod_{k,k' \in K^2}q(\phi_{kk'} | \epsilon_{kk'}) \\
+    &\quad \prod_{i,j \in V^2}q(\zij, \zji | \gamma_{ij})
+\end{align*}
 
 In the Collapsed Variational Bayes (CVB), the assumption on the variational distribution is much weaker and therefore constitute a better approximation than standard VB \cite{teh2006collapsed}. We only assume that the $Z$ variables are mutually independent, then the variational posterior becomes : 
-\begin{align}
-q(F, \Phi, Z) &= q(F,\Phi) \prod_{(i,j)\in V^2}q(\zij, \zji | \gamma_{ij}) \\
+\begin{align*}
+q(F, \Phi, Z) &= q(F,\Phi | Z) \prod_{(i,j)\in V^2}q(\zij, \zji | \gamma_{ij}) \\
 	&= q(F, \Phi | Z)q(Z)
-\end{align}
+\end{align*}
 
 The ELBO can be split by separating both independent contributions of the variational posterior. Since we do not restrict the form of $q(F, \Phi | Z)$, the ELBO maximum is achieved when the true posterior is reached at $p(F, \Phi | Y, Z,  \tau) = q(F, \Phi | Z)$. The ELBO simplifies in the following collapsed form :
-\begin{align}
+\begin{align*}
     \mathcal{L}(q(Z)) &= \max_{q(F,\Phi|Z)} \mathcal{L}(q(F, \Phi|Z)q(Z)) \\
     &= E_q[\log p(Y,Z|\tau)] - E_q[q(Z)]
-\end{align}
+\end{align*}
 
 The variational parameters are chosen in the same family of distribution than the true distribution, thus $q(\zij=k, \zji=k' | \gamma_{ij})$ are multinomial with parameters $\gamma_{ij}$.
 
 Finally, the CVB update is obtained by maximizing the collapsed ELBO with respect to $\gamma_{ijkk'}$ and it takes the following general form :
 \begin{equation} \label{eq:cvb_update}
-    \gamma_{ijkk'} \propto \exp \left( E_{q(Z^{\neg ij})} [\log(\zij=k, \zji=k' |Y, Z^{\neg ij}, \tau)] \right)
+    \gamma_{ijkk'} \propto \exp \left( E_{q(Z^{\neg ij})} [\log p(\zij=k, \zji=k' |Y, Z^{\neg ij}, \tau)] \right)
 \end{equation}
 
 Where the superscript $\neg ij$ means that the corresponding variables (or counts) are excluded.
 This equation is not directly tractable, therefore it is possible to approximate equation \eqref{eq:cvb_update} by noting its relation with the collapse Gibbs update. Then,  the closed form expression for the CVB update can be obtained by using a central limit theorem approximation followed by a Taylor expansion.
 
-The Collapse Gibbs Sampler (CGS) for both models are given by the following update rule :
+The Collapse Gibbs Sampler (CGS) for both models are given by the following updates:
 
-%\begin{align} \label{eq:post_cgs}
+%\begin{align*} \label{eq:post_cgs}
 %    p(\zij=k, \zji=k' | Y, Z^{\neg ij}, \tau) \propto  \quad & p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau) \nonumber\\
 %    & p(\zij=k, \zji=k' | Z^{\neg ij}, \tau)
-%\end{align}
+%\end{align*}
 \begin{align} \label{eq:post_cgs}
     &p(\zij=k, \zji=k' | Y, Z^{\neg ij}, \tau) \propto  \nonumber\\
     & \quad p(\zij=k, \zji=k' | Z^{\neg ij}, \tau) \nonumber \\
@@ -126,32 +127,48 @@ The Collapse Gibbs Sampler (CGS) for both models are given by the following upda
 
 Both MMSB and WMMSB models had in common the prior over the latent classes which characterise the mixed-membership effect. The update for the left hand part of equation \eqref{eq:post_cgs} represents a reinforcement effect on latent classes membership :
 
-\begin{align}
+\begin{align*}
     & p(\zij=k, \zji=k' | Z^{\neg ij}, \tau) \propto  \nonumber\\
     & (n^{F\neg j}_{ik} + \alpha_k) (n^{F\neg i}_{jk} + \alpha_{k'}) 
-\end{align}
+\end{align*}
 
 
-Both models difference arise from their kernels that are respectively Bernoulli-Beta and Poisson-Gamma distributed for MMSB and WMMSB. The righ part of equation \eqref{eq:post_cgs} are given by the following equations :
+Both models difference arise from their kernels that are respectively Bernoulli-Beta and Poisson-Gamma distributed for MMSB and WMMSB. The righ part of equation \eqref{eq:post_cgs} are given by the updates in table \ref{table:cgs} :
 
-\begin{itemize}
-    \item MMSB : {\setlength{\mathindent}{0cm} \begin{align} \quad & p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau) = \nonumber \\ & \quad  \frac{ n^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{n^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\end{align}}
-        \item WMMSB : {\setlength{\mathindent}{0cm} \begin{align} &\quad p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau) = \nonumber\\& \quad  NB(y_{ij}; n^{Y\neg ij}_{kk'} + \eta, \frac{1}{n^{\Phi\neg ij}_{\bm{.}kk'} + \theta + 1} )\end{align}}
-\end{itemize}
+%\paragraph{MMSB :}
+%%    \item MMSB : {\setlength{\mathindent}{0cm} \begin{align*} \quad & p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau) = \nonumber \\ & \quad  \frac{ n^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{n^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\end{align*}}
+%    \begin{align*} \quad & p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau) = \nonumber \\ & \quad  \frac{ n^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{n^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\end{align*}
+%
+%\paragraph{WMSB :}
+%\begin{align*} &\quad p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau) = \nonumber\\& \quad  NB(y_{ij}; n^{Y\neg ij}_{kk'} + \eta, \frac{1}{n^{\Phi\neg ij}_{\bm{.}kk'} + \theta + 1} )\end{align*}
+%
+\begin{table}[h] \label{table:cgs}
+\caption{Gibbs updates for the MMSB and WMMSB kernels.}
+
+    \begin{tabular}{ll}
+    \hline
+    CGS update    & $p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k', \tau)$ \\
+    \hline
+    MMSB  & $\frac{ n^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{n^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}$ \\
+    WMMSB & $NB(y_{ij}; n^{Y\neg ij}_{kk'} + \eta, \frac{1}{n^{\Phi\neg ij}_{\bm{.}kk'} + \theta + 1} )$ \\
+    \hline
+    \end{tabular}
+\end{table}
+
 
 Where $NB(x;a, b)$ represents the pdf of a Negative Binomial distribution parametrized by $(a,b)$.
 
 The collapse Gibbs Samplers only need to update the various counts $n^*$ that emerge from the conjugacy of prior in the *MMSB models. The counts represents the following quantities :
-%\begin{align}
+%\begin{align*}
 %    &n^{F}_{ik} = \sum_j \delta(\zij=k) + \delta(z_{j\leftarrow i}=k) \qquad\qquad\qquad n^{Y}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k') \\
 %    &n^{\Phi}_{xkk'} = \sum_{ij} \delta(y_{ij}=x, \zij=k, \zji=k') \qquad  n^{\Phi}_{\bm{.}kk'} = \sum_x n^{\Phi}_{xkk'}
-%\end{align}
-\begin{align}
+%\end{align*}
+\begin{align*}
 &n^{F}_{ik} = \sum_j \delta(\zij=k) + \delta(z_{j\leftarrow i}=k) \\  
 &n^{Y}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k') \\
 &n^{\Phi}_{xkk'} = \sum_{ij} \delta(y_{ij}=x, \zij=k, \zji=k') \\
 &n^{\Phi}_{\bm{.}kk'} = \sum_x n^{\Phi}_{xkk'}
-\end{align}
+\end{align*}
 
 In order to compute equation \eqref{eq:cvb_update}, one can approximate the variational distribution with a zero Taylor expansion under a Gaussian approximation. 
 
@@ -164,10 +181,31 @@ By the central limit theorem, one can compute the expectations of the counts sta
 
 Under this Gaussian approximation, we can apply a Taylor expansion of equation \eqref{eq:cvb_update}. For simplicity and effectiveness \cite{asuncion2009smoothing}, we propose a zero order approximation, which is know as the CVB0 algorithm and gives the following updates :
 
-\begin{itemize}
-    \item MMSB : \[ \gamma_{ijkk'} \propto  \frac{ N^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}} (N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'})\]
-    \item WMMSB : \[ \gamma_{ijkk'} \propto NB(y_{ij}; n^{Y\neg ij}_{kk'} + \eta, \frac{1}{n^{\Phi\neg ij}_{\bm{.}kk'} + \theta + 1} ) (N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'})\]
-\end{itemize}
+\paragraph{MMSB :}
+\begin{align*}
+\gamma_{ijkk'} \propto  \frac{ N^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}} (N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'}) 
+\end{align*}
+
+\paragraph{WMMSB :}
+\begin{align*}
+\gamma_{ijkk'} &\propto NB(y_{ij}; n^{Y\neg ij}_{kk'} + \eta, \frac{1}{n^{\Phi\neg ij}_{\bm{.}kk'} + \theta + 1} ) \\
+&\quad (N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'}) 
+\end{align*}
+
+%%% Equation don't fit in table.
+%\begin{table}[h] \label{table:cvb}
+%\caption{CVB updates for the MMSB and WMMSB kernels.}
+%
+%    \begin{tabular}{ll}
+%    \hline
+%    CVB update    & $\gamma_{ijkk'}$ \\
+%    \hline
+%    MMSB  & $\frac{ N^{\Phi\neg ij}_{y_{ij}kk'} + \lambda_{y_{ij}}}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}} (N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'})$ \\
+%    WMMSB & $NB(y_{ij}; n^{Y\neg ij}_{kk'} + \eta, \frac{1}{n^{\Phi\neg ij}_{\bm{.}kk'} + \theta + 1} )(N^{F\neg j}_{ik} + \alpha_k) (N^{F\neg i}_{jk} + \alpha_{k'})$ \\
+%    \hline
+%    \end{tabular}
+%\end{table}
+
 
 One can remark the similarity with the Collapse Gibbs update. But as the inference is deterministic, it is possible to derive a stochastic gradient in order to prevent batch learning and to scale to large datasets.
 
@@ -182,11 +220,11 @@ We propose to derive update for a Stochastic Collapsed Variational Inference (SC
 
 The CVB algorithm is resumed by the statistics $N^*$ (see equations \eqref{eq:stat_cvb}). It means that the model parameter can be recovered from those statistics :
 
-\begin{align}
+\begin{align*}
     \hat f_{ik} &= \frac{N^{F}_{ik} + \alpha_k }{2|V| + \alpha_{\bm{.}}} \\
     \hat \phi_{kk',x} &= \frac{ N^{\Phi}_{x, kk'} + \lambda_x}{N^{\Phi}_{\bm{.}, kk'} + \lambda_{\bm{.}}}  \qquad \mathrm{for}\quad\mathrm{MMSB}\\
     \hat \phi_{kk',x} &= NB(x; N^Y_{kk'} + \eta, \frac{1}{N^{\Phi}_{\bm{.}kk'} + \theta + 1} ) \qquad \mathrm{for}\quad\mathrm{WMMSB}
-\end{align}
+\end{align*}
 
 For one observations, global statistics are updated by computing the natural gradient of the objective under variational parameter and given by the following steps :
 \begin{itemize}
