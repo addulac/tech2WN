@@ -1,13 +1,16 @@
 
-This work is intersect with several groups of related works:
+# Related work
 
-First, the recent advance on Stochatistic Variationnal inference have made it possible to scale bayesian model to bigger dataset and to do online learning which impact both time and memory complexity. This inference have first been proposed for topic modeling [1][2] before being adapted for the MMSB model with an adaptation to discover overllaping communities [3] [4],
 
-Nevertheless, the previous work only focus on undirected binary networks.
+This work intersects with several groups of related works:
 
-In [5] the author proposed an efficient inference algorithm for weigthed networks, based on a MCMC algorithms. The model is an extension of the SBM, the latent class membership does not allow overllaping classes. (I still have to dive into to understand how his inferecne works...) (does it allow online learning ? )
+First, the recent advance on Stochatistic Variationnal inference have made it possible to scale bayesian model to bigger dataset and to do online learning which enable a low memory footprint. This inference have first been proposed for topic modeling [1][2] before being adapted for the MMSB model with an adaptation to discover overllaping communities [3] [4],
 
-Finally, SVB has been combined with CVB inference to propose an efficient online algothim for topic inference. [6]
+Nevertheless, the previous works only study the case of (undirected) binary networks.
+
+In [5] the author proposed an efficient inference algorithm for weigthed networks, based on a MCMC algorithms. The model is an extension of the SBM. Those models assumed that the class don't overllap. (I still have to dive into to understand how his inferecne works...) (does it allow online learning ? )
+
+Finally, SVB has been combined with CVB inference for topic modelling to propose a improoved over SVB. [6]
 
 This paper combines the different advantage of those works to propose a Online learning algorithm to models networks that can be weighted, with overllaping classes, directed or undirected.
 
