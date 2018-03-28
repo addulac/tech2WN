@@ -15,10 +15,15 @@ Finally, SVB has been combined with CVB inference for topic modelling to propose
 This paper combines the different advantage of those works to propose a Online learning algorithm to models networks that can be weighted, with overllaping classes, directed or undirected.
 
 [1] Online Learning for Latent Dirichlet Allocationa https://papers.nips.cc/paper/3902-online-learning-for-latent-dirichlet-allocation
+
 [2] Stochastic Variational Inference https://arxiv.org/abs/1206.7051
+
 [3] Scalable Inference of Overlapping Communities http://www.cs.columbia.edu/~blei/papers/GopalanMimnoGerrishFreedmanBlei2012.pdf
+
 [4] Efficient Online Inference for Bayesian Nonparametric Relational Models  http://www.ics.uci.edu/~sudderth/papers/nips13hdpRelational.pdf
+
 [5] Nonparametric weighted stochastic block models  https://arxiv.org/abs/1708.01432
+
 [6] Stochastic Collapsed Variational Bayesian Inference for Latent Dirichlet Allocation  https://arxiv.org/abs/1305.2452
 
 
