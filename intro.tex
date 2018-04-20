@@ -1,6 +1,216 @@
 \section{Introduction}
 
-Relational data are widespread in modern sciences. From social networks to protein interaction, from physics to linguistics, all interacting objects can be represented as a graph where the objects are the nodes and the interaction the edges. Modelization of such graphs are an important interest in the machine learning literature for prediction tasks as well as dimensionality reduction. One of the main challenge in this area is to be able to scale to massive networks, as the one currently available from the current state of the internet. The complexity (time and memory) of batch algorithm are polynomial for graph. Thus, the need of online algorithm, able to update a model as data become available is fundamental for scaling strategy. This can because of the temporality of the data or more simply because the data don't fit in memory. Another source of diversity in networks is the support for labelled and dynamic networks. In this paper we study and propose an algorithm based on latent models with rich priors who scale for complex and massive networks, with labeled edges (weighted networks), and that can be adapted to model the exchangeability of sequences of binary networks (temporal networks).
+Relational data are widespread in modern sciences. From social networks to protein interaction, from physics to linguistics, all interacting objects can be represented as a graph where the objects are the nodes and the interaction the edges. The interest for modelling such networks has naturally increased with the availability of large datasets. Especially in the machine learning literature, that focused on link prediction, dimensionality reduction and data exploration tasks. One of the main challenge in this area is to be able to scale to massive networks that emerge from the web. In this paper, we focus on networks that underpin some kind of social relationship such has collaboration or communication networks. In this context, we propose an online learning algorithm that we derived for both binary and count edge covariate, within the framework of Mixed-Membership Stochastic Blockmodel (MMSB).
 
-\section{Related Work}
-Please take into account take a part of the related work of this work in included in each section.
+%%% The type of networks that exists
+%Complex networks are graphs that are used to represents real world relationnal information. In computer science, a major network is the web that connects a large amount of data. There is a large diversity in the type of data that can be interconnected, which ca be a set of people in a social plateform, a set of documents linked with hyperlinks, communication networks of email  or more recently a graph of transaction encoded in a blockchain. Outside the web an other important networks is the one made of the scientific collaborations.
+
+%%% The Scalability problem => Sparse Network E/N**2 << 1
+%The complexity (time and memory) of batch algorithm are polynomial for graph. Thus, the need of online algorithm, able to update a model as data become available is fundamental for scaling strategy. This can because of the temporality of the data or more simply because the data don't fit in memory. Another source of diversity in networks is the support for labelled and dynamic networks. In this paper we study and propose an algorithm based on latent models with rich priors who scale for complex and massive networks, with labeled edges (weighted networks), and that can be adapted to model the exchangeability of sequences of binary networks (temporal networks).
+
+\section{Weighted Networks}
+
+Most of complex networks exhibit a topology more complex than just binary relationship between nodes. Instead, the relations can be weighted and dynamic. For example, co-authorship networks can be construct such that the edges covariate are the count of the collaboration between two authors \cite{newman2001scientific}. For communication network, the weight is the number of message sent from the sender to the receiver. In the web, documents are connected with hyperlinks where the count of those is at the roots of the Pagerank algorithm. Or again, in lexical network, a network of words can be built where the weight between two words is the number of times two words follow each other. Another useful scenario where weighted networks can be built is when one has temporal networks. For the case of communication networks for example, messages are sent at a specific time, thus taking into account the number of messages is at the mid-way between temporal and binary modelling keeping the complexity of the modelling low while taking into account the \emph{strength} of the relations.
+
+
+A natural prior for count edge covariate is the Poisson distribution. In addition, it has several nice properties,
+%\cite{orbanz2015bayesian}
+
+\begin{itemize}
+\item{Additivity}: If $K_1 \sim \mathrm{Poi}(\alpha_1)$ and $K_2 \sim \mathrm{Poi}(\alpha_2)$ then:
+    \begin{equation*}
+        K_1 + K_2 = \mathrm{Poi}(\alpha_1 + \alpha_2)
+    \end{equation*}
+\item {Thinning}: The number of successes in a Poisson number of coin flips is Poisson, namely if $K \sim \mathrm{Poi}(\alpha)$ and $X_1,...,X_2 \sim \mathrm{Bern}(p)$, then:
+    \begin{equation*}
+        \sum_{i=1}^K X_i = \mathrm{Poi}(p\alpha)
+    \end{equation*}
+\end{itemize}
+
+These two properties justify to build weighted networks datasets from sequence of either weighted graphs or binary graphs to feed a Poisson based model. In the rest of the paper we will assume that a network is represented by a graph $G=(V,E)$ where $V$ in the set of nodes such that $N=|V|$ and E the set of edges. We consider the adjacency matrix $Y=(y_{ij})_{ij\in N^2}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} > 0$ otherwise.
+
+In the rest of the paper, we will use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index.
+
+
+\section{Mixed-Membership Stochastic Blockmodel Family}
+
+Mixed-Membership Stochastic Blockmodel extend the former Stochastick Blockmodel (SBM) \cite{airoldi2009mixed} whom consists to cluster nodes into a low number of blocks where each node belongs to one and only one block. Link prediction is then based on a link distribution depending on the blocks interaction only. % => structural equivalence
+In the MMSB family, the single node assignment to blocks is relaxed by using similar mechanism than the Latent Dirichlet Allocation (LDA) model. Each node $i$ has a distribution over $K$ classes $\theta_i \sim \textrm{Dir}(\alpha)$. Then, two sets of latent class membership, denoted $Z_\rightarrow = \{z_{p\rightarrow q} \sim \textrm{cat}(\theta_p),  (p,q) \in V\}$ and $Z_\leftarrow = \{z_{p\leftarrow q} \sim \textrm{cat}(\theta_q),  (p,q) \in V\}$ are generated with categorical draw. Then a link is generated with probability $p(y_{ij}) = F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$ where $F$ is the kernel distribution which is chosen to be in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ an associate (eventually) conjugate prior. Thus for binary and weighted networks the kernel and prior are respectively Bernoulli-Beta and Poisson-Gamma,
+
+\begin{align*} \label{eq:generative}
+y_{ij} &\sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}) & \phi_{kk'} &\sim \textrm{Beta}(\lambda_0, \lambda_1) & \textrm{ if binary case} \\
+y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}) &  \phi_{kk'} &\sim \textrm{Gamma}(r, \frac{p}{1-p})    & \textrm{ if weighted case} 
+\end{align*}
+
+Note that for undirected network one can enforce the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ to be symmetric.
+
+In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi \}$ and the set of model hyper-parameters $\Omega$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$.
+
+\subsection{Beta-Gamma Augmentation}
+
+The generative process for WMMSB defined in \eqref{eq:generative} assume that the rate parameters of the Poisson distribution are drawn from the same Gamma distribution which can limit the ability of the model to capture the variance in the interaction strength between the latent classes. Adapting the work from \cite{zhou2015negative} \cite{zhou2012beta}, one can augment the model by putting priors over the shape and scale parameter of the gamma prior respectively from a Gamma and Beta distribution. The generative model becomes,
+
+\begin{gather*}
+r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)) \\
+\phi_{kk'} \sim \textrm{Gamma}(r_{kk'}, \frac{p_{kk'}}{1-p_{kk'}})
+\end{gather*}
+
+Note that the WMMSB kernel can be formulated as $y_{ij} \sim \textrm{NB}(r_{kk'}, p_{kk'})$ where NB is the negative binomial distribution. Hence, the inference can take advantage of the conjugacy of the Beta-Negative binomial construction. We denote this model as bg-WMMSB.
+
+As for most hierarchical Bayesian model, the exact inference is intractable and one must resort to approximate inference. In the next section we propose a Stochastic Collapse Variational Inference algorithm for MMSB and it's weighted version WMMSB.
+
+
+\section{Inference}
+
+One bottleneck of the original inference method proposed for MMSB models is that it scale quadratically with the numner of nodes wich makes it impractical for large networks. Recent advances in Stochastic Variational Inference (SVI) \cite{hoffman2013stochastic},  and more recently with well designed sampling techniques \cite{gopalan2013efficient}\cite{kim2013efficient}, tackle this challenge by enabling the control of the memory complexity with online/minibatch updates and in the same time to scale-up the time complexity with the number of observation (i.e the edges) in the networks. This last point is critical since real world networks are most of the time very sparse \cite{barabasi_burst}. 
+
+Furthermore, we combine SVI with Collapse Variational Bayesian (CVB) inference method \cite{teh2006collapsed} which provide a weaker assumption on the variational parameters comparing to the mean-field approximation.
+
+
+\subsection{Variational Objective}
+
+From the Jensen inequality, one can show the relation between an arbitrary distribution $q$ of the parameters $\Pi$ and the evidence, 
+\begin{equation*}
+\log p(Y | \Omega) - \textrm{KL}[q(\Pi)||p(\Pi | Y, \Omega)] = \L_\Pi
+\end{equation*}
+
+Where $\textrm{KL}$ is the Kullback-Leibler divergence and, denoting the Shannon entropy $\textrm{H}$, $\L_\Pi$ usually referred as the Evidence Lower BOund (ELBO) satisfies, 
+\begin{equation*}
+\log p(Y|\Omega) \geq \L_\Pi = \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)] 
+\end{equation*}
+
+One can see that maximizing the ELBO is equivalent to minimizing the KL divergence between the variational distribution and the true posterior.
+In the next sections, we will omit the reference to the hyper-parameters $\Omega$ for brevity.
+
+\subsection{Collapsing the Variational Objective}
+Inspired from the closed form updates of the collapse Gibbs sampling one can weaken the mean-field assumption made over the variational distribution by assuming,
+\begin{equation*}
+q(\Pi) = q(\Theta, \Phi | Z) q(Z)
+\end{equation*}
+
+Such that $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. Then, one can maximize $L_\Pi$ w.r.t $q(\Theta, \Phi | Z)$ to obtain a collapsed form of the ELBO,
+\begin{equation*}
+\log p(Y) \geq \L_Z = \E_{q}[\log p(Y, Z)] + \textrm{H}[q(Z)]
+\end{equation*}
+
+Finally, maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion, and a Gaussian approximation, following \cite{teh2006collapsed}\cite{asuncion2009smoothing}, yields to the following update,
+\begin{equation} \label{eq:maximization}
+\gamma_{ijkk'} \propto (N_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (N_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k')
+\end{equation}
+
+Where $N^{\Theta}$ is defined in equation \eqref{eq:sss}.
+Depending on the kernel and marginalizing over $\Theta$ and $\Phi$, one can show that the predictive link distribution $p(y_{ij}|-)$ takes the following closed-form expression,
+\begin{align*}
+p(y_{ij} |-)=\begin{cases}
+    \left( \frac{ N^{\Phi\neg ij}_{1 kk'} + \lambda_1}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi\neg ij}_{1 kk'} + \lambda_1}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ if binary case} \\
+    \mathrm{NB}\left(y_{ij}; N^{Y\neg ij}_{kk'} + r, \frac{p}{p\,N^{\Phi\neg ij}_{\bm{.}kk'} + 1} \right) & \textrm{ if weighted case} 
+\end{cases}
+\end{align*}]
+
+Where $\textrm{NB}$ is the Negative-Binomial distribution. The different count statistics are estimated from the variational parameters $\gamma_{ijkk'}$ such that,
+\begin{align} \label{eq:sss}
+    N^{\Theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & N^{\Theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
+    N^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & N^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
+\end{align}
+
+In this inference scheme, the $\gamma_{ij}$ are identified as the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters.  
+
+Finally, the model parameters can be recovered from their estimates as follows:
+\begin{align*}
+\hat \theta_{ik} = \frac{N^{\Theta}_{\rightarrow ik} + N^{\Theta}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}} \qquad 
+\hat \phi_{kk'}=\begin{cases}
+     \frac{N^{\Phi}_{1 kk'} + \lambda_1}{N^{\Phi}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ if binary case} \\
+    \frac{p(N^Y_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ if weighted case} 
+    \end{cases}
+\end{align*}
+
+
+\subsection{Optimising the Beta-Gamma augmentation}
+
+To optimize the parameters of the bg-WMMSB model, One can rewrite the variational distribution as
+\begin{equation*}
+q(\Pi) = q(\Theta, \Phi|Z, R, P) q(Z)q(R)q(P)
+\end{equation*}
+
+Such that $R=(r_{kk'})$ and $P=(p_{kk'})$ with $k,k' \in \{1,..,K\}^2$. Exploiting the conjugacy of the Beta-Negative binomial distribution and assuming that $q(P)=p(P|Y,Z)$  one can show that $p_{kk'}$ can be sample from,
+\begin{equation} \label{eq:pk_update}
+p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}r_{kk'})
+\end{equation}
+
+For the $R$ parameters, there is no conjugacy and so it's posterior distribution has no closed form. However one can derive variational update. Letting $q(r_{kk'}) = \textrm{Gamma}(a_{kk'},b_{kk'})$, one can show that maximizing the ELBO w.r.t to $b_{kk'}$ gives the following update,
+\begin{equation} \label{eq:bk_update}
+b_{kk'}= \frac{r_0c_0}{a_{kk'} (c_0  -N^\Phi_{kk'}\log(1-p_{kk'}) -1)}
+\end{equation}
+
+Although the update for $a_{kk'}$ has no closed form due to differential equation involving digamma function, it turns out that we can estimate the expectation of $E_q[r_{kk'}]=a_{kk'}b_{kk'}$ by plugging equation \eqref{eq:bk_update}, one has,
+\begin{equation} \label{eq:rk_update}
+E_q[r_{kk'}] = \frac{r_0c_0}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'}) -1}
+\end{equation}
+
+Therefore, we found  that sampling the parameter as $r_{kk'} \sim \textrm{Gamma}(r_0c_0,\frac{1}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'}) -1} )$ gave better result in practice.
+
+The details of the derivation for the WMMSB model are given in appendix.
+The next sub-section aims to propose efficient online updates for the *MMSB models.
+
+\subsection{Stochastic Variational Inference}
+
+Stochastic Variational inference (SVI) is a deterministic method that optimize the ELBO by following noisy but unbiased estimates of its natural gradient \cite{hoffman2013stochastic}. This noise comes from the training data that are randomly sampled when updating the variational parameters. Suppose  that we sample a dyad $(i,j)$ in the graph $G$ with a distribution $g(i,j)$, then SVI can be summarized as follows:
+\begin{enumerate}
+\item Maximize local parameter $\gamma_{ij}$ with equation \eqref{eq:maximization},
+\item Compute the intermediate global parameter expectation: $\hat N = \frac{\gamma_{ij}}{g(i,j)}$,
+\item Update the global parameter: $N^{(t+1)} = (1-\rho_t)N^{(t)} + \rho_t \hat N$.
+\end{enumerate}
+
+One bottleneck of the CVB updates is that it computes the expectation on the distribution $q(Z^{-ij})$. Consequently, the maximization step needs to keep in memory the $(\gamma_{ij})$ matrix of size $N^2\times K^2$ which is not convenient for large networks. Thus, following \cite{foulds2013stochastic}, we consider that for large count, the $ij^{th}$ term has a negligible impact on the overall sum and so we omit it. They shown that this approximation is equivalent to make a online EM MAP estimation.
+
+\subsection{Stratified Sampling}
+\label{sec:sampling}
+
+An advantage of SVI is that it let the freedom to choose a sampling strategy. Stratified sampling was proposed in \cite{gopalan2013efficient} with a SVI inference for the binary MMSB model. We adapt this sampling strategy for our SCVI algorithm. Instead of sampling on a distribution $g(i,j)$ on edges, it samples on a subset $S$ of edges (i.e minibatches) with distribution $h(S)$. For each nodes, we build a link-set $S_1$ containing all its edges, and a non-link set $S_0$ of all its non-links that we scattered in $m$ subset of equal size such that $S_0 = \cup_{n=1}^m S_{0,n}$. Then for each iteration, we randomly pick one node and either its set $S_1$ or one of its $m$ subset in $S_0$ with,
+\begin{align*}
+h(S)=\begin{cases}
+    \frac{1}{\chi N}  & \textrm{ if } S = S_1 \\
+    \frac{1}{\chi N m}  & \textrm{ if } S \in S_0 
+    \end{cases}
+\end{align*}
+Where $\chi$ is a factor to take into account the symmetry of the graph. We set $\chi=1$ for directed graph and $\chi=2$ otherwise. The sampling method allows to adapt the inference to the sparsity of the graph. Moreover, empirical results shows that stratified sampling improve speed and quality of the convergence compared to other sampling strategy \cite{gopalan2013efficient}\cite{kim2013efficient}. In our experiments we find out that sampling the minibatches in $S_0$ with replacement of the non-links improved the performance for both MMSB and WMMSB.
+%Our sampling strategy differ from \cite{gopalan2013efficient}, in the distribution over the set $S_0$, since we sample the subset of non-links with replacement the two distribution differ of a factor $N$.
+
+\subsection{Robbins-Monro Condition}
+
+The convergence of the SVI is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that impose constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtain with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus we maintain a gradient step for each global parameters $\rho^\Phi$ and $\rho^Y$ for respectively  $N^\Phi$ and $N^Y$. For $N^\Theta$ we maintain individual gradient step $\rho_i^{\Phi}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}, as we observed it improves the convergence and prediction performance. Thus for each minibatch we only increase the gradient steps of the nodes that are observed.
+
+Furthermore, to increase the speed of the inference we update the global parameter $N^\Phi$ and $N^Y$ only after a minibatch round. For the global parameter $N^\Theta$ we update it after a burnin period $T_{burnin}$ such that $T_{burnin} \leq |S|$, which consists to update the class assignment of nodes after observing a bunch of dyad. This heuristic allow to find a trade-off between updating the global parameters after each observation which slow down the inference and may be prone to get stuck in local optima, and updating them only after the minibatch which can be relatively large in the stratified sampling scheme. 
+
+%%% Two more point exists:
+% * the time step is increased with the minibatch size,
+% * the intermiatade graidnet is normalized by the minibatch size.
+
+Our SCVI algorithm is summarized in pseudo-code \ref{algo:scvb}.
+
+\begin{algorithm}
+\KwIn{Random initialization of $N^\Phi$, $N^\Theta$, $N^Y$}
+\Begin{
+$t \gets 0$ \\
+\While{Convergence criteria not met}{
+    Sample a minibatch $S_t$ from $h(S)$ \\
+    \ForEach{$i,j \in S_t$}{
+        Maximize local parameters $\gamma_{ij}$ from \eqref{eq:maximization}\\
+        \If{burnin is false}{
+            Compute intermediate gradient $\hat N^\Theta$ from \eqref{eq:sss}\\
+            Update global parameter $N^{\Theta (t)}$\\
+            Update gradient step $\rho^\Theta_t$\\
+        }
+    }
+
+    Compute intermediate gradient $\hat N^\Phi$ and $\hat N^Y$  from \eqref{eq:sss}\\
+    Update global parameters $N^{\Phi (t)}$ and $N^{Y (t)}$\\
+    Update gradient steps $\rho^\Phi_t$ and $\rho^\Theta_t$\\
+	Sample $P$ and $R$ from \eqref{eq:pk_update} \eqref{eq:rk_update}\\
+    $t \gets t + 1$
+    }
+}
+\caption{SCVI pseudo-code.}
+\label{algo:scvb}
+\end{algorithm}
+

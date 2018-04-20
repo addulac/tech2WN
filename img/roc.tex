@@ -1,0 +1,37 @@
+
+\caption{AUC-ROC performance comparaison for two different size of testsets. In the top table, the testsets contains 20 percent of the edges. In the bottom table the testsets contains 80 percent of the edges. Score are averaged on 10 independants runs and for each run we randomly build the testsets that were held-out during the inference. For the SCVB inference, we fix the sampling parameter $m=50$.}
+
+\begin{tabular}{llllll}
+\toprule
+$t_{ratio}=0.2$             &   MMSB &   WMMSB & bg-WMMSB      &    SBM &   WSBM \\
+\midrule
+
+ astro-ph                & 0.735 $\pm$ 0.018   & 0.717 $\pm$ 0.013    & 0.739 $\pm$ 0.004         & 0.676 $\pm$ 0.049 & 0.729 $\pm$ 0.062 \\
+ cond-mat                & 0.675 $\pm$ 0.007   & 0.612 $\pm$ 0.019    & 0.662 $\pm$ 0.032         & 0.728 $\pm$ 0.045 & 0.752 $\pm$ 0.054 \\
+ hep-th                  & 0.682 $\pm$ 0.008   & 0.659 $\pm$ 0.008    & 0.689 $\pm$ 0.009         & 0.672 $\pm$ 0.036 & 0.616 $\pm$ 0.036 \\
+ netscience              & 0.684 $\pm$ 0.03    & 0.586 $\pm$ 0.04     & 0.724 $\pm$ 0.029         & 0.733 $\pm$ 0.077 & 0.774 $\pm$ 0.057 \\
+ manufacturing           & 0.900 $\pm$ 0.003   & 0.884 $\pm$ 0.01     & 0.886 $\pm$ 0.006         & 0.876 $\pm$ 0.014 & 0.659 $\pm$ 0.052 \\
+ fb\_uc                  & 0.820 $\pm$ 0.105   & 0.883 $\pm$ 0.004    & 0.871 $\pm$ 0.009         & 0.807 $\pm$ 0.019 & 0.662 $\pm$ 0.017 \\
+ enron                   & 0.640 $\pm$ 0.159   & 0.849 $\pm$ 0.016    & 0.844 $\pm$ 0.021         & 0.562 $\pm$ 0.048 & 0.498 $\pm$ 0.088 \\
+ wiki-link & 0.522 $\pm$ 0.12    & 0.723 $\pm$ 0.107    & 0.779 $\pm$ 0.016         & 0.615 $\pm$ 0.043 & 0.553 $\pm$ 0.047 \\
+
+\bottomrule
+\end{tabular}
+
+\begin{tabular}{llllll}
+\toprule
+$t_{ratio}=0.8$             &   MMSB &   WMMSB & bg-WMMSB      &    SBM &   WSBM \\
+\midrule
+
+ astro-ph                & 0.729 $\pm$ 0.011   & 0.708 $\pm$ 0.008    & 0.739 $\pm$ 0.006         & 0.462 $\pm$ 0.046 & 0.617 $\pm$ 0.09  \\
+ cond-mat                & 0.647 $\pm$ 0.01    & 0.601 $\pm$ 0.013    & 0.635 $\pm$ 0.015         & 0.474 $\pm$ 0.077 & 0.553 $\pm$ 0.04  \\
+ hep-th                  & 0.652 $\pm$ 0.007   & 0.646 $\pm$ 0.004    & 0.631 $\pm$ 0.019         & 0.446 $\pm$ 0.053 & 0.457 $\pm$ 0.057 \\
+ netscience              & 0.613 $\pm$ 0.011   & 0.580 $\pm$ 0.015    & 0.611 $\pm$ 0.018         & 0.470 $\pm$ 0.009 & 0.462 $\pm$ 0.013 \\
+ manufacturing           & 0.883 $\pm$ 0.006   & 0.864 $\pm$ 0.008    & 0.851 $\pm$ 0.012         & 0.805 $\pm$ 0.023 & 0.654 $\pm$ 0.036 \\
+ fb\_uc                  & 0.789 $\pm$ 0.104   & 0.857 $\pm$ 0.006    & 0.852 $\pm$ 0.011         & 0.569 $\pm$ 0.072 & 0.459 $\pm$ 0.083 \\
+ enron                   & 0.659 $\pm$ 0.204   & 0.825 $\pm$ 0.075    & 0.866 $\pm$ 0.012         & 0.489 $\pm$ 0.108 & 0.344 $\pm$ 0.071 \\
+ wiki-link & 0.608 $\pm$ 0.186   & 0.678 $\pm$ 0.12     & 0.779 $\pm$ 0.025         & 0.281 $\pm$ 0.053 & 0.227 $\pm$ 0.043 \\
+
+\bottomrule
+\end{tabular}
+

@@ -1,19 +1,4 @@
-
-\section{Weighted Networks and Time exchangeability}
-
-% dense - unrealistic
-The link prediction models, in the literature \cite{goldenberg2010survey,lu2011link}, usually represent a network by a graph $G=(V,E)$, where $V$ is a set of vertex and $E$ a set of edges between the vertex. It can be represented by its adjacency matrix $(Y_{ij})_{(ij) \in E} \in \mathcal{Y}$. For a binary network, the support of the edges is $\mathcal{Y} = (0,1)$ to account respectively for the absence or the presence of an edge between two nodes. Formally the likelihood of such model is characterized by a Bernoulli density such that $y_{ij} \sim \mathrm{Bern}(\theta)$. If $\theta$ is a constant, this is an Erd\"o-R\'eniy model. Relaxing this unrealistic assumptions with a latent model gives the Stochastic Blockmodel, and more recently, by relaxing the hard assignment to blocks, gives the Mixed-Membership Stochastic Blockmodel (MMSB) \cite{MMSB}. Moreover all of those models are in a setting of binary networks and  static graphs which is formally traduced by an assumption of exchangeability. It means that the joint probability of a graph do not depend on the order of which we observes the nodes. %? $echangeability$
-
-\textcolor{red}{\paragraph{cette sous section sur la sparsite a revoir et aligner avec les update SCVB (ce qsue je raconte dans sections rouge, est probablement incorrect (je laisse car reflexion en cours...)! The weighted model is still exchangeable ?}~\\
-% sparse - real
-The main limitation of such models is that they can't handle sparse networks, which is a corollary of the Aldous-Hoover theorem \cite{orbanz2015bayesian}. The models has been said to be misspecified. A way to alleviate this limitation is to weight edges instead of considering binary one. This weighting can be understood, in some way, as smoothing the networks. Additionally, a weighted network is a binary networks where information has bee added under the for of node labeling. The reason why sparsity could be handle this way is because, by considering a weighted networks, it makes all non-edges in a network (0 entries in the adjacency matrix) having a weak contribution to the degree distribution of associated node (see section \ref{todo}). Thus, the inference process can take advantage of this fact because, in sparse networks, most of the interactions are unrealized.}
-
-\section{Model}
-
-
-A powerful model for binary exchangeable networks is the Mixed Membership Stochastic Blockmodel (MMSB). We propose an extension of the MMSB
-
-The proposed model is a weighted extension of MMSB, named WMMSB. The main design difference is that the likelihood is drawn from a Poisson distribution, and the correlations between the shared classes are drawn from independent Gamma distributions. The model first draw latent class membership for each node from a shared Dirichlet distribution. Then for each interactions,  nodes draw a single membership. The observation level is then draw from Poisson distribution taking its rate parameter according to two classes that summarize the interaction between the two underlying nodes. The observation corresponds to the strength of the relationship between two classes. The generative model (along  with the graphical model) is summarized as follows:
+\section{Stochastic Block Models}
 
 \begin{figure}[h]
     \hspace*{-3.7em}
@@ -37,28 +22,14 @@ The proposed model is a weighted extension of MMSB, named WMMSB. The main design
 
 Note that the group membership of each node is context dependent. That is, each node may assume different membership when interacting or being interacted with by different peers. Statistically, each node is an admixture of group-specific interactions. The two sets of latent group indicators are denoted by $Z_\rightarrow = \{z_{p\rightarrow q} : p, q \in V\}$ and $Z_\leftarrow = \{z_{p\leftarrow q} : p, q \in V\}$. Also note that the correlation between classes need not be equal. Equality may be enforced when modeling symmetric interactions. \cite{goldenberg2010survey}.
 
-%In the rest of this paper  we will note the set of hyperparameters as $\H = (\alpha, \theta, k)$.
-
-For simplicity, the marginal likelihood (or evidence), takes the following form:
-\begin{equation*}
-    \p(Y | \alpha, \Phi) = \int_F \sum_Z \p(Y| Z, \Phi) \p(Z|F) \p(F| \alpha) dF
-\end{equation*}
-
-Furthermore, observed links are conditionally independent given the parameters for nodes ($F$) and for classes ($\Phi$) and by marginalizing over the class membership. Thus the likelihood can be written as a matrix decomposition :
-\begin{equation*}
-P(Y | F, \Phi) = \prod_{i,j \in V^2} f_i \Phi f_j^T
-\end{equation*} 
-
-Unfortunately the evidence is intractable, and conducts the practitioner to resort to approximate inference. In the next section, we propose a Stochastic Collapsed Variational inference method.
-
-
 
 
 
 \section{Inference}
 
 
-\subsection{Collapsed Variational Inference}
+
+
 
 The Variational Bayes (VB) method is an inference method based on the approximation of the Bayesian model's parameters, $(F, \Phi, Z)$, with free variational parameters $(\nu, \epsilon, \gamma)$ usually taken in the same family than the true parameters. It consists of an iterating algorithm which updates the variational parameters by maximizing the lower bound arising from the Jensen Inequality. This is equivalent to  minimize the Kullback-Leibler divergence between the variational (posterior) distribution over the variational parameters denoted $q(F, \Phi, Z | \nu, \epsilon, \gamma)$ (we will suppress reference to the variational parameters in the variational posterior for brevity) and the true (posterior) distribution $p(F, \Phi, Z | \tau)$ where $\tau = (\alpha, \eta, \theta)$ denotes the set of hyperparameters of the model. The evidence lower bound (ELBO) takes the following form :
 
@@ -191,9 +162,18 @@ Under this Gaussian approximation, we can apply a Taylor expansion of equation \
 
 One can remark the similarity with the Collapse Gibbs update. But as the inference is deterministic, it is possible to derive a stochastic gradient in order to prevent batch learning and to scale to large datasets.
 
-\subsection{Stochastic Variational Inference}
 
-We propose to derive update for a Stochastic Collapsed Variational Inference (SCVB) for the *MMSB models. It is closely related to The Stochastic Variational Inference (SVB)  where online inference is made possible with variational Inference in the exponential family and to \cite{hoffman2013stochastic} which propose general online E-M algorithm for latent model \cite{cappe2009line}. This approach is useful for the two following reasons :
+
+
+
+
+
+
+
+
+
+
+We now derive update for a Stochastic Collapsed Variational Inference (SCVB) for the *MMSB models. It is closely related to The Stochastic Variational Inference (SVB)  where online inference is made possible with variational Inference in the exponential family and to \cite{hoffman2013stochastic} which propose general online E-M algorithm for latent model \cite{cappe2009line}. This approach is useful for the two following reasons :
 
 \begin{itemize}
     \item Scale to large datasets : The time complexity becomes linear with the size of the datasets because the algorithm can work with minibatch of an arbitrary size. The memory complexity is drastically save, because only the minibatch content need be loaded to fit a model against the quadratic complexity usually met in networks.
@@ -222,26 +202,10 @@ Where $\overline N$ is the expected statistics computed as if all observations w
         
 \end{itemize}
 
-Todo :
 \begin{itemize}
-    \item gradient step constraint for convergence
-    \item (reflexion) what does  it means in term of convergence and step gradient constraint,  if I want to forget old data, make a global burstiness effect (a sparse network) ??
+\item derivation of CVB for Mmmsb And Wmmsb
+\item SCVB update for for Mmms And Wmmsb with stratified sampling strategy
 \end{itemize}
 
-Thus our algorithm is very similar than the one use by \cite{foulds2013stochastic} for their SCVB algorithm adapted for LDA and text data.
 
 
-
-
-
-
-
-
-
-\section{Experiments}
-
-%WMMSB compare it with LDA (a mask)i vs a bipartite networks (Document)
-%D (doc) x W (Voc) -- entry count
-%
-%the bag of word VS the networks representation of document
-%* it adds a parameter the document modelization !!!!!!!

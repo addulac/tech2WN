@@ -1,11 +1,14 @@
-\documentclass[twocolumn]{article}
-%\documentclass[a4paper, 12pt]{article}
-%\documentclass[a4paper, 12pt, draft]{article} % don't include images, leave a border of same size...great
+%\documentclass[runningheads]{llncs}
+
+\documentclass{article}
+\usepackage{nips_2018}
 
 
 %\usepackage[cmex10]{amsmath, mathtools}
-\usepackage[fleqn]{amsmath}
-\usepackage{amssymb,amsbsy,amsfonts,amsthm}
+\usepackage{amsmath}
+%\usepackage[fleqn]{amsmath}
+%\usepackage{amssymb,amsbsy,amsfonts,amsthm}
+\usepackage{amssymb,amsbsy,amsfonts}
 \usepackage{bm}
 \usepackage{enumerate}
 \usepackage{url}
@@ -16,8 +19,11 @@
 \usepackage{multicol}
 \usepackage{adjustbox}
 %\usepackage[margin=6.5em]{geometry}
+\usepackage{makecell} % thicker table separator
+\usepackage{booktabs}
 
 
+\usepackage{subfigure}
 \usepackage{wrapfig}
 \usepackage{tikz}
 %\input{../tikz.conf}
@@ -46,35 +52,52 @@
 \newcommand{\M}{\mathcal{M}}
 \newcommand{\V}{\mathcal{V}}
 \newcommand{\N}{\mathcal{N}}
+\newcommand{\D}{\mathcal{D}}
 \renewcommand{\L}{\mathcal{L}}
 \newcommand{\mat}[1]{\mathbf{#1}}
 \newcommand{\unit}{1\!\!1}
 \newcommand{\zij}{z_{i\rightarrow j}}
 \newcommand{\zji}{z_{i\leftarrow j}}
+\newcommand{\Thetah}{\hat\Theta}
+\newcommand{\Phih}{\hat\Phi}
+\newcommand{\thetah}{\hat\theta}
+\newcommand{\phih}{\hat\phi}
+
+\newcommand\mms[1]{\vcenter{\hbox{$\scriptstyle #1$}}}
 
 %\renewcommand{\Phi}{\mat{\Phi}}
 
-\title{Mixed-Membership Inference in (Sparse?) Weigted Networks.}
 
 %\date{avril 2015}
 
-\newtheorem{definition}{Definition}[section]
-\newtheorem{proposition}{Proposition}[section]
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{corollary}{Corollary}[section]
+%\newtheorem{definition}{Definition}[section]
+%\newtheorem{proposition}{Proposition}[section]
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{corollary}{Corollary}[section]
 %\newtheorem{proof}{Proof}[section]
 
+
 \begin{document}
+
+\title{Online Learning for Stochastic Blockmodels Adapted to Complex Networks}
 	
 \maketitle
+
 \begin{abstract}
+We propose an online learning algorithm designed to model binary, weigthed, directed or undirected networks. It relies on a probabilistic framework inherited from the mixed-membership stochastic blockmodel. The inference combines the advantages of Variational Inference, in particular to derive stochastic gradient descent uptates of the variational objectives which enables minibatches updates, and Collapse Gibbs Sampling that weaken the asumptions made by the classical mean-field approximation of the posterior distribution. We study the convergence of the inference and we evaluate the performance of the models on several real word networks that show that our algorithm exhibits fast convergence and outperforms concurrent methods on links prediction task when the network is partially observed.
 \end{abstract}
 
-\input{intro.tex}
-\input{approach.tex}
+
+\input{intro}
+%\input{approach} % mote to the Appendix
+%\input{inference}
+\input{expe}
+\input{conclusion}
 \clearpage
 
 \bibliographystyle{unsrt}
+%\bibliographystyle{splncs04}
+
 \bibliography{./a}
 
 \appendix

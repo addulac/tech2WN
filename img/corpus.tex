@@ -1,0 +1,22 @@
+
+\caption{Datasets networks used to train the models. Type A is for co-authorship, type C is for communication, type H is for hyperlinks and type L is for lexical network.}
+
+\begin{tabular}{lrrrrcrrrr}
+%\Xhline{2\arrayrulewidth}
+\toprule
+ Datasets     &   Nodes &   Edges &   Density & Directed  &    Diameter &   \multicolumn{3}{c}{Weights}  	& type     \\
+ \cmidrule(l){7-9}  &   &   	  &   		  & 		  &  		   	&  mean & std  & max             \\
+%\hline
+\midrule
+ astro-ph      &   16706 &  121251 &     0.001    & False    &       14 &   1.8& 3.3 & 306      & A  \\
+ cond-mat      &   16726 &   47594 &     0.000    & False    &       18 &   3.1& 7.2& 544      & A  \\
+ hep-th        &    8361 &   15751 &     0.000    & False    &        1 &   5.2& 16& 1226      & A  \\
+ netscience    &    1589 &    2742 &     0.002    & False    &        2 &   2.2& 1.9 &33       & A  \\
+ manufacturing &     167 &    5783 &     0.209    & True     &        3 &  14.3& 44.9&1458    & C  \\
+ fb\_uc        &    1899 &   20296 &     0.006    & True     &        4 &   2.8& 4.7& 98       & C  \\
+ enron         &    87273  & 320154   &  0.0000   & True     &       15 &   3.4& 12.4&3904    & C  \\
+ wiki-link     &  100312   & 887426   & 0.0001    & True     &       14 &   1.7& 3.0& 185      & H  \\
+%\Xhline{2\arrayrulewidth}
+\bottomrule
+\end{tabular}
+
