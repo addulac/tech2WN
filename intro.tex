@@ -44,7 +44,7 @@ y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}) &  \phi_
 
 Note that for undirected network one can enforce the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ to be symmetric.
 
-In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi \}$ and the set of model hyper-parameters $\Omega$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$.
+In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi, Z \}$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$ and the set of model hyper-parameters $\Omega$.
 
 \subsection{Beta-Gamma Augmentation}
 
@@ -57,7 +57,7 @@ r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\e
 
 Note that the WMMSB kernel can be formulated as $y_{ij} \sim \textrm{NB}(r_{kk'}, p_{kk'})$ where NB is the negative binomial distribution. Hence, the inference can take advantage of the conjugacy of the Beta-Negative binomial construction. We denote this model as bg-WMMSB.
 
-As for most hierarchical Bayesian model, the exact inference is intractable and one must resort to approximate inference. In the next section we propose a Stochastic Collapse Variational Inference algorithm for MMSB and it's weighted version WMMSB.
+As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a Stochastic Collapse Variational Inference algorithm for MMSB and it's weighted version WMMSB.
 
 
 \section{Inference}
@@ -102,12 +102,12 @@ Where $N^{\Theta}$ is defined in equation \eqref{eq:sss}.
 Depending on the kernel and marginalizing over $\Theta$ and $\Phi$, one can show that the predictive link distribution $p(y_{ij}|-)$ takes the following closed-form expression,
 \begin{align*}
 p(y_{ij} |-)=\begin{cases}
-    \left( \frac{ N^{\Phi\neg ij}_{1 kk'} + \lambda_1}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi\neg ij}_{1 kk'} + \lambda_1}{N^{\Phi\neg ij}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ if binary case} \\
-    \mathrm{NB}\left(y_{ij}; N^{Y\neg ij}_{kk'} + r, \frac{p}{p\,N^{\Phi\neg ij}_{\bm{.}kk'} + 1} \right) & \textrm{ if weighted case} 
+    \left( \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ if binary case} \\
+    \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ if weighted case} 
 \end{cases}
-\end{align*}]
+\end{align*}
 
-Where $\textrm{NB}$ is the Negative-Binomial distribution. The different count statistics are estimated from the variational parameters $\gamma_{ijkk'}$ such that,
+The different count statistics $N^*$ are estimated from the variational parameters $\gamma_{ijkk'}$ such that,
 \begin{align} \label{eq:sss}
     N^{\Theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & N^{\Theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
     N^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & N^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
@@ -139,22 +139,22 @@ p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}r_
 
 For the $R$ parameters, there is no conjugacy and so it's posterior distribution has no closed form. However one can derive variational update. Letting $q(r_{kk'}) = \textrm{Gamma}(a_{kk'},b_{kk'})$, one can show that maximizing the ELBO w.r.t to $b_{kk'}$ gives the following update,
 \begin{equation} \label{eq:bk_update}
-b_{kk'}= \frac{r_0c_0}{a_{kk'} (c_0  -N^\Phi_{kk'}\log(1-p_{kk'}) -1)}
+b_{kk'}= \frac{x_0}{a_{kk'} (c_0  -N^\Phi_{kk'}\log(1-p_{kk'}))}
 \end{equation}
 
-Although the update for $a_{kk'}$ has no closed form due to differential equation involving digamma function, it turns out that we can estimate the expectation of $E_q[r_{kk'}]=a_{kk'}b_{kk'}$ by plugging equation \eqref{eq:bk_update}, one has,
+With $x_0 = r_0 c_0$ if $N^Y_{kk'}=0$ and $x_0 = r_0 c_0 -1$ otherwise. Thus one must ensure that $r_0 c_0 > 1$. Although the update for $a_{kk'}$ has no closed form due to differential equation involving digamma function, it turns out that we can estimate the expectation of $E_q[r_{kk'}]=a_{kk'}b_{kk'}$ by plugging equation \eqref{eq:bk_update}, one has,
 \begin{equation} \label{eq:rk_update}
-E_q[r_{kk'}] = \frac{r_0c_0}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'}) -1}
+E_q[r_{kk'}] = \frac{x_0}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
 \end{equation}
 
-Therefore, we found  that sampling the parameter as $r_{kk'} \sim \textrm{Gamma}(r_0c_0,\frac{1}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'}) -1} )$ gave better result in practice.
+Therefore, we found  that sampling the parameter as $r_{kk'} \sim \textrm{Gamma}(x_0,\frac{1}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})} )$ gave better result in practice.
 
 The details of the derivation for the WMMSB model are given in appendix.
 The next sub-section aims to propose efficient online updates for the *MMSB models.
 
 \subsection{Stochastic Variational Inference}
 
-Stochastic Variational inference (SVI) is a deterministic method that optimize the ELBO by following noisy but unbiased estimates of its natural gradient \cite{hoffman2013stochastic}. This noise comes from the training data that are randomly sampled when updating the variational parameters. Suppose  that we sample a dyad $(i,j)$ in the graph $G$ with a distribution $g(i,j)$, then SVI can be summarized as follows:
+Stochastic Variational inference (SVI) is a method that optimize the ELBO by following noisy but unbiased estimates of its natural gradient \cite{hoffman2013stochastic}. This noise comes from the training data that are randomly sampled when updating the variational parameters. Suppose  that we sample a dyad $(i,j)$ in the graph $G$ with a distribution $g(i,j)$, then SVI can be summarized as follows:
 \begin{enumerate}
 \item Maximize local parameter $\gamma_{ij}$ with equation \eqref{eq:maximization},
 \item Compute the intermediate global parameter expectation: $\hat N = \frac{\gamma_{ij}}{g(i,j)}$,
