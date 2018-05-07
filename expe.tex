@@ -1,17 +1,3 @@
-\section{Related Works}
-
-\begin{itemize}
-\item on SBM and WSBM (Clauset/peixoto)
-\item on MMSB familly (Airoldi/Blei/Mimmo/Gopalan) and SVB
-\item on SCVB (Foulds). (they show that scvb is similar to EM+map on made the links with online EM of (Cappé and Moulines)
-\item on PFA (Poisson Factor Analysis) and Gamma Processes (Zhou etc).
-\end{itemize}
-
-
-
-
-
-
 
 \section{Experiments}
 
@@ -20,7 +6,7 @@
 %
 
 
-We evaluate our models on several real world networks that can be either directed or undirected. Theirs statistics and properties are summarized in table \ref{table:corpus}. The details of their descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/}.
+We evaluated our models on several real world networks either directed or undirected. Theirs statistics and properties are summarized in table \ref{table:corpus}. The detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/}.
 
 \begin{table}[h]
 \bgroup
@@ -35,17 +21,16 @@ We evaluate our models on several real world networks that can be either directe
 % Evaluaiton method (testing set and mesure)
 %
 
-For each run, we build a testset extracted from the original network composed of an equivalent number of edges and non-edges. We denote the ratio of the held-out edges by $t_{ratio}$. The evaluation of experiments were based on three metrics that we measured at a period of $5m$ minibatches until the stop criteria is met, where $m$ is the parameters of the set $S_0$ defined in section \ref{sec:sampling}.
-Note that we compute all our metrics on the test-set only because the cost of computing them on the training set would impact the inference speed too much.
+For each run, we build a testset extracted from the original network composed of an equivalent number of edges and non-edges. We denote the ratio of the held-out edges by $t_{ratio}$. The evaluation of experiments were based on three metrics that we measured at a period of $5m$ minibatches until the stop criteria is met, where $m$ is the number of subsets of $S_0$ as defined in section \ref{sec:sampling}. For the stopping criteria we held-out a validation set with another 10 percent of the edges and same amount of non-edges from the training set. We stop the training when the average change on the log-likelihood on the validation is less than $0.001$ percent.
 
-The gradient step parameters was set to $\tau=1024$ and $\kappa=0.5$ and the burnin period  to $T_{burnin}=150$. For MMSB we set the hyper-parameters $\lambda_0=\lambda_1=0.1$ and for both MMSB and WMMSB we set the latent-class hyper-parameters to $\alpha_k=\frac{1}{K}$ and $K=10$.
+The gradient step parameters were set to $\tau=1024$ and $\kappa=0.5$ and the burn-in period  to $T_{burnin}=150$. For MMSB we set the hyper-parameters $\lambda_0=\lambda_1=0.1$ and for both MMSB and WMMSB we set the latent-class hyper-parameters to $\alpha_k=\frac{1}{K}$ and $K=10$.
 
 
 %
 % Perplexity
 %
 
-The most direct way to measure the convergence of the inference is the log-likelihood of the predictive distribution since the variational gradient optimize a lower bound of this quantity. For a testset $\D_{test}$ the log-likelihood is:
+The most direct way to measure the convergence of the inference is the log-likelihood of the predictive distribution since the variational gradient optimizes a lower bound of this quantity. For a testset $\D_{test}$ the log-likelihood is
 
 \begin{figure}[h]
 \centering
@@ -66,16 +51,17 @@ The most direct way to measure the convergence of the inference is the log-likel
 We evaluate the capacity of the models to predict missing links with the ROC-AUC curve on the testset. For the weighted models, the measure consists to evaluate to what extent they can reconstruct the topology of the network and to compare them with binary models. Thus, for the WMMSB models we compute the probability of observing a link as the probability to generate at least one edge count,
 
 \begin{table}
+\centering
 	\input{img/roc}
 \label{table:roc}
 \end{table}
 
 \begin{equation*}
-p(y_{ij} \geq 1 | \Thetah, \Phih)
+p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{\phih_{kk'}}
 \end{equation*}
 
 The performance results in table \ref{table:roc} show that WMMSB is able to infer the topology of the networks. Furthermore, it outperforms the baseline for networks where weights represents natural information such as for communication and hyperlinks networks. 
-In the other hand, MMSB and WMMSB under SCVI inference shows that they can infer the network topology when only observing a small portion of the networks, wichh represents an advantage in terms of scalability and when only a sub-graph of the real data are available.
+In the other hand, MMSB and WMMSB under SCVI inference shows that they can infer the network topology when only observing a small portion of the networks, which represents an advantage in terms of scalability or when only a sub-graph of the real data are available.
 
 %
 % Sim

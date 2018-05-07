@@ -79,28 +79,30 @@
 
 \begin{document}
 
-\title{Online Learning for Stochastic Blockmodels Adapted to Complex Networks}
+\title{Online Learning of Stochastic Blockmodels Adapted for Weighted Networks}
 	
 \maketitle
 
 \begin{abstract}
-We propose an online learning algorithm designed to model binary, weigthed, directed or undirected networks. It relies on a probabilistic framework inherited from the mixed-membership stochastic blockmodel. The inference combines the advantages of Variational Inference, in particular to derive stochastic gradient descent uptates of the variational objectives which enables minibatches updates, and Collapse Gibbs Sampling that weaken the asumptions made by the classical mean-field approximation of the posterior distribution. We study the convergence of the inference and we evaluate the performance of the models on several real word networks that show that our algorithm exhibits fast convergence and outperforms concurrent methods on links prediction task when the network is partially observed.
+We propose an online learning algorithm designed to model binary, weigthed, directed or undirected networks. It relies on a probabilistic framework inherited from the mixed-membership stochastic blockmodel. The inference combines the advantages of Variational Inference, in particular to derive stochastic gradient descent of the variational objectives which enables minibatches updates, and Collapse Gibbs Sampling that weaken the assumption made by the classical mean-field approximation of the posterior distribution. We study the convergence of the inference and we evaluate the performance of the models on several real world networks. Our experiments show that our algorithm exhibits fast convergence and have competitive  results on links prediction task especially when the network is partially observed. Futhermore, we show that the weighted MMSB (WMMSB) with an Beta-Gamma priors proposed (WMMSB-bg) signifanctly improves link prediction on most of the weighted networks tested compared to MMSB.
 \end{abstract}
 
 
 \input{intro}
 %\input{approach} % mote to the Appendix
 %\input{inference}
+\input{related}
 \input{expe}
 \input{conclusion}
-\clearpage
 
+\clearpage
 \bibliographystyle{unsrt}
 %\bibliographystyle{splncs04}
 
 \bibliography{./a}
 
 \appendix
+\input{appendix}
 
 \end{document}
 

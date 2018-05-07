@@ -17,6 +17,9 @@ bib: pdf
 pdf:
 	pdflatex ${SRC}.tex
 
+open:
+	@xdg-open $(SRC).pdf
+
 test:
 	${CC} ${TEST}.tex
 	${CONV} ${TEST}.dvi; 

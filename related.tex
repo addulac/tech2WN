@@ -1,0 +1,33 @@
+\section{Related Works}
+
+%\begin{itemize}
+%\item on SBM and WSBM (Clauset/peixoto)
+%\item on MMSB familly (Airoldi/Blei/Mimmo/Gopalan) and SVB
+%\item on PFA (Poisson Factor Analysis) and Gamma Processes (Zhou etc).
+%\item on SCVB (Foulds). (they show that scvb is similar to EM+map on made the links with online EM of (Cappé and Moulines)
+%\end{itemize}
+
+
+A weighted version of the SBM has been proposed in \cite{aicher2014learning} which can be understood as a special case of the WMMSB model proposed in this paper, when nodes are constrained to belongs to only one blocks. In \cite{peixoto2018nonparametric}, authors explore different kernels to model weighted networks in the SBM framework. They proposed efficient inference based on a MCMC approach, but unlike the MMSB framework, their model lack of hierarchical prior structure. Instead they rely on model selection for parameters optimization which have a high computational cost.
+
+The original MMSB model was proposed in \cite{airoldi2009mixed} with a variational inference scheme. It was further extended to scale the model within the framework of Stochastic Variation Inference (SVI) \cite{gopalan2013efficient} and Structured Variational Inference \cite{kim2013efficient}. Recently, Stochastic Variational Inference was applied with a collapsed variational in the context of LDA model \cite{foulds2013stochastic} but there is no former work that applied Stochastic Collapsed Variational Inference to MMSB model to our knowledge.
+
+Separately, count processes has been studied trough Poisson distribution with Gamma Process as conjugate priors where the relation with the Negative Binomial Processes were highlighted \cite{zhou2012augment} \cite{zhou2015negative}. This studies were applied for topic modeling with a model called Poisson Factor Analysis (PFA) with MCMC inference \cite{zhou2012beta}. The main difference between PFA and WMMSB is that PFA factorized count data as as  Poisson variable of a sum of latent factors while for WMMSB, count are  factorized as a convex sum of Poisson variable depending on classes memberships.
+
+
+
+
+%
+%This work intersects with several groups of related works:
+%
+%First, the recent advance on Stochatistic Variationnal inference have made it possible to scale bayesian model to bigger dataset and to do online learning which enable a low memory footprint. This inference have first been proposed for topic modeling [1][2] before being adapted for the MMSB model with an adaptation to discover overllaping communities [3] [4],
+%
+%Nevertheless, the previous works only study the case of (undirected) binary networks.
+%
+%In [5] the author proposed an efficient inference algorithm for weigthed networks, based on a MCMC algorithms. The model is an extension of the SBM. Those models assumed that the class don't overllap. (I still have to dive into to understand how his inferecne works...) (does it allow online learning ? )
+%
+%Finally, SVB has been combined with CVB inference for topic modelling to propose a improoved over SVB. [6]
+%
+%This paper combines the different advantage of those works to propose a Online learning algorithm to models networks that can be weighted, with overllaping classes, directed or undirected.
+%
+

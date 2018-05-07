@@ -1,0 +1,101 @@
+\section{Appendix}
+\label{sec:append}
+
+
+\subsection{Collapsed Variational Updates Derivation}
+
+see the paper WMMSB\_derive.pdf in the github repo.
+
+\subsection{Beta-Gamma Updates}
+
+In the WMMSB-bg model, we assume the variational distribution to be 
+
+\begin{equation*}
+q(\Pi) = q(\Theta, \Phi|Z, R, P) q(Z)q(R)q(P)
+\end{equation*}
+
+In our optimization, we set the $q(r_k) \sim \mathrm{Gamma}(a_k, b_k)$ iid for $1\leq k \leq K^2$. 
+
+The collapsed ELBO can be rewritten as 
+
+\begin{align*}
+\log p(Y) \geq \L_{Z,R,P} &= \E_{q}[\log p(Y, Z, R, P)] + \textrm{H}[q(Z)] + \textrm{H}[q(R)] + \textrm{H}[q(P)] \\
+                        &=  \E_{q(Z)}[\log p(Y, Z)] + \textrm{H}[q(Z)] \\
+                        &\qquad + \E_{q}[\log p(R|Y,Z,P)] + \textrm{H}[q(R)] \\
+                        &\qquad +\E_{q}[\log p(P|Y,Z)] + \textrm{H}[q(P)] 
+\end{align*}
+
+\paragraph{Optimizing $r_k$}
+
+We isolate the part of the ELBO than depends only on $r_k$ parameters ($a_k$ and $b_k$) and we will drop the other terms. Thus, We consider only the links that have been generated in the class $k$ denoted by $Y^{(k)}$. Furthermore we know that links in class $k$ are i.i.d drawn from  Negative binomial distribution such that $y_{ij} \sim NB(r_k, p_k)$ if $(ij)$ is in the class $k$. One has
+
+\begin{align*}
+\L_{[r_k]} = \E_{q(r_k)}[\log p(r_k|Y^{(k)},Z^{(k)},p_k)] + \textrm{H}[q(r_k)] \\
+\end{align*}
+
+By applying a bayes rules and dropping the normalizing term that do not depend on $r_k$, on has
+
+\begin{align*}
+\L_{[r_k]} &= \E_{q(r_k)}[\log \left( p(Y^{(k)}|Z^{(k)}, r_k, p_k) p(r_k) \right)] + \textrm{H}[q(r_k)] \\
+    &= \E_{q(r_k)}[\log \left( \prod_{ij\in Y^{(k)}} \dbinom{r_k + y_{ij}-1}{y_{ij}} (1-p_k)^{r_k} p_k^{y_{ij}} p(r_k) \right) ] + \textrm{H}[q(r_k)] \\
+    &= \E_{q(r_k)}[\log \left( (1-p_k)^{r_k N^{\Phi}_k} p_k^{N^{Y}_k} p(r_k) \prod_{ij\in Y^{(k)}} \frac{\Gamma(r_k+y_{ij})}{\Gamma(r_k) \Gamma(y_{ij}+1) }  \right) ] + \textrm{H}[q(r_k)]
+\end{align*}
+
+From the model definitions one has the following identities
+
+\begin{equation*}
+p(r_k) \propto r_0 c_0\log(r_k) - r_k c_0
+\end{equation*}
+
+and 
+
+\begin{equation*}
+\textrm{H}[q(r_k)] = a_k + \log(b_k) +\log \Gamma(a_k) + (1-a_k)\Psi(a_k)
+\end{equation*}
+
+If $N^Y_k=0$, the ELBO takes the following closed form expression
+
+\begin{align*}
+\L_{[r_k]} &= N^\Phi_k a_k b_k \log(1-p_k) + (r_0 c_0-1 )(\Psi(a_k) + \log(b_k)) -c_0 a_k b_k   \\
+&\qquad a_k + \log(b_k) +\log \Gamma(a_k) + (1-a_k)\Psi(a_k)
+\end{align*}
+
+Maximizing with respect to $b_k$ gives the following update
+
+\begin{equation}\label{eq:update1}
+b_k = \frac{r_0 c_0}{a_k (c_0 - N^\Phi_k \log(1-p_k))}
+\end{equation}
+
+If $N^Y_k \neq 0$, by remarking that $\log \prod_{ij\in Y^{(k)}} \frac{\Gamma(r_k+y_{ij})}{\Gamma(r_k) \Gamma(y_{ij}+1) } \leq -\log(r_k) + cst$, one can bound the ELBO by
+
+\begin{align*}
+\L_{[r_k]} &\geq N^\Phi_k a_k b_k \log(1-p_k) + (r_0 c_0-1 )(\Psi(a_k) + \log(b_k)) -c_0 a_k b_k -\Psi(a_k) - \log(b_k)  \\
+&\qquad a_k + \log(b_k) +\log \Gamma(a_k) + (1-a_k)\Psi(a_k)
+\end{align*}
+
+Maximizing again with respect to $b_k$, the update becomes
+
+\begin{equation} \label{eq:update2}
+b_k = \frac{r_0 c_0-1}{a_k (c_0 - N^\Phi_k \log(1-p_k))}
+\end{equation}
+
+Finally, the maximisation with respect to $a_k$ leads to update of the form of differential equation involving digamma function. Thus, it has no closed form expression. In the literature, Newtow's method has been suggested to estimate such equation. Instead, we find that $r_k$ can be recovered from updates \eqref{eq:update1} and \eqref{eq:update2} by remarking that
+
+\begin{equation}
+\E_q[r_k] = a_k b_k = \frac{x_0}{a_k (c_0 - N^\Phi_k \log(1-p_k))}
+\end{equation}
+
+With $x_0=r_0 c_0$ if $N^Y_k \neq 0$ and $x_0=r_0 c_0-1$ otherwise.
+
+
+
+\paragraph{Optimizing $p_k$}
+
+To optimize $p_k$, instead of using a variational approach, that unfortunately have no closed form expression, but one can use Gibbs sampling. As the $p_k$ is conjugate of the Negative Binomial distribution one can derived closed form update of the form
+
+\begin{align*}
+p(p_k | Y^{(k)}, Z^{(k)}, r_k) &\propto p(Y^{(k)| Z^{(k)}, r_k} p(r_k) \\
+                               &\propto (1-p_k)^{r_k N^\Phi_k}p_k^{N^Y_k} p_k^{c\epsilon -1} (1-p_k)^{c(1-\epsilon) -1}\\
+                               &\propto p_k^{c\epsilon + N^Y_{k} -1} (1-p_k)^{c(1-\epsilon) + N^\Phi_{k}r_k-1}\\
+                               &propto \mathrm{Beta}(c\epsilon + N^Y_{k}, c(1-\epsilon) + N^\Phi_{k}r_k)
+\end{align*}
