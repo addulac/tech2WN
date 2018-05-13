@@ -93,8 +93,8 @@ where the elements $N^{\Theta}$ are defined in Eqs~\eqref{eq:sss}. Depending on 
 %
 \begin{align*}
 p(y_{ij} | z_{i \rightarrow j} = k,z_{i \leftarrow j} = k') \begin{cases}
-    = \left( \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ for MMSB} \\
-    \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ for WMMSB} % \\
+    = \left( \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ \textit{for MMSB}} \\
+    \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ \textit{for WMMSB}} % \\
 %    \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ for bg-WMMSB}
 \end{cases}
 \end{align*}
@@ -113,8 +113,8 @@ Finally, the model parameters can be recovered from their estimates as follows:
 \begin{align*}
 \hat \theta_{ik} = \frac{N^{\Theta}_{\rightarrow ik} + N^{\Theta}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}} \qquad 
 \hat \phi_{kk'}=\begin{cases}
-     \frac{N^{\Phi}_{1 kk'} + \lambda_1}{N^{\Phi}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ for MMSB} \\
-    \frac{p(N^Y_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ for WMMSB}  % \\
+     \frac{N^{\Phi}_{1 kk'} + \lambda_1}{N^{\Phi}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ \textit{for MMSB}} \\
+    \frac{p(N^Y_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ \textit{for WMMSB}}  % \\
 %    \frac{\E_{q}[p_{kk'}](N^Y_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}  & \textrm{ for bg-WMMSB} 
     \end{cases}
 \end{align*}
@@ -124,12 +124,12 @@ Finally, the model parameters can be recovered from their estimates as follows:
 For bg-WMMSB model, we consider the following collapsed variational distribution:
 %
 \begin{equation*}
-q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)
+q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)
 \end{equation*}
 %
-with $R=(r_{kk'})$ and $P=(p_{kk'})$, $k,k' \in \{1,..,K\}^2$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
+with $R=(r_{kk'})$, $k,k' \in \{1,..,K\}^2$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
 
-Following the same development as before, the parameters $\gamma_{ijkk'}$ are given by Eq.~\ref{eq:maximization}. Furthermore, $p(y_{ij}|z_{i \rightarrow j}=k,z_{i \leftarrow j}=k')$ and $\hat \phi_{kk'}$ now take the form:
+The same development as before applies for the parameters $\gamma_{ijkk'}$, given here also by Eq.~\ref{eq:maximization}. Furthermore, $p(y_{ij}|z_{i \rightarrow j}=k,z_{i \leftarrow j}=k')$ and $\hat \phi_{kk'}$ now take the form:
 %
 \[
 p(y_{ij} | z_{i \rightarrow j} = k,z_{i \leftarrow j} = k')  \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right)
@@ -138,7 +138,7 @@ p(y_{ij} | z_{i \rightarrow j} = k,z_{i \leftarrow j} = k')  \sim \mathrm{NB}\le
 \hat \phi_{kk'} = \frac{\E_{q}[p_{kk'}](N^Y_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}
 \]
 %
-Exploiting the conjugacy of the Beta and the negative binomial distributions and assuming that $q(P)=p(P|Y,Z)$, one can show that $p_{kk'}$ can be sampled from a Beta distribution:
+Exploiting the conjugacy of the Beta and the negative binomial distributions, one can show that $p_{kk'}$ can be sampled from a Beta distribution:
 %
 \begin{equation} \label{eq:pk_update}
 p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}r_{kk'})
