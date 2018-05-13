@@ -71,7 +71,7 @@ In the remainder, we use the notation $n^{-ij}$ to indicate that the superscript
 \log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
 \end{equation*}
 %
-where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to:
+where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB:
 %
 \begin{equation*}
 q(\Pi) = q(\Theta, \Phi | Z) q(Z)
@@ -83,18 +83,19 @@ with $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial 
 \log p(Y|\Omega) \geq \underbrace{\E_{q}[\log p(Y, Z)] + \textrm{H}[q(Z)]}_{\L_Z}
 \end{equation*}
 
-Maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion and a Gaussian approximation, following \cite{teh2006collapsed,asuncion2009smoothing}, yields the following updates:
+Maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion and a Gaussian approximation, following \cite{teh2006collapsed,asuncion2009smoothing}, yields the following updates, detailed in the supplementary material:
 %
 \begin{equation} \label{eq:maximization}
 \gamma_{ijkk'} \propto (N_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (N_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k')
 \end{equation}
 %
-where the elements $N^{\Theta}$ are defined in Eqs~\eqref{eq:sss}. Depending on the model considered, the predictive link distribution $p(y_{ij}|\Omega)$ takes the following form:
+where the elements $N^{\Theta}$ are defined in Eqs~\eqref{eq:sss}. Depending on the model considered, the predictive link distribution $p(y_{ij}|z_{i \rightarrow j}=k,z_{i \leftarrow j}=k')$ takes the following form:
 %
 \begin{align*}
-p(y_{ij} |-)=\begin{cases}
-    \left( \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ if binary case} \\
-    \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ if weighted case} 
+p(y_{ij} | z_{i \rightarrow j} = k,z_{i \leftarrow j} = k') \begin{cases}
+    = \left( \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ for MMSB} \\
+    \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ for WMMSB} % \\
+%    \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ for bg-WMMSB}
 \end{cases}
 \end{align*}
 
@@ -112,41 +113,49 @@ Finally, the model parameters can be recovered from their estimates as follows:
 \begin{align*}
 \hat \theta_{ik} = \frac{N^{\Theta}_{\rightarrow ik} + N^{\Theta}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}} \qquad 
 \hat \phi_{kk'}=\begin{cases}
-     \frac{N^{\Phi}_{1 kk'} + \lambda_1}{N^{\Phi}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ if binary case} \\
-    \frac{p(N^Y_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ if weighted case} 
+     \frac{N^{\Phi}_{1 kk'} + \lambda_1}{N^{\Phi}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ for MMSB} \\
+    \frac{p(N^Y_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ for WMMSB}  % \\
+%    \frac{\E_{q}[p_{kk'}](N^Y_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}  & \textrm{ for bg-WMMSB} 
     \end{cases}
 \end{align*}
 
-\subsection{Optimising the Beta-Gamma augmentation}
+\subsubsection{Beta-Gamma augmentation}
 
-To optimize the parameters of the bg-WMMSB model, one can rewrite the variational distribution as
+For bg-WMMSB model, we consider the following collapsed variational distribution:
+%
 \begin{equation*}
-q(\Pi) = q(\Theta, \Phi|Z, R, P) q(Z)q(R)q(P)
+q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)
 \end{equation*}
+%
+with $R=(r_{kk'})$ and $P=(p_{kk'})$, $k,k' \in \{1,..,K\}^2$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
 
-Such that $R=(r_{kk'})$ and $P=(p_{kk'})$ with $k,k' \in \{1,..,K\}^2$. Exploiting the conjugacy of the Beta-Negative binomial distribution and assuming that $q(P)=p(P|Y,Z)$  one can show that $p_{kk'}$ can be sample from
+Following the same development as before, the parameters $\gamma_{ijkk'}$ are given by Eq.~\ref{eq:maximization}. Furthermore, $p(y_{ij}|z_{i \rightarrow j}=k,z_{i \leftarrow j}=k')$ and $\hat \phi_{kk'}$ now take the form:
+%
+\[
+p(y_{ij} | z_{i \rightarrow j} = k,z_{i \leftarrow j} = k')  \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right)
+\]
+\[
+\hat \phi_{kk'} = \frac{\E_{q}[p_{kk'}](N^Y_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}
+\]
+%
+Exploiting the conjugacy of the Beta and the negative binomial distributions and assuming that $q(P)=p(P|Y,Z)$, one can show that $p_{kk'}$ can be sampled from a Beta distribution:
+%
 \begin{equation} \label{eq:pk_update}
 p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}r_{kk'})
 \end{equation}
+%
+so that: $\E_{q}[p_{kk'}] = \frac{c\epsilon + N^Y_{kk'}}{c\epsilon + N^Y_{kk'} + c(1-\epsilon) + N^\Phi_{kk'}r_{kk'}}$.
 
-For the $R$ parameters, there is no conjugacy and so its posterior distribution has no closed form. However, one can derive variational update. By setting $q(r_{kk'}) = \textrm{Gamma}(a_{kk'},b_{kk'})$, one can show that maximizing the ELBO w.r.t to $b_{kk'}$ gives the following update
-\begin{equation} \label{eq:bk_update}
-b_{kk'}= \frac{x_0}{a_{kk'} (c_0  -N^\Phi_{kk'}\log(1-p_{kk'}))}
+Lastly, by setting $q(r_{kk'}) = \textrm{Gamma}(a_{kk'},b_{kk'})$, one can show (see supplementary material) that $r_{kk'}$ can be sampled from a Gamma distribution ($r_{kk'} \sim \textrm{Gamma}(r_0c_0+N^Y_{kk'},\frac{1}{c_0  -N^\Phi_{kk'}\log(1-\E_{q}[p_{kk'}])})$ and is such that:
+%
+\begin{equation}
+\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-\E_{q}[p_{kk'}])}
 \end{equation}
 
-With $x_0 = r_0 c_0$ if $N^Y_{kk'}=0$ and $x_0 = r_0 c_0 -1$ otherwise. Thus one must ensure that $r_0 c_0 > 1$. Although the update for $a_{kk'}$ has no closed form due to differential equation involving digamma function, it turns out that we can estimate the expectation of $E_q[r_{kk'}]=a_{kk'}b_{kk'}$ by plugging equation \eqref{eq:bk_update}, one has
-\begin{equation} \label{eq:rk_update}
-E_q[r_{kk'}] = \frac{x_0}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
-\end{equation}
+\subsection{Stochastic variational inference with stratified sampling}
 
-Therefore, we found  that sampling the parameter as $r_{kk'} \sim \textrm{Gamma}(x_0,\frac{1}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})} )$ gave better result in practice.
-
-The details of the derivation for the WMMSB model are given in appendix.
-The next sub-section aims to propose efficient online updates of the models inference.
-
-\subsection{Stochastic Variational Inference}
-
-Stochastic Variational inference (SVI) is a method that optimizes the ELBO by following noisy but unbiased estimates of its natural gradient \cite{hoffman2013stochastic}. This noise comes from the training data that are randomly sampled when updating the variational parameters. Suppose  that we sample a dyad $(i,j)$ in the graph $G$ with a distribution $g(i,j)$, then SVI can be summarized as follows:
+As mentioned before, we couple CVB with SVI. SVI aims at optimizing ELBO through noisy yet unbiased estimates of its natural gradient \cite{hoffman2013stochastic}. %The noise is associated from the training data that are randomly sampled when updating the variational parameters. 
+Suppose  that we sample a dyad $(i,j)$ in the graph $G$ with a distribution $g(i,j)$, then SVI can be summarized as follows:
 \begin{enumerate}
 \item Maximize local parameter $\gamma_{ij}$ with equation \eqref{eq:maximization},
 \item Compute the intermediate global parameter expectation: $\hat N = \frac{\gamma_{ij}}{g(i,j)}$,
@@ -154,9 +163,6 @@ Stochastic Variational inference (SVI) is a method that optimizes the ELBO by fo
 \end{enumerate}
 
 One bottleneck of the CVB updates is that it computes the expectation on the distribution $q(Z^{-ij})$. Consequently, the maximization step needs to keep in memory the $(\gamma_{ij})$ matrix of size $N^2\times K^2$ which is not convenient for large networks. Thus, following \cite{foulds2013stochastic}, we consider that for large count, the $ij^{th}$ term has a negligible impact on the overall sum and so we omit it. In fact, Foulds et al. shown that this approximation is equivalent to make a online EM MAP estimation.
-
-\subsection{Stratified Sampling}
-\label{sec:sampling}
 
 An advantage of SVI is that it let the freedom to choose a sampling strategy. Stratified sampling was proposed in \cite{gopalan2013efficient} with a SVI inference for the binary MMSB model. We adapt this sampling strategy for our SCVI algorithm. Instead of sampling on a distribution $g(i,j)$ on edges, it samples on a subset $S$ of edges (i.e minibatches) with distribution $h(S)$. For each nodes, we build a link-set $S_1$ containing all its edges, and a non-link set $S_0$ of all its non-links that we scattered in $m$ subsets of equal size such that $S_0 = \cup_{n=1}^m S_{0,n}$. Then for each iteration, we randomly pick one node and either its set $S_1$ or one of its $m$ subset in $S_0$ with
 \begin{align*}
@@ -168,42 +174,41 @@ h(S)=\begin{cases}
 Where $\chi$ is a factor to take into account the symmetry of the adjacency matrix which is fixed to 1 for directed graph and fixed to 2 otherwise. The sampling method allows to adapt the inference to the sparsity of the graph. Moreover, empirical results show that stratified sampling improves speed and quality of the convergence compared to other sampling strategy \cite{gopalan2013efficient}\cite{kim2013efficient}. In our experiments, we find out that sampling the minibatches in $S_0$ with replacement of the non-links improved the performance for both MMSB and WMMSB.
 %Our sampling strategy differ from \cite{gopalan2013efficient}, in the distribution over the set $S_0$, since we sample the subset of non-links with replacement the two distribution differ of a factor $N$.
 
-\subsection{Robbins-Monro Condition}
-
-The convergence of the SVI is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global parameters $\rho^\Phi$ and $\rho^Y$ accounting respectively for  $N^\Phi$ and $N^Y$. For $N^\Theta$ we maintain individual gradient step $\rho_i^{\Phi}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}, as we observed it improves the convergence and the prediction performance. Thus for each minibatch we only increase the gradient steps of the nodes that are observed.
-
-Furthermore, to increase the speed of the inference we update the global parameter $N^\Phi$ and $N^Y$ only after a minibatch round. For the global parameter $N^\Theta$ we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$, which consists to update the class assignment of nodes after observing a bunch of dyad. This heuristic allows to find a trade-off between updating the global parameters after each observation, which slow down the inference and may be prone to get stuck in local optima, and updating them only after a minibatch which can be relatively large (proportional to the number of nodes).
+\textbf{Robbins-Monro Condition} The convergence of the SVI is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global parameters $\rho^\Phi$ and $\rho^Y$ accounting respectively for  $N^\Phi$ and $N^Y$. For $N^\Theta$, we maintain individual gradient steps $\rho_i^{\Phi}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance.% Thus for each minibatch we only increase the gradient steps of the nodes that are observed. 
+Furthermore, to increase the speed of the inference, we update the global parameter $N^\Phi$ and $N^Y$ only after a minibatch round. For the global parameter $N^\Theta$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
+%, which consists to update the class assignment of nodes after observing a bunch of dyad.
+This heuristic provides a trade-off between updating the global parameters after each observation, which slows down the inference and may result in bad local optima, and updating them only after minibatches that are potentially large (proportional to the number of nodes).
 
 %%% Two more point exists:
 % * the time step is increased with the minibatch size,
 % * the intermiatade graidnet is normalized by the minibatch size.
 
-Our SCVI algorithm is summarized in pseudo-code \ref{algo:scvb}.
-
-\begin{algorithm}
-\KwIn{Random initialization of $N^\Theta, N^\Phi, N^Y$.}
-\KwOut{$\Thetah, \Phih$.}
-\Begin{
-$t \gets 0$ \\
-\While{Convergence criteria not met}{
-    Sample a minibatch $S_t$ from $h(S)$. \\
-    \ForEach{$i,j \in S_t$}{
-        Maximize local parameters $\gamma_{ij}$ from \eqref{eq:maximization}.\\
-        \If{burn-in finished}{
-            Compute intermediate gradient $\hat N^\Theta$ from \eqref{eq:sss}.\\
-            Update global parameter $N^{\Theta (t)}$.\\
-            Update gradient step $\rho^\Theta_t$.\\
-        }
-    }
-
-    Compute intermediate gradient $\hat N^\Phi$ and $\hat N^Y$  from \eqref{eq:sss}.\\
-    Update global parameters $N^{\Phi (t)}$ and $N^{Y (t)}$.\\
-    Update gradient steps $\rho^\Phi_t$ and $\rho^\Theta_t$.\\
-	Sample $P$ and $R$ from \eqref{eq:pk_update} \eqref{eq:rk_update}.\\
-    $t \gets t + 1$ .
-    }
-}
-\caption{SCVI pseudo-code.}
-\label{algo:scvb}
-\end{algorithm}
+%Our SCVI algorithm is summarized in pseudo-code \ref{algo:scvb}.
+%
+%\begin{algorithm}
+%\KwIn{Random initialization of $N^\Theta, N^\Phi, N^Y$.}
+%\KwOut{$\Thetah, \Phih$.}
+%\Begin{
+%$t \gets 0$ \\
+%\While{Convergence criteria not met}{
+%    Sample a minibatch $S_t$ from $h(S)$. \\
+%    \ForEach{$i,j \in S_t$}{
+%        Maximize local parameters $\gamma_{ij}$ from \eqref{eq:maximization}.\\
+%        \If{burn-in finished}{
+%            Compute intermediate gradient $\hat N^\Theta$ from \eqref{eq:sss}.\\
+%            Update global parameter $N^{\Theta (t)}$.\\
+%            Update gradient step $\rho^\Theta_t$.\\
+%        }
+%    }
+%
+%    Compute intermediate gradient $\hat N^\Phi$ and $\hat N^Y$  from \eqref{eq:sss}.\\
+%    Update global parameters $N^{\Phi (t)}$ and $N^{Y (t)}$.\\
+%    Update gradient steps $\rho^\Phi_t$ and $\rho^\Theta_t$.\\
+%	Sample $P$ and $R$ from \eqref{eq:pk_update} \eqref{eq:rk_update}.\\
+%    $t \gets t + 1$ .
+%    }
+%}
+%\caption{SCVI pseudo-code.}
+%\label{algo:scvb}
+%\end{algorithm}
 
