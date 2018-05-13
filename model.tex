@@ -23,7 +23,7 @@
 
 \section{Mixed-membership stochastic block models and (un)weighted graphs}
 
-As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We consider the adjacency matrix $Y=(y_{ij})_{ij\in N^2}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} > 0$ otherwise. Furthermore, we use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index.
+As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We consider the adjacency matrix $Y=(y_{ij})_{ij\in N^2}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} > 0$ otherwise.
 
 Mixed-Membership Stochastic Block (MMSB) models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$ that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\alpha$ are $K$-dimensional vectors, where $K$ denotes  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ an associated (usually conjugate) distribution that represents the relations between classes. For unweighted graphs, $F$ is the Bernoulli distribution and $\phi$ its conjugate Beta distribution.
 
@@ -59,44 +59,38 @@ As for most hierarchical Bayesian model, exact inference is intractable and one 
 
 \section{Inference}
 
-One bottleneck of the original inference method proposed for MMSB models is that it scales quadratically with the number of nodes which makes it impractical for large networks. Recent advances in Stochastic Variational Inference (SVI) \cite{hoffman2013stochastic}, notably based on well designed sampling techniques \cite{gopalan2013efficient}\cite{kim2013efficient}, tackle this challenge by enabling the control of the memory complexity with online/minibatch updates and in the same time to scale-up the time complexity with the number of observation (i.e the edges) in the networks. This last point is critical since real world networks are most of the time very sparse \cite{barabasi_burst}. 
+One drawback of the original inference method proposed for MMSB models is its quadratic complexity in the number of nodes. It is impossible to use such a method on large networks. Recent advances in Stochastic Variational Inference (SVI) \cite{hoffman2013stochastic}, notably based on well designed sampling techniques \cite{gopalan2013efficient,kim2013efficient}, address this challenge by enabling the control of the memory complexity with online/minibatch updates while keeping the time complexity linear in the number of edges present in the network. Such approaches are thus very well adapted to online settings, in which links are observed during certain time intervals, over sparse networks (real world networks are most of the time very sparse \cite{barabasi_burst}).
 
-To overcome these limits we propose to combine SVI with Collapse Variational Bayesian (CVB) inference method \cite{teh2006collapsed} which provides a weaker assumption on the variational parameters comparing to the mean-field approximation.
+We propose to combine here SVI with Collapsed Variational Bayesian (CVB) inference \cite{teh2006collapsed} that relies on a weaker assumption on the variational distribution.
 
+\subsection{Collapsed variational inference}
 
-\subsection{Variational Objective}
-
-From the Jensen inequality, one can show the relation between an arbitrary distribution $q$ of the parameters $\Pi$ and the evidence, 
+In the remainder, we use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index. Furthermore, $\Pi$ will denote the model parameters ($\Pi = (\Theta,\Phi,Z)$ for MMSB and WMMSB and $(\Theta,\Phi,Z,R,P)$ for bg-WMMSB) and $\Omega$ the hyperparameters ($\Omega = (\alpha,\lambda_0,\lambda_1)$ for MMSB, $(\alpha,r,p)$ for WMMSB and $(\alpha, c_0, r_0, c, \epsilon)$ for bg-WMMSB). From Jensen's inequality, for any distribution $q$, one has:
+%
 \begin{equation*}
-\log p(Y | \Omega) - \textrm{KL}[q(\Pi)||p(\Pi | Y, \Omega)] = \L_\Pi
+\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
 \end{equation*}
-
-Where $\textrm{KL}$ is the Kullback-Leibler divergence and, denoting the Shannon entropy $\textrm{H}$, $\L_\Pi$ usually referred as the Evidence Lower BOund (ELBO) satisfies
-\begin{equation*}
-\log p(Y|\Omega) \geq \L_\Pi = \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)] 
-\end{equation*}
-
-One can see that maximizing the ELBO is equivalent to minimizing the KL divergence between the variational distribution and the true posterior.
-In the next sections, we will omit the reference to the hyper-parameters $\Omega$ for brevity.
-
-\subsection{Collapsing the Variational Objective}
-Inspired from the closed form updates of the collapse Gibbs sampling, one can weaken the mean-field assumption made over the variational distribution by assuming,
+%
+where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to:
+%
 \begin{equation*}
 q(\Pi) = q(\Theta, \Phi | Z) q(Z)
 \end{equation*}
-
-Such that $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. Then, one can maximize $L_\Pi$ w.r.t $q(\Theta, \Phi | Z)$ to obtain a collapsed form of the ELBO,
+%
+with $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial with parameter $\gamma_{ij}$. The evidence is then lower bounded by:
+%
 \begin{equation*}
-\log p(Y) \geq \L_Z = \E_{q}[\log p(Y, Z)] + \textrm{H}[q(Z)]
+\log p(Y|\Omega) \geq \underbrace{\E_{q}[\log p(Y, Z)] + \textrm{H}[q(Z)]}_{\L_Z}
 \end{equation*}
 
-Finally, maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion, and a Gaussian approximation, following \cite{teh2006collapsed}\cite{asuncion2009smoothing}, yields to the following update
+Maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion and a Gaussian approximation, following \cite{teh2006collapsed,asuncion2009smoothing}, yields the following updates:
+%
 \begin{equation} \label{eq:maximization}
 \gamma_{ijkk'} \propto (N_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (N_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) p(y_{ij} | Y^{\neg ij}, Z^{\neg ij}, \zij=k, \zji=k')
 \end{equation}
-
-Where $N^{\Theta}$ is defined in equation \eqref{eq:sss}.
-Depending on the kernel and marginalizing over $\Theta$ and $\Phi$, one can show that the predictive link distribution $p(y_{ij}|-)$ takes the following closed-form expression
+%
+where the elements $N^{\Theta}$ are defined in Eqs~\eqref{eq:sss}. Depending on the model considered, the predictive link distribution $p(y_{ij}|\Omega)$ takes the following form:
+%
 \begin{align*}
 p(y_{ij} |-)=\begin{cases}
     \left( \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{\Phi^{-ij}}_{1 kk'} + \lambda_1}{N^{\Phi^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{ if binary case} \\
@@ -104,15 +98,17 @@ p(y_{ij} |-)=\begin{cases}
 \end{cases}
 \end{align*}
 
-The different count statistics $N^*$ are estimated from the variational parameters $\gamma_{ijkk'}$ by
+The different count statistics $N^*$ are estimated from the variational parameters $\gamma_{ijkk'}$ by:
+%
 \begin{align} \label{eq:sss}
     N^{\Theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & N^{\Theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
     N^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & N^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
 \end{align}
+%
+In this inference scheme, $\gamma_{ij}$ are the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters.  
 
-In this inference scheme, the $\gamma_{ij}$ are identified as the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters.  
-
-Finally, the model parameters can be recovered from their estimates as follows
+Finally, the model parameters can be recovered from their estimates as follows:
+%
 \begin{align*}
 \hat \theta_{ik} = \frac{N^{\Theta}_{\rightarrow ik} + N^{\Theta}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}} \qquad 
 \hat \phi_{kk'}=\begin{cases}
@@ -120,7 +116,6 @@ Finally, the model parameters can be recovered from their estimates as follows
     \frac{p(N^Y_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ if weighted case} 
     \end{cases}
 \end{align*}
-
 
 \subsection{Optimising the Beta-Gamma augmentation}
 
