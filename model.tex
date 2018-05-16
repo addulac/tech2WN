@@ -1,8 +1,9 @@
 \section{Mixed-membership stochastic block models and (un)weighted graphs}
+\label{sec:model}
 
 As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We consider the adjacency matrix $Y=(y_{ij})_{ij\in N^2}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} > 0$ otherwise.
 
-Mixed-Membership Stochastic Block (MMSB) models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$ that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\alpha$ are $K$-dimensional vectors, where $K$ denotes  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ an associated (usually conjugate) distribution that represents the relations between classes. For unweighted graphs, $F$ is the Bernoulli distribution and $\phi$ its conjugate Beta distribution.
+Mixed-Membership Stochastic Block (MMSB) models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$ that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\alpha$ are $K$-dimensional vectors, $K$ denoting  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ an associated (usually conjugate) distribution that represents the relations between classes. For unweighted graphs, $F$ is usually Bernoulli and $\phi$ its conjugate Beta distribution.
 
 Many real networks nevertheless rely on graphs in which edges are naturally weighted. In co-authorship networks, for example, it is standard to consider edges weighted according to the number of collaborations between authors \cite{newman2001scientific}. In communication networks, the weight are based on the number of messages sent from the sender to the receiver. In text mining and natural language processing applications, it is also common to use word graphs in which edges are weighted on the basis of the number of times the words co-occur (in a sentence, paragraph or document). In all these cases, weights are integers that can naturally be modeled with Poisson distributions. Relying on its conjugate Gamma distribution for $\phi$, one finally obtains the following models, denoted MMSB for unweighted graphs and WMMSB for weighted graphs:
 %
@@ -17,26 +18,25 @@ y_{ij} &\sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), &\phi_
 y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), &\phi_{kk'} &\sim \textrm{Gamma}(r, \frac{p}{1-p}),    & \textrm{  \textit{for weighted graphs (WMMSB)}} 
 \end{align*}
 %
-The choice made here for the Gamma distribution in WMMSB allows one to represent overdispersed count data as one has $y_{ij} \sim \textrm{NB}(r,p)$ \cite{zhou2012beta}, where $\textrm{NB}$ denotes the negative binomial distribution. Furthermore, the above models are valid for both directed and undirected graphs, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
+The choice made here for the Poisson and Gamma distributions in WMMSB allows one to represent overdispersed count data as one has $y_{ij} \sim \textrm{NB}(r,p)$ \cite{zhou2012beta}, where $\textrm{NB}$ denotes the negative binomial distribution. Furthermore, the above models are valid for both directed and undirected graphs, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
 
 %In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi, Z \}$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$ and the set of model hyper-parameters $\Omega$.
 
-\subsection{Beta-Gamma augmentation}
-
-The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them. Following the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}, we model here the rate parameter of the Gamma distribution used in WMMSB with a Beta prior and its shape parameter with another Gamma distribution of the form:
-
+\textbf{Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them. Following the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}, we model here the rate parameter of the Gamma distribution used in WMMSB with a Beta prior and its shape parameter with another Gamma distribution of the form:
+%
 \begin{gather*}
 r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)) \\
 \phi_{kk'} \sim \textrm{Gamma}(r_{kk'}, \frac{p_{kk'}}{1-p_{kk'}})
 \end{gather*}
+%
+The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form: $y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}})$. As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes now play a prominent role in the model. We will denote this model as bg-WMMSB.
 
-The hyperparameters of this model, denoted as bg-WMMSB, are: $\Omega = (\alpha, c_0, r_0, c, \epsilon)$. The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form: $y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}})$. As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes know play a prominent role in the model.
-
-As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a stochastic collapsed variational inference algorithm for the above models (MMSB, WMMSB, bg-WMMSB) that can be used in online settings.
+As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a stochastic collapsed variational inference algorithm for the above models (MMSB, WMMSB, bg-WMMSB).
 
 \section{Inference}
+\label{sec:inference}
 
-As mentioned before, one drawback of doing inference with Gibbs sampling for MMSB models is the quadratic complexity in the number of nodes. If one wants to use MMSB models and its extensions on large networks, one needs to rely on other techniques, as variational inference. We use here Collapsed Variational Bayes (CVB) inference that relies on weaker assumptions than standard variational inference and has proven to be efficient on the Latent Dirichlet Allocation model \cite{teh2006collapsed}. Furthermore, recent advances in Stochastic Variational Inference (SVI) \cite{hoffman2013stochastic}, notably based on well designed sampling techniques \cite{gopalan2013efficient,kim2013efficient}, have shown that it is possible to speed-up variational inference with online updates based on minibatches so that the overall complexity is only linear in the number of edges present in the network. \textcolor{red}{CHECK THE COMPLEXITY} 
+One drawback of doing inference with Gibbs sampling for MMSB models, as is standard, is the quadratic complexity in the number of nodes. If one wants to use MMSB models and its weighted extensions on large networks, one needs to rely on other techniques, as variational inference. We use here Collapsed Variational Bayes (CVB) inference that relies on weaker assumptions than standard variational inference and has proven to be efficient on the Latent Dirichlet Allocation model \cite{teh2006collapsed}. Furthermore, recent advances in Stochastic Variational Inference (SVI) \cite{hoffman2013stochastic}, notably based on well designed sampling techniques \cite{gopalan2013efficient,kim2013efficient}, have shown that it is possible to speed-up variational inference with online updates based on minibatches so that the overall complexity is only linear in the number of nodes and quadratic in the number of latent classes.
 %Such approaches are thus very well adapted to online settings, in which links are observed during certain time intervals, over sparse networks (real world networks are most of the time very sparse \cite{barabasi_burst}). 
 %We combine here SVI with Collapsed Variational Bayes (CVB) inference \cite{teh2006collapsed} that relies on a weaker assumption on the variational distribution than standard variational inference.
 
@@ -46,18 +46,18 @@ We first provide below the results obtained through CVB for MMSB and its weighte
 
 In the remainder, we use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index. Furthermore, $\Pi$ will denote the model parameters ($\Pi = (\Theta,\Phi,Z)$ for MMSB and WMMSB and $\Pi = (\Theta,\Phi,Z,R,P)$ for bg-WMMSB) and $\Omega$ the hyperparameters ($\Omega = (\alpha,\lambda_0,\lambda_1)$ for MMSB, $\Omega = (\alpha,r,p)$ for WMMSB and $\Omega = (\alpha, c_0, r_0, c, \epsilon)$ for bg-WMMSB). 
 
-From Jensen's inequality, for any distribution $q$, one has:
-%
-\begin{equation*}
-\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
-\end{equation*}
-%
-where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB:
-%
-\begin{equation*}
-q(\Pi) = q(\Theta, \Phi | Z) q(Z)
-\end{equation*}
-%
+From Jensen's inequality, for any distribution $q$, one has: $\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]$, 
+%%
+%\begin{equation*}
+%\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
+%\end{equation*}
+%%
+where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB: $q(\Pi) = q(\Theta, \Phi | Z) q(Z)$,
+%%
+%\begin{equation*}
+%q(\Pi) = q(\Theta, \Phi | Z) q(Z)
+%\end{equation*}
+%%
 with $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial with parameter $\gamma_{ij}$. The evidence is then lower bounded by:
 %
 \begin{equation*}
@@ -89,7 +89,7 @@ The different count statistics $N^*$ are estimated from the variational paramete
     N^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & N^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
 \end{align}
 %
-In this inference scheme, $\gamma_{ij}$ are the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters.  
+In this inference scheme, $\gamma_{ij}$ are the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters (or global counts).  
 
 Finally, the model parameters can be recovered from their estimates as follows:
 %
@@ -102,15 +102,15 @@ Finally, the model parameters can be recovered from their estimates as follows:
     \end{cases}
 \end{align*}
 
-\textbf{Beta-Gamma augmentation} For bg-WMMSB model, we consider the following collapsed variational distribution:
-%
-\begin{equation*}
-q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)
-\end{equation*}
-%
-with $R=(r_{kk'})$, $k,k' \in \{1,..,K\}^2$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
+\textbf{Beta-Gamma augmentation} For bg-WMMSB model, we consider the following collapsed variational distribution: $q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)$,
+%%
+%\begin{equation*}
+%q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)
+%\end{equation*}
+%%
+with $R=(r_{kk'}), P=(p_{kk'}), \, 1 \le k,k' \le K$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
 
-The same development as before applies for the parameters $\gamma_{ijkk'}$, given here also by Eq.~\ref{eq:maximization}. Furthermore, $p(y_{ij}|z_{i \rightarrow j}=k,z_{i \leftarrow j}=k')$ and $\hat \phi_{kk'}$ now take the form:
+The same development as above applies for the parameters $\gamma_{ijkk'}$, given here also by Eq.~\ref{eq:maximization}. Furthermore, the predictive link probability and $\hat \phi_{kk'}$ now take the form:
 %
 \[
 p(y_{ij} | Y^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega)  \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right)
@@ -119,42 +119,48 @@ p(y_{ij} | Y^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega)  \sim \mathrm{NB}\left(y_{
 \hat \phi_{kk'} = \frac{\E_{q}[p_{kk'}](N^Y_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}
 \]
 %
-Setting $q(P) = p(P|Y,Z,\Omega)$ where $p$ is the true distribution and exploiting the conjugacy of the Beta and the negative binomial distributions leads to a Beta distribution for $p_{kk'}$ of the form:
-%
-\begin{equation} \label{eq:pk_update}
-p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])
-\end{equation}
-%
+Setting $q(P) = p(P|Y,Z,\Omega)$ where $p$ is the true distribution and exploiting the conjugacy of the Beta and the negative binomial distributions leads to a Beta distribution for $p_{kk'}$: $p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])$,
+%%
+%\begin{equation} \label{eq:pk_update}
+%p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])
+%\end{equation}
+%%
 so that: $\E_{q}[p_{kk'}] = \frac{c\epsilon + N^Y_{kk'}}{c\epsilon + N^Y_{kk'} + c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}]}$.
 
-Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form:
+Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form: $\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}$.
 %
-\begin{equation}
-\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
-\end{equation}
+%\begin{equation}
+%\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
+%\end{equation}
 
 \subsection{Stochastic variational inference with stratified sampling}
 
-SVI aims at optimizing ELBO through noisy yet unbiased estimates of its natural gradient computed on sampled data points. Different sampling strategies \cite{gopalan2013efficient,kim2013efficient} can be used. Following the study in \cite{gopalan2013efficient}, we rely here on stratified sampling that allows one to control the number of links and non-links used in the inference process. 
-
-For each node $i, \, 1 \le i \le N$, one first constructs a set, denoted $s_1^i$, containing all the nodes to which $i$ is connected to as well as $M$ sets of equal size \textcolor{red}{WHICH SIZE}, denoted $s_0^{i,m}, \, 1 \le m \le M$, each containing a sample of the nodes to which $i$ is not connected to\footnote{The sampling is here uniform over the nodes not connected to $i$ with replacement; sampling without replacement led to poorer results in our experiments.}. We will denote by $S_0^i$ the set of all $s_0^{i,m}$ sets. The sets thus obtained, for all nodes, constitute minibatches that can be sampled and used to update the global parameters in Eq.~\ref{eq:sss}. The combined scheme, stratified sampling with SVI, is summarized below:
+SVI aims at optimizing ELBO through noisy yet unbiased estimates of its natural gradient computed on sampled data points. Different sampling strategies \cite{gopalan2013efficient,kim2013efficient} can be used. Following the study in \cite{gopalan2013efficient}, we rely here on stratified sampling that allows one to control the number of links and non-links used in the inference process. For each node $i, \, 1 \le i \le N$, one first constructs a set, denoted $s_1^i$, containing all the nodes to which $i$ is connected to as well as $M$ sets of equal size, denoted $s_0^{i,m}, \, 1 \le m \le M$, each containing a sample of the nodes to which $i$ is not connected to\footnote{The sampling is here uniform over the nodes not connected to $i$ with replacement; sampling without replacement led to poorer results in our experiments.}. We will denote by $S_0^i$ the set of all $s_0^{i,m}$ sets. The sets thus obtained, for all nodes, constitute minibatches that can be sampled and used to update the global parameters in Eq.~\ref{eq:sss}. The combined scheme, stratified sampling with SVI, is summarized below:
 %
 \begin{enumerate}
-\item Sample a node $i$ uniformly over all nodes in the graph; with probability $\frac{1}{2}$, either select $s_1^i$ or any set from $S_0^i$ (in the latter case, the selection is uniform over the sets in $S_0^i$). We will denote by $s_i$ the set selected and by $|s_i|$ its cardinality.
-\item For each node $j \in s_i$, compute $\gamma_{ijkk'}$ through Eq.~\ref{eq:maximization} and intermediate local counts as follows:
-\begin{align}
-\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
-\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
-\end{align}
+\item Sample a node $i$ uniformly from all nodes in the graph; with probability $\frac{1}{2}$, either select $s_1^i$ or any set from $S_0^i$ (in the latter case, the selection is uniform over the sets in $S_0^i$). We will denote by $s_i$ the set selected and by $|s_i|$ its cardinality.
+\item For each node $j \in s_i$, compute $\gamma_{ijkk'}$ through Eq.~\ref{eq:maximization} and intermediate global counts acc. to: {\small
+$\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'}, \,\, \hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij}$
+}\\
+%\begin{align}
+%\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
+%\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
+%\end{align}
 where $C$ is a constant that is $2$ for undirected graphs and $1$ for directed graphs and $g(s_i) = \frac{1}{Nm}$ if $s_i \in S_0^i$ and $\frac{1}{N}$ otherwise.
-\item Stochastic update of the global counts:
-\begin{align}
-\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
-\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
-\end{align}
+\item Update of the global counts (online version of Eq.~\ref{eq:sss}): {\small $N^{\Theta}_{\rightarrow ik} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\rightarrow ik} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\rightarrow ik}, \,\, N^{\Theta}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\leftarrow jk'} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\leftarrow jk'}, \,\, N^{\Phi}_{xkk'} \leftarrow (1 - \rho^{\Phi}_t) N^{\Phi}_{xkk'} + \rho^{\Phi}_t \hat N^{\Phi}_{xkk'}, \,\, N^{Y}_{kk'} \leftarrow (1 - \rho^{Y}_t) + \rho^{Y}_t \hat N^{Y}_{kk'}$}
+%\begin{align}
+%N^{\Theta}_{\rightarrow ik} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\rightarrow ik} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\rightarrow ik}, & \,\,\, N^{\Theta}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\leftarrow jk'} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\leftarrow jk'} \nonumber \\
+%N^{\Phi}_{xkk'} \leftarrow (1 - \rho^{\Phi}_t) N^{\Phi}_{xkk'} + \rho^{\Phi}_t \hat N^{\Phi}_{xkk'}, & \,\,\, N^{Y}_{kk'} \leftarrow (1 - \rho^{Y}_t) + \rho^{Y}_t \hat N^{Y}_{kk'} \nonumber
+%\end{align}
+\item $\rho^*_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$.
+\item Go back to step 1 till stopping criterion is met.
 \end{enumerate}
+%
+As one can note, the intermediate global counts correspond to a restriction, on minibatches, of the complete computation given in Eq.~\ref{eq:sss}. The value of $C$ is due to the fact that in undirected networks, each edge can be seen twice. The terms $\frac{1}{|s_i|}$ and $\frac{1}{Cg(s_i)}$ serve as a normalization in the gradient-like updates of the global counts (as there are more non-links than links, each non-link minibatch, representing a smaller fraction of the non-links, leads to more conservative updates). The "gradient steps" $\rho^*$ are discussed below (Robbins-Monro condition).
 
-One bottleneck of the CVB updates is that it computes the expectation on the distribution $q(Z^{-ij})$. Consequently, the maximization step needs to keep in memory the $(\gamma_{ij})$ matrix of size $N^2\times K^2$ which is not convenient for large networks. Thus, following \cite{foulds2013stochastic}, we consider that for large count, the $ij^{th}$ term has a negligible impact on the overall sum and so we omit it. In fact, Foulds et al. shown that this approximation is equivalent to make a online EM MAP estimation.
+\textcolor{red}{ADRIEN, PEUX-TU DIRE DEUX MOTS SUR LE STOPPING CRITERION?}
+
+Lastly, to be able to efficiently compute such quantities as $N^{\Phi^{-ij}}$ used for the computation of the link probability, one needs to store in memory, for each pair of nodes $(i,j)$, a $K \times K$ matrix, which is not feasible for large networks. Thus, following \cite{foulds2013stochastic}, we replace here $N^{\Phi^{-ij}}$ by $N^{\Phi}$, which amounts to assume that the contribution of each individual pair of nodes is negligible compared to all other pairs, a reasonable assumption when the network is large. The complete code for the inference will be made available in GitHub.
 
 \textbf{Robbins-Monro condition} The convergence of the SVI is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global parameters $\rho^\Phi$ and $\rho^Y$ accounting respectively for  $N^\Phi$ and $N^Y$. For $N^\Theta$, we maintain individual gradient steps $\rho_i^{\Theta}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance.% Thus for each minibatch we only increase the gradient steps of the nodes that are observed. 
 Furthermore, to increase the speed of the inference, we update the global parameter $N^\Phi$ and $N^Y$ only after a minibatch round. For the global parameter $N^\Theta$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
