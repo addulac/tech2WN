@@ -17,7 +17,7 @@ y_{ij} &\sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), &\phi_
 y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), &\phi_{kk'} &\sim \textrm{Gamma}(r, \frac{p}{1-p}),    & \textrm{  \textit{for weighted graphs (WMMSB)}} 
 \end{align*}
 %
-The choice made here for the Gamma distribution in WMMSB allows one to represent overdispersed count data as one has $y_{ij} \sim \textrm{NB}(r,p)$ \cite{zhou2012beta}, where $\textrm{NB}$ denotes the negative binomial distribution. Furthermore, the above models are valid for both directed and undirected graphs, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
+The choice made here for the Poisson and Gamma distributions in WMMSB allows one to represent overdispersed count data as one has $y_{ij} \sim \textrm{NB}(r,p)$ \cite{zhou2012beta}, where $\textrm{NB}$ denotes the negative binomial distribution. Furthermore, the above models are valid for both directed and undirected graphs, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
 
 %In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi, Z \}$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$ and the set of model hyper-parameters $\Omega$.
 
