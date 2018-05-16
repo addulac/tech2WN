@@ -1,12 +1,53 @@
-\section{Appendix}
-\label{sec:append}
 
 
-\subsection{Collapsed Variational Updates Derivation}
 
-see the paper WMMSB\_derive.pdf in the github repo.
 
-\subsection{Beta-Gamma Updates}
+\section{Collapsed Variational Updates Derivation}
+
+The derivation of the Collapsed Variational update is obtained by maximizing the ELBO w.r.t $\gamma_{ijkk'}$ with 
+
+\begin{align*}
+\frac{\partial \L}{\partial \gamma_{ijkk'}} &= \frac{\partial }{\partial \gamma_{ijkk'}}  \sum_{Z^{-ij}}\sum_{k_1=1}^K\sum_{k_2=1}^K  q(Z^{-ij}) \gamma_{ijk_1 k_2} (\log p(Y, Z^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2|\Omega)+ \\
+& \qquad \log q(Z^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2) )   \\
+&= E_{q(Z^{-ij})}[ p(Y, Z^{-ij}, z_{i\rightarrow j}=k, z_{i\leftarrow j}=k'|\Omega))] + H[Z^{-ij}] -\log(\gamma_{ijkk'}) +1
+\end{align*}
+
+\textcolor{red}{(expliqué la prportionnel.)}
+
+By Equating the derivative to zeros, one obtain the following update
+\begin{equation} \label{eq1}
+\gamma_{ijkk'} \propto \exp E_{q(Z^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega) ]
+\end{equation}
+
+with  $P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega)$ being the collapse Gibbs update in WMMSB with the following close form expression
+
+\begin{align*}
+P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' |-) \propto (n_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (n_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) \mathrm{NB}\left(y_{ij}; n^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,n^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right)
+\end{align*}
+
+Where the count statistic are obtained from the following equations
+
+%\begin{align} \label{eq:sss}
+%    n^{\Theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & n^{\Theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
+%    n^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & n^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
+%\end{align}
+
+\begin{align*}                                                                                                                                        
+&n^{\Theta}_{\rightarrow ik} = \sum_j \delta(\zij=k)\\
+&n^{Y}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k') \\
+&n^{\Phi}_{\bm{.}kk'} = \sum_{ij} \delta( \zij=k, \zji=k') 
+\end{align*}   
+
+By Applying a first order Taylor expansion on equation \eqref{eq1}, following \cite{teh2006collapsed} one obtain
+
+\begin{equation}
+\gamma_{ijkk'} \propto (E_{q(Z^{-ij})}[n_{\rightarrow ik}^{\Theta^{-j}}] + \alpha_k) (E_{q(Z^{-ij})}[n_{\leftarrow jk}^{\Theta^{-i}}] + \alpha_{k'}) \mathrm{NB}\left(y_{ij}; E_{q(Z^{-ij})}[n^{Y^{-ij}}_{kk'}] + r, \frac{p}{p\,E_{q(Z^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}] + 1} \right)
+\end{equation}
+
+Finally, by using a gaussian approximation, one can estimate the expectations $E_{q(Z^{-ij})}[n_{\rightarrow ik}^{\Theta^{-j}}], E_{q(Z^{-ij})}[n_{\leftarrow jk}^{\Theta^{-i}}]$ and  $E_{q(Z^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}]$ with the counts define in equations (2) (section 3.1).
+
+
+\section{Beta-Gamma Updates}
 
 In the WMMSB-bg model, we assume the variational distribution to be 
 
@@ -14,88 +55,147 @@ In the WMMSB-bg model, we assume the variational distribution to be
 q(\Pi) = q(\Theta, \Phi|Z, R, P) q(Z)q(R)q(P)
 \end{equation*}
 
-In our optimization, we set the $q(r_k) \sim \mathrm{Gamma}(a_k, b_k)$ iid for $1\leq k \leq K^2$. 
+In our optimization, we set the $q(r_{kk'}) \sim \mathrm{Gamma}(a_{kk'}, b_{kk'})$ iid for $1\leq k \leq K$ and $1\leq k' \leq K$ . 
 
 The collapsed ELBO can be rewritten as 
 
 \begin{align*}
-\log p(Y) \geq \L_{Z,R,P} &= \E_{q}[\log p(Y, Z, R, P)] + \textrm{H}[q(Z)] + \textrm{H}[q(R)] + \textrm{H}[q(P)] \\
-                        &=  \E_{q(Z)}[\log p(Y, Z)] + \textrm{H}[q(Z)] \\
+\log p(Y) \geq \L_{Z,R,P} &= \E_{q}[\log p(Y, Z, R, P|\Omega)] + \textrm{H}[q(Z)] + \textrm{H}[q(R)] + \textrm{H}[q(P)] \\
+                        &= \E_{q}[\log p(Y, Z)] + \textrm{H}[q(Z)] \\
                         &\qquad + \E_{q}[\log p(R|Y,Z,P)] + \textrm{H}[q(R)] \\
                         &\qquad +\E_{q}[\log p(P|Y,Z)] + \textrm{H}[q(P)] 
 \end{align*}
 
-\paragraph{Optimizing $r_k$}
+\paragraph{Optimizing $\gamma_{ijkk'}$}
 
-We isolate the part of the ELBO than depends only on $r_k$ parameters ($a_k$ and $b_k$) and we will drop the other terms. Thus, We consider only the links that have been generated in the class $k$ denoted by $Y^{(k)}$. Furthermore we know that links in class $k$ are i.i.d drawn from  Negative binomial distribution such that $y_{ij} \sim NB(r_k, p_k)$ if $(ij)$ is in the class $k$. One has
+In the beta-gamma augmentation, the parameter $p$ and $r$ are marginalized in the original update equation \eqref{eq1}
+\begin{equation}
+\gamma_{ijkk'} \propto \exp E_{q(Z^{-ij})} [\log E_{q(r_{kk'})}[E_{q(p_{kk'})}[ P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega) ] ] ]
+\end{equation}
+
+By using a first order Taylor expansion, on obtain the following update
+
+\begin{equation}
+\gamma_{ijkk'} \propto (N_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (N_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right)
+\end{equation}
+
+\paragraph{Optimizing $r_{kk'}$}
+
+We isolate the part of the ELBO than depends only on $r_{kk'}$ parameters ($a_{kk'}$ and $b_{kk'}$) and we will drop the other terms. Thus, We consider only the links that have been generated within the classes interaction $k,k'$ denoted by $Y^{(kk')}$. Furthermore we know that links in class $k$ are i.i.d drawn from  Negative binomial distribution such that $y_{ij} \sim NB(r_{kk'}, p_{kk'})$ if $(ij)$ is within the classes interaction $k,k'$. One has
 
 \begin{align*}
-\L_{[r_k]} = \E_{q(r_k)}[\log p(r_k|Y^{(k)},Z^{(k)},p_k)] + \textrm{H}[q(r_k)] \\
+\L_{[r_{kk'}]} = \E_{q(r_{kk'})}[\log p(r_{kk'}|Y^{(kk')},Z^{(kk')},p_{kk'})] + \textrm{H}[q(r_{kk'})] \\
 \end{align*}
 
-By applying a bayes rules and dropping the normalizing term that do not depend on $r_k$, on has
+By applying a Bayes rules and dropping the normalizing term that do not depend on $r_{kk'}$, on has
 
 \begin{align*}
-\L_{[r_k]} &= \E_{q(r_k)}[\log \left( p(Y^{(k)}|Z^{(k)}, r_k, p_k) p(r_k) \right)] + \textrm{H}[q(r_k)] \\
-    &= \E_{q(r_k)}[\log \left( \prod_{ij\in Y^{(k)}} \dbinom{r_k + y_{ij}-1}{y_{ij}} (1-p_k)^{r_k} p_k^{y_{ij}} p(r_k) \right) ] + \textrm{H}[q(r_k)] \\
-    &= \E_{q(r_k)}[\log \left( (1-p_k)^{r_k N^{\Phi}_k} p_k^{N^{Y}_k} p(r_k) \prod_{ij\in Y^{(k)}} \frac{\Gamma(r_k+y_{ij})}{\Gamma(r_k) \Gamma(y_{ij}+1) }  \right) ] + \textrm{H}[q(r_k)]
+\L_{[r_{kk'}]} &= \E_{q(r_{kk'})}[\log \left( p(Y^{(kk')}|Z^{(kk')}, r_{kk'}, p_{kk'}) p(r_{kk'}]) \right)] + \textrm{H}[q(r_{kk'})] \\
+    &= \E_{q(r_{kk'})}[\log \left( \prod_{ij\in Y^{(kk')}} \dbinom{r_{kk'} + y_{ij}-1}{y_{ij}} (1-p_{kk'})^{r_{kk'}} p_k^{y_{ij}} p(r_{kk'}) \right) ] + \textrm{H}[q(r_{kk'})] \\
+    &= \E_{q(r_{kk'})}[\log \left( (1-p_{kk'})^{r_{kk'} N^{\Phi}_{kk'}} p_{kk'}^{N^{Y}_{kk'}} p(r_{kk'}) \prod_{ij\in Y^{(kk')}} \frac{\Gamma(r_{kk'}+y_{ij})}{\Gamma(r_{kk'}) \Gamma(y_{ij}+1) }  \right) ] + \textrm{H}[q(r_{kk'})]
 \end{align*}
 
 From the model definitions one has the following identities
 
 \begin{equation*}
-p(r_k) \propto r_0 c_0\log(r_k) - r_k c_0
+\log p(r_{kk'}) = (r_0 c_0-1)\log(r_{kk'}) - r_{kk'} c_0 + \mathrm{cst}
 \end{equation*}
 
 and 
 
 \begin{equation*}
-\textrm{H}[q(r_k)] = a_k + \log(b_k) +\log \Gamma(a_k) + (1-a_k)\Psi(a_k)
+\textrm{H}[q(r_{kk'})] = a_{kk'} + \log(b_{kk'}) +\log \Gamma(a_{kk'}) + (1-a_{kk'})\Psi(a_{kk'})
 \end{equation*}
 
-If $N^Y_k=0$, the ELBO takes the following closed form expression
+If $N^Y_{kk'}=0$, the ELBO takes the following closed form expression
 
 \begin{align*}
-\L_{[r_k]} &= N^\Phi_k a_k b_k \log(1-p_k) + (r_0 c_0-1 )(\Psi(a_k) + \log(b_k)) -c_0 a_k b_k   \\
-&\qquad a_k + \log(b_k) +\log \Gamma(a_k) + (1-a_k)\Psi(a_k)
+\L_{[r_{kk'}]} &= N^\Phi_{kk'} a_{kk'} b_{kk'} \log(1-p_{kk'}) + (r_0 c_0-1 )(\Psi(a_{kk'}) + \log(b_{kk'})) -c_0 a_{kk'} b_{kk'}   \\
+&\qquad + a_{kk'} + \log(b_{kk'}) +\log \Gamma(a_{kk'}) + (1-a_{kk'})\Psi(a_{kk'})
 \end{align*}
 
-Maximizing with respect to $b_k$ gives the following update
+Maximizing with respect to $b_{kk'}$ gives the following update
 
 \begin{equation}\label{eq:update1}
-b_k = \frac{r_0 c_0}{a_k (c_0 - N^\Phi_k \log(1-p_k))}
+b_{kk'} = \frac{r_0 c_0}{a_{kk'} (c_0 - N^\Phi_{kk'} \log(1-p_{kk'}))}
 \end{equation}
 
-If $N^Y_k \neq 0$, by remarking that $\log \prod_{ij\in Y^{(k)}} \frac{\Gamma(r_k+y_{ij})}{\Gamma(r_k) \Gamma(y_{ij}+1) } \leq -\log(r_k) + cst$, one can bound the ELBO by
+If $N^Y_{kk'} \neq 0$, one has $\log \prod_{ij\in Y^{(kk')}} \frac{\Gamma(r_{kk'}+y_{ij})}{\Gamma(r_{kk'}) \Gamma(y_{ij}+1) } = \log \prod_{ij\in Y^{(kk')}} \frac{1}{B(r_{kk'}, y_{ij})y_{ij}}$. From the beta function definition, and assuming that the $y_{ij} \in Y^{(kk')}$ are greater that zeros, one has
 
 \begin{align*}
-\L_{[r_k]} &\geq N^\Phi_k a_k b_k \log(1-p_k) + (r_0 c_0-1 )(\Psi(a_k) + \log(b_k)) -c_0 a_k b_k -\Psi(a_k) - \log(b_k)  \\
-&\qquad a_k + \log(b_k) +\log \Gamma(a_k) + (1-a_k)\Psi(a_k)
+B(r_{kk'}, y_{ij}) = \int_0^1 t^{r_{kk'}-1} (1-t)^{y_{ij}-1} dt  \leq \int_0^1 t^{r_{kk'}-1} dt = \frac{1}{r_k}
 \end{align*}
 
-Maximizing again with respect to $b_k$, the update becomes
+Therefore plugging the inequality, one has
+
+\begin{equation*}
+\log \prod_{ij\in Y^{(kk')}} \frac{\Gamma(r_{kk'}+y_{ij})}{\Gamma(r_{kk'}) \Gamma(y_{ij}+1) } \geq n^Y_{kk'} \log(r_{kk'}) + \mathrm{cst}
+\end{equation*}
+
+
+\textcolor{red}{here, expliqué le passage de $n^Y$ a $N^y$ encore avec une taylor expansion sur q(Z), excatement comme precedement.}
+The ELBO can further be lower bounded, which leads to te following form
+
+
+\begin{align*}
+\L_{[r_{kk'}]} &\geq N^\Phi_{kk'} a_{kk'} b_{kk'} \log(1-p_{kk'}) + (r_0 c_0-1 )(\Psi(a_{kk'}) + \log(b_{kk'})) -c_0 a_{kk'} b_{kk'} +N^Y_{kk'} (\Psi(a_{kk'}) + \log(b_{kk'}))  \\
+&\qquad a_{kk'} + \log(b_{kk'}) +\log \Gamma(a_{kk'}) + (1-a_{kk'})\Psi(a_{kk'})
+\end{align*}
+
+Maximizing again with respect to $b_{kk'}$, the update becomes
 
 \begin{equation} \label{eq:update2}
-b_k = \frac{r_0 c_0-1}{a_k (c_0 - N^\Phi_k \log(1-p_k))}
+b_{kk'} = \frac{r_0 c_0 + N^Y_{kk'}}{a_{kk'} (c_0 - N^\Phi_{kk'} \log(1-p_{kk'}))}
 \end{equation}
 
-Finally, the maximisation with respect to $a_k$ leads to update of the form of differential equation involving digamma function. Thus, it has no closed form expression. In the literature, Newtow's method has been suggested to estimate such equation. Instead, we find that $r_k$ can be recovered from updates \eqref{eq:update1} and \eqref{eq:update2} by remarking that
+Finally, the maximisation with respect to $a_{kk'}$ leads to update of the form of differential equation involving digamma function. Thus, it has no closed form expression. In the literature, Newtow's method has been suggested to estimate such equation. Instead, we find that $r_{kk'}$ can be recovered from updates \eqref{eq:update1} and \eqref{eq:update2} by remarking that
 
 \begin{equation}
-\E_q[r_k] = a_k b_k = \frac{x_0}{a_k (c_0 - N^\Phi_k \log(1-p_k))}
+\E_q[r_{kk'}] = a_{kk'} b_{kk'} = \frac{r_0 c_0 + N^Y_{kk'}}{a_{kk'} (c_0 - N^\Phi_{kk'} \log(1-p_{kk'}))}
 \end{equation}
 
-With $x_0=r_0 c_0$ if $N^Y_k \neq 0$ and $x_0=r_0 c_0-1$ otherwise.
+
+One can show that this update is also sound when $N^Y_{kk'} = 0$.
 
 
+\paragraph{Optimizing $p_{kk'}$}
 
-\paragraph{Optimizing $p_k$}
-
-To optimize $p_k$, instead of using a variational approach, that unfortunately have no closed form expression, but one can use Gibbs sampling. As the $p_k$ is conjugate of the Negative Binomial distribution one can derived closed form update of the form
+In oder to maximize the ELBO w.r.t $p_{kk}'$ one can let $q(p_{kk'} =p(p_{kk'} | Y,Z)=E_q(r_{kk'}) [ p(p_{kk'} | Y^{(kk')},Z^{(kk')} ,r_{kk'})]$. As the Negative binomial and beta distribution are conjugate, a close form expression can obtain as
 
 \begin{align*}
-p(p_k | Y^{(k)}, Z^{(k)}, r_k) &\propto p(Y^{(k)| Z^{(k)}, r_k} p(r_k) \\
-                               &\propto (1-p_k)^{r_k N^\Phi_k}p_k^{N^Y_k} p_k^{c\epsilon -1} (1-p_k)^{c(1-\epsilon) -1}\\
-                               &\propto p_k^{c\epsilon + N^Y_{k} -1} (1-p_k)^{c(1-\epsilon) + N^\Phi_{k}r_k-1}\\
-                               &propto \mathrm{Beta}(c\epsilon + N^Y_{k}, c(1-\epsilon) + N^\Phi_{k}r_k)
+p(p_{kk'} | Y^{(kk')}, Z^{(kk')}, r_{kk'}) &\propto p(Y^{(kk')| Z^{(kk')}, r_{kk'}} p(r_{kk'}) \\
+                               &\propto (1-p_{kk'})^{r_{kk'} N^\Phi_{kk'}}p_{kk'}^{N^Y_{kk'}} p_{kk'}^{c\epsilon -1} (1-p_{kk'})^{c(1-\epsilon) -1}\\
+                               &\propto p_{kk'}^{c\epsilon + N^Y_{kk'} -1} (1-p_{kk'})^{c(1-\epsilon) + N^\Phi_{kk'}r_{kk'}-1}\\
+                               &\sim \mathrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}r_{kk'})
 \end{align*}
+
+Finally, by resorting to a first order expansion, one obtain the final update
+
+\begin{equation*}
+p(p_{kk'} | Y^{(kk')}, Z^{(kk')}, r_{kk'}) \sim \mathrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'} E_q[r_{kk'}])
+\end{equation*}
+
+
+\section{Stratified Sampling}
+
+Sampling from minibatches in SVI, for MMSB model, was initially proposed in [6] and [7]. The adaptation of the sampling scheme for SCVI is based on the reformulation of the "sufficient statistics" $N^\Theta, N^\Phi$ and $N^Y$  by bringing up a minibatch distribution $h(S)$. The idea of the stratified sampling is to divide the edges into subset that share some statistical strength.
+For each node $n$ with divide it's neighbors pairs into a set $S_1$ containing all its links (edges) and a subset $S_0$ dividing into  $m$ set containing its non-links. Then sampling consists of drawing one of its its set $S_0$ or $S_0$ with probability.
+
+\begin{align*}
+h(S)=\begin{cases}
+    \frac{1}{2 N}  & \textrm{ if } S = S_1 \\
+    \frac{1}{2 N m}  & \textrm{ if } S \in S_0 
+    \end{cases}
+\end{align*}
+
+
+By referencing any of the global "sufficient statistics" of the models with the term $N^*$ such that $N^* \in \{N^Y, N^\Theta, N^\Phi\}$. Assuming that every pair (i, j) occurs in some constant number of sets c, $N^*$ can be reformulated as follows 
+
+\begin{align*}
+N^* = \sum_{ij, *} \gamma_{ij} = \E_h[ \frac{1}{c}\frac{1}{h(S)} \sum_{ij \in S, *} \gamma_{ij}  ]
+\end{align*}
+
+Where $N^*$ and $\gamma_{ij}$ are matricies of size $K\times K$.
+The exact summing formulation of $N^*=\sum_{ij,*}$ is given in section 3.1. For undirected network, $c$ is equal to 2 because each pair occurs in two set, and $c$ is 1 for directed network.
+
+

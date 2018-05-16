@@ -24,6 +24,15 @@ test:
 	${CC} ${TEST}.tex
 	${CONV} ${TEST}.dvi; 
 
+appendix:
+	pdflatex wmmsb_appendix.tex
+
+
+
+pandoc:
+	pandoc extra_stoch.md --latex-engine=pdflatex --listings -H setup.tex --filter pandoc-citeproc -o extra_stoch.tex
+	pdflatex extra_stoch.tex
+
 
 clean:
 	rm -f *.dvi
