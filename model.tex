@@ -44,18 +44,18 @@ We first provide below the results obtained through CVB for MMSB and its weighte
 
 In the remainder, we use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index. Furthermore, $\Pi$ will denote the model parameters ($\Pi = (\Theta,\Phi,Z)$ for MMSB and WMMSB and $\Pi = (\Theta,\Phi,Z,R,P)$ for bg-WMMSB) and $\Omega$ the hyperparameters ($\Omega = (\alpha,\lambda_0,\lambda_1)$ for MMSB, $\Omega = (\alpha,r,p)$ for WMMSB and $\Omega = (\alpha, c_0, r_0, c, \epsilon)$ for bg-WMMSB). 
 
-From Jensen's inequality, for any distribution $q$, one has:
-%
-\begin{equation*}
-\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
-\end{equation*}
-%
-where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB:
-%
-\begin{equation*}
-q(\Pi) = q(\Theta, \Phi | Z) q(Z)
-\end{equation*}
-%
+From Jensen's inequality, for any distribution $q$, one has: $\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]$, 
+%%
+%\begin{equation*}
+%\log p(Y | \Omega) \ge \E_{q}[\log p(Y, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
+%\end{equation*}
+%%
+where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2006collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB: $q(\Pi) = q(\Theta, \Phi | Z) q(Z)$,
+%%
+%\begin{equation*}
+%q(\Pi) = q(\Theta, \Phi | Z) q(Z)
+%\end{equation*}
+%%
 with $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial with parameter $\gamma_{ij}$. The evidence is then lower bounded by:
 %
 \begin{equation*}
@@ -100,15 +100,15 @@ Finally, the model parameters can be recovered from their estimates as follows:
     \end{cases}
 \end{align*}
 
-\textbf{Beta-Gamma augmentation} For bg-WMMSB model, we consider the following collapsed variational distribution:
-%
-\begin{equation*}
-q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)
-\end{equation*}
-%
-with $R=(r_{kk'})$, $k,k' \in \{1,..,K\}^2$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
+\textbf{Beta-Gamma augmentation} For bg-WMMSB model, we consider the following collapsed variational distribution: $q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)$,
+%%
+%\begin{equation*}
+%q(\Pi) = q(\Theta, \Phi|Z, R, P)q(Z)q(R)q(P)
+%\end{equation*}
+%%
+with $R=(r_{kk'}), P=(p_{kk'}), \, 1 \le k,k' \le K$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$. 
 
-The same development as before applies for the parameters $\gamma_{ijkk'}$, given here also by Eq.~\ref{eq:maximization}. Furthermore, $p(y_{ij}|z_{i \rightarrow j}=k,z_{i \leftarrow j}=k')$ and $\hat \phi_{kk'}$ now take the form:
+The same development as above applies for the parameters $\gamma_{ijkk'}$, given here also by Eq.~\ref{eq:maximization}. Furthermore, the predictive link probability and $\hat \phi_{kk'}$ now take the form:
 %
 \[
 p(y_{ij} | Y^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega)  \sim \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right)
