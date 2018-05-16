@@ -22,13 +22,13 @@ The choice made here for the Poisson and Gamma distributions in WMMSB allows one
 %In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi, Z \}$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$ and the set of model hyper-parameters $\Omega$.
 
 \textbf{Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them. Following the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}, we model here the rate parameter of the Gamma distribution used in WMMSB with a Beta prior and its shape parameter with another Gamma distribution of the form:
-
+%
 \begin{gather*}
 r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)) \\
 \phi_{kk'} \sim \textrm{Gamma}(r_{kk'}, \frac{p_{kk'}}{1-p_{kk'}})
 \end{gather*}
-
-The hyperparameters of this model, denoted as bg-WMMSB, are: $\Omega = (\alpha, c_0, r_0, c, \epsilon)$. The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form: $y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}})$. As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes know play a prominent role in the model.
+%
+The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form: $y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}})$. As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes now play a prominent role in the model. We will denote this model as bg-WMMSB.
 
 As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a stochastic collapsed variational inference algorithm for the above models (MMSB, WMMSB, bg-WMMSB) that can be used in online settings.
 
