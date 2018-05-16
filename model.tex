@@ -21,9 +21,7 @@ The choice made here for the Gamma distribution in WMMSB allows one to represent
 
 %In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi, Z \}$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$ and the set of model hyper-parameters $\Omega$.
 
-\subsection{Beta-Gamma augmentation}
-
-The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them. Following the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}, we model here the rate parameter of the Gamma distribution used in WMMSB with a Beta prior and its shape parameter with another Gamma distribution of the form:
+\textbf{Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them. Following the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}, we model here the rate parameter of the Gamma distribution used in WMMSB with a Beta prior and its shape parameter with another Gamma distribution of the form:
 
 \begin{gather*}
 r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)) \\
@@ -89,7 +87,7 @@ The different count statistics $N^*$ are estimated from the variational paramete
     N^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & N^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
 \end{align}
 %
-In this inference scheme, $\gamma_{ij}$ are the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters.  
+In this inference scheme, $\gamma_{ij}$ are the \emph{local} parameters while the count statistics $N^*$ represent the \emph{global} parameters (or global counts).  
 
 Finally, the model parameters can be recovered from their estimates as follows:
 %
@@ -119,42 +117,48 @@ p(y_{ij} | Y^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega)  \sim \mathrm{NB}\left(y_{
 \hat \phi_{kk'} = \frac{\E_{q}[p_{kk'}](N^Y_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}
 \]
 %
-Setting $q(P) = p(P|Y,Z,\Omega)$ where $p$ is the true distribution and exploiting the conjugacy of the Beta and the negative binomial distributions leads to a Beta distribution for $p_{kk'}$ of the form:
-%
-\begin{equation} \label{eq:pk_update}
-p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])
-\end{equation}
-%
+Setting $q(P) = p(P|Y,Z,\Omega)$ where $p$ is the true distribution and exploiting the conjugacy of the Beta and the negative binomial distributions leads to a Beta distribution for $p_{kk'}$: $p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])$,
+%%
+%\begin{equation} \label{eq:pk_update}
+%p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])
+%\end{equation}
+%%
 so that: $\E_{q}[p_{kk'}] = \frac{c\epsilon + N^Y_{kk'}}{c\epsilon + N^Y_{kk'} + c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}]}$.
 
-Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form:
+Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form: $\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}$.
 %
-\begin{equation}
-\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
-\end{equation}
+%\begin{equation}
+%\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
+%\end{equation}
 
 \subsection{Stochastic variational inference with stratified sampling}
 
-SVI aims at optimizing ELBO through noisy yet unbiased estimates of its natural gradient computed on sampled data points. Different sampling strategies \cite{gopalan2013efficient,kim2013efficient} can be used. Following the study in \cite{gopalan2013efficient}, we rely here on stratified sampling that allows one to control the number of links and non-links used in the inference process. 
-
-For each node $i, \, 1 \le i \le N$, one first constructs a set, denoted $s_1^i$, containing all the nodes to which $i$ is connected to as well as $M$ sets of equal size \textcolor{red}{WHICH SIZE}, denoted $s_0^{i,m}, \, 1 \le m \le M$, each containing a sample of the nodes to which $i$ is not connected to\footnote{The sampling is here uniform over the nodes not connected to $i$ with replacement; sampling without replacement led to poorer results in our experiments.}. We will denote by $S_0^i$ the set of all $s_0^{i,m}$ sets. The sets thus obtained, for all nodes, constitute minibatches that can be sampled and used to update the global parameters in Eq.~\ref{eq:sss}. The combined scheme, stratified sampling with SVI, is summarized below:
+SVI aims at optimizing ELBO through noisy yet unbiased estimates of its natural gradient computed on sampled data points. Different sampling strategies \cite{gopalan2013efficient,kim2013efficient} can be used. Following the study in \cite{gopalan2013efficient}, we rely here on stratified sampling that allows one to control the number of links and non-links used in the inference process. For each node $i, \, 1 \le i \le N$, one first constructs a set, denoted $s_1^i$, containing all the nodes to which $i$ is connected to as well as $M$ sets of equal size, denoted $s_0^{i,m}, \, 1 \le m \le M$, each containing a sample of the nodes to which $i$ is not connected to\footnote{The sampling is here uniform over the nodes not connected to $i$ with replacement; sampling without replacement led to poorer results in our experiments.}. We will denote by $S_0^i$ the set of all $s_0^{i,m}$ sets. The sets thus obtained, for all nodes, constitute minibatches that can be sampled and used to update the global parameters in Eq.~\ref{eq:sss}. The combined scheme, stratified sampling with SVI, is summarized below:
 %
 \begin{enumerate}
-\item Sample a node $i$ uniformly over all nodes in the graph; with probability $\frac{1}{2}$, either select $s_1^i$ or any set from $S_0^i$ (in the latter case, the selection is uniform over the sets in $S_0^i$). We will denote by $s_i$ the set selected and by $|s_i|$ its cardinality.
-\item For each node $j \in s_i$, compute $\gamma_{ijkk'}$ through Eq.~\ref{eq:maximization} and intermediate local counts as follows:
-\begin{align}
-\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
-\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
-\end{align}
+\item Sample a node $i$ uniformly from all nodes in the graph; with probability $\frac{1}{2}$, either select $s_1^i$ or any set from $S_0^i$ (in the latter case, the selection is uniform over the sets in $S_0^i$). We will denote by $s_i$ the set selected and by $|s_i|$ its cardinality.
+\item For each node $j \in s_i$, compute $\gamma_{ijkk'}$ through Eq.~\ref{eq:maximization} and intermediate global counts acc. to: {\small
+$\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'}, \,\, \hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij}$
+}\\
+%\begin{align}
+%\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
+%\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
+%\end{align}
 where $C$ is a constant that is $2$ for undirected graphs and $1$ for directed graphs and $g(s_i) = \frac{1}{Nm}$ if $s_i \in S_0^i$ and $\frac{1}{N}$ otherwise.
-\item Stochastic update of the global counts:
-\begin{align}
-\hat N^{\Theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\Theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
-\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{Y}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
-\end{align}
+\item Update of the global counts (online version of Eq.~\ref{eq:sss}): {\small $N^{\Theta}_{\rightarrow ik} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\rightarrow ik} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\rightarrow ik}, \,\, N^{\Theta}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\leftarrow jk'} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\leftarrow jk'}, \,\, N^{\Phi}_{xkk'} \leftarrow (1 - \rho^{\Phi}_t) N^{\Phi}_{xkk'} + \rho^{\Phi}_t \hat N^{\Phi}_{xkk'}, \,\, N^{Y}_{kk'} \leftarrow (1 - \rho^{Y}_t) + \rho^{Y}_t \hat N^{Y}_{kk'}$}
+%\begin{align}
+%N^{\Theta}_{\rightarrow ik} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\rightarrow ik} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\rightarrow ik}, & \,\,\, N^{\Theta}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,\Theta}_t) N^{\Theta}_{\leftarrow jk'} + \rho^{i,\Theta}_t \hat N^{\Theta}_{\leftarrow jk'} \nonumber \\
+%N^{\Phi}_{xkk'} \leftarrow (1 - \rho^{\Phi}_t) N^{\Phi}_{xkk'} + \rho^{\Phi}_t \hat N^{\Phi}_{xkk'}, & \,\,\, N^{Y}_{kk'} \leftarrow (1 - \rho^{Y}_t) + \rho^{Y}_t \hat N^{Y}_{kk'} \nonumber
+%\end{align}
+\item $\rho^*_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$.
+\item Go back to step 1 till stopping criterion is met.
 \end{enumerate}
+%
+As one can note, the intermediate global counts correspond to a restriction, on minibatches, of the complete computation given in Eq.~\ref{eq:sss}. The value of $C$ is due to the fact that in undirected networks, each edge can be seen twice. The terms $\frac{1}{|s_i|}$ and $\frac{1}{Cg(s_i)}$ serve as a normalization in the gradient-like updates of the global counts (as there are more non-links than links, each non-link minibatch, representing a smaller fraction of the non-links, leads to more conservative updates). The "gradient steps" $\rho^*$ are discussed below (Robbins-Monro condition).
 
-One bottleneck of the CVB updates is that it computes the expectation on the distribution $q(Z^{-ij})$. Consequently, the maximization step needs to keep in memory the $(\gamma_{ij})$ matrix of size $N^2\times K^2$ which is not convenient for large networks. Thus, following \cite{foulds2013stochastic}, we consider that for large count, the $ij^{th}$ term has a negligible impact on the overall sum and so we omit it. In fact, Foulds et al. shown that this approximation is equivalent to make a online EM MAP estimation.
+\textcolor{red}{ADRIEN, PEUX-TU DIRE DEUX MOTS SUR LE STOPPING CRITERION?}
+
+Lastly, to be able to efficiently compute such quantities as $N^{\Phi^{-ij}}$ used for the computation of the link probability, one needs to store in memory, for each pair of nodes $(i,j)$, a $K \times K$ matrix, which is not feasible for large networks. Thus, following \cite{foulds2013stochastic}, we replace here $N^{\Phi^{-ij}}$ by $N^{\Phi}$, which amounts to assume that the contribution of each individual pair of nodes is negligible compared to all other pairs, a reasonable assumption when the network is large. The complete code for the inference will be made available in GitHub.
 
 \textbf{Robbins-Monro condition} The convergence of the SVI is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global parameters $\rho^\Phi$ and $\rho^Y$ accounting respectively for  $N^\Phi$ and $N^Y$. For $N^\Theta$, we maintain individual gradient steps $\rho_i^{\Theta}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance.% Thus for each minibatch we only increase the gradient steps of the nodes that are observed. 
 Furthermore, to increase the speed of the inference, we update the global parameter $N^\Phi$ and $N^Y$ only after a minibatch round. For the global parameter $N^\Theta$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
