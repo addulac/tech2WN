@@ -30,7 +30,7 @@ r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\e
 %
 The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form: $y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}})$. As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes now play a prominent role in the model. We will denote this model as bg-WMMSB.
 
-As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a stochastic collapsed variational inference algorithm for the above models (MMSB, WMMSB, bg-WMMSB) that can be used in online settings.
+As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a stochastic collapsed variational inference algorithm for the above models (MMSB, WMMSB, bg-WMMSB).
 
 \section{Inference}
 
