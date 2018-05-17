@@ -5,10 +5,8 @@
 % Corpus
 %
 
-\textcolor{red}{Describe all hyperparameters, including size of non-link minibatches and convergence criterion}
 
-
-We evaluated our models on several real world networks either directed or undirected. Theirs statistics and properties are summarized in table \ref{table:corpus}. The detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/}.
+We experimented our models and inference on several real world, either directed or undirected, networks. Theirs statistics and properties are summarized in table \ref{table:corpus}. The detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/}.
 
 \begin{table}[h]
 \bgroup
@@ -19,56 +17,87 @@ We evaluated our models on several real world networks either directed or undire
 \end{table}
 
 
-%
-% Evaluaiton method (testing set and mesure)
-%
-
-For each run, we build a testset extracted from the original network composed of an equivalent number of edges and non-edges. We denote the ratio of the held-out edges by $t_{ratio}$. The evaluation of experiments were based on three metrics that we measured at a period of $5m$ minibatches until the stop criteria is met, where $m$ is the number of subsets of $S_0$ as defined in section \ref{sec:sampling}. For the stopping criteria we held-out a validation set with another 10 percent of the edges and same amount of non-edges from the training set. We stop the training when the average change on the log-likelihood on the validation is less than $0.001$ percent.
-
-The gradient step parameters were set to $\tau=1024$ and $\kappa=0.5$ and the burn-in period  to $T_{burnin}=150$. For MMSB we set the hyper-parameters $\lambda_0=\lambda_1=0.1$ and for both MMSB and WMMSB we set the latent-class hyper-parameters to $\alpha_k=\frac{1}{K}$ and $K=10$.
-
 
 %
-% Perplexity
+% Evaluation method (testing set and mesure)
 %
+To evaluate the performance of the models and to illustrate the advantage of the online inference, we designed a experiments based on different size of training set to test the impact of the amount of data on the inference. For all the dataset, we first built a test set  by extracting randomly 20 percent of the edges of the networks and about the same amount of non-links. The remaining data consitute the "full" training set. Then, we subsampled the full training set in order to obtain "sub" training set containg different propotions of the edges (i.e 1, 5, 10, 20, 30, 50, and 100 percent, the former corresponfing to the full trainig set.). Furthermore, we ensure that all the sub training set are inclusive. We repeated this settings 10 times with different seed, to cross validate our results.
 
-The most direct way to measure the convergence of the inference is the log-likelihood of the predictive distribution since the variational gradient optimizes a lower bound of this quantity. For a testset $\D_{test}$ the log-likelihood is
+The all our models implemented with the stochastic collapsed variationnal inference, we set the gradient step parameters to $\tau=1024$ and $\kappa=0.5$, the burn-in period to $T_{burnin}=150$ and for the stratidied sampling, we fix the paramter $M=50$. For MMSB we set the hyperparameters $\lambda_0=\lambda_1=0.1$ and for MMSB, WMMSB and WMMSB-bg we set the latent-class hyperparameters to $\alpha_k=\frac{1}{K}$ and the number of latent classes to $K=10$.
 
-\begin{figure}[h]
-\centering
-	\input{img/conv_entropy}
-    \label{fig:conv_entropy}
-\end{figure}
-
+% stopping citerion
+For the stopping criteria of the inference, we further held-out 10 percent of the remaining training set is held-out during the inference. The log-likelihood is computed at after each minibatche. When the log-likelihood average increase (on the last 20 measures) is less that 0.001, the inference is stopped. The log-likelihood of a  given set of observations $\D_{test}$  is computed as follows:
 \begin{equation*}
 \log p(\D_{test}) = \sum_{i,j \in \D_{test}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
 %\log p(\D_{test}) = \sum_{i,j \in \D_{test}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
 \end{equation*}
 
 
-%
-% ROC
-%
 
-We evaluate the capacity of the models to predict missing links with the ROC-AUC curve on the testset. For the weighted models, the measure consists to evaluate to what extent they can reconstruct the topology of the network and to compare them with binary models. Thus, for the WMMSB models we compute the probability of observing a link as the probability to generate at least one edge count,
+\textcolor{white}{ % trick to make it invisible, only in the footpage.
+\footnote{\url{http://konect.uni-koblenz.de/networks/ca-AstroPh}. We used the cleaned version available in the  graph-tool framenetwork.}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/ca-cit-HepTh}. We used the cleaned version available in the  graph-tool framework.}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/moreno_names}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/radoslaw_email}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/opsahl-ucsocial}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/munmun_digg_reply}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/slashdot-threads}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/enron}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/link-dynamic-simplewiki}}
+\footnote{\url{hhttp://konect.uni-koblenz.de/networks/prosper-loans}}
+}
 
-\begin{table}
+
+\begin{figure}[h]
 \centering
-	\input{img/roc}
-\label{table:roc}
-\end{table}
+	\input{img/roc_evolv_fig}
+   \label{fig:roc}
+\end{figure}
 
+
+In order to carachterize to wich extent the models can predict the missing links of the networks, an thus recover its topology. For the weighted models, the probability to observe a links is computed as the probability that at least one edge count is generated by:
 \begin{equation*}
 p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{\phih_{kk'}}
 \end{equation*}
 
-The performance results in table \ref{table:roc} show that WMMSB is able to infer the topology of the networks. Furthermore, it outperforms the baseline for networks where weights represents natural information such as for communication and hyperlinks networks. 
-In the other hand, MMSB and WMMSB under SCVI inference shows that they can infer the network topology when only observing a small portion of the networks, which represents an advantage in terms of scalability or when only a sub-graph of the real data are available.
+The models are compared against two baselines, namely SBM and WSBM that are the non hierarchical counterpart of MMSB and WMMSB. Futhermore, we used the microcanonical stochastic blockmodel of \cite{peixoto2018nonparametric} that introduces an efficient MCMC inference method for the stochastic blockmodels, that are implemented in the graph-tool framework \footnote{\url{peixoto2018nonparametric}}.
+
+In figure \ref{fig:roc}, we compared the performance of the models in terms of AUC-ROC on the different datasets. Generally,  We can see that performance increases with the number of oberved edges (i.e the size of the dataset.). This comportment particularcy pronouced for SBM and WSBM because there inference algorithm is designed to learn on batch dataset, while our models converge faster to their best performance  before it eventually overfit the trainig set. MMSB has a very high variance compared to other models, and while it can be competitive on some dataset (astro-ph, hep-th, moreno-names) it failed on other (propser-loan, slashdot, wiki-link. WWMSB-bg outperforms WWMSB and WMMSB-bg is competitive with the baselines. Furthermore, it outperforms the baseline when the number of missing links is high (1, 5 10 percent of the oberved edge) while its results stay stable between the full training set and the small one.
+
+
+
+% Table Roc comments
+\begin{table}
+\centering
+	\input{img/roc_evolv_tab}
+\label{table:roc}
+\end{table}
+In table \ref{table:roc} we show precise results for 10 and 100 percent of the trainig set. It highlight the \textcolor{red}{to complete}
+
+
+\textcolor{red}{add convergence results and comments}
+
+
+
+
+
+
+
+
+
+%
+% Convergence commments
+%
+
+%\begin{figure}[h]
+%\centering
+%	\input{img/conv_entropy}
+%    \label{fig:conv_entropy}
+%\end{figure}
 
 %
 % Sim
 %
-
 %For the weighted models, we further measure the capacity to predict right edge counts with a $l_1$ distance between the real count of the test set and the expected count of the models 
 %
 %\begin{equation*}
@@ -76,10 +105,6 @@ In the other hand, MMSB and WMMSB under SCVI inference shows that they can infer
 %\end{equation*}
 
 
-
-%
-%  Figure analysis and commment
-%
 
 
 
