@@ -178,3 +178,27 @@ We provide the results for AUC-ROC evaluation and the convergence for all the da
 	\input{img/conv_entropy}
     \label{fig:conv_entropy}
 \end{figure}
+
+\section{Reproducible Research}
+
+We publish our implementation that we develloped in a platform called pymake, under open-source license. We are currently maintaining this open-source platform, and that aims to ease the devellopment of reproducible complex experiments. 
+
+To reproduce our results, you can proceed as follows:
+\begin{itemize}
+\item Install the Pymake project:   %\lstinline|git clone https://github.com/dtrckd/pymake|  
+    \begin{lstlisting}[language=bash]
+          $ git clone https://github.com/dtrckd/pymake
+          $ cd pymake and make install
+          $ cd repo/ml
+    \end{lstlisting}
+\item Fit all the models on all the corpus, and save the results:
+\begin{lstlisting}[language=bash]
+        $ pmk online_roc -x fit --w --repeat 0 1 2 3 4 5 6 7 8 9 
+\end{lstlisting}
+\item (optionnal) run can be parallelized simply by adding the options \lstinline|--cores NUMBER_OF_CORES|,
+\item Then, figures can be plot symply with the command:  
+\begin{lstlisting}[language=bash]
+        $ pmk online_roc -x roc_evolution2 --repeat 0 1 2 3 4 5
+\end{lstlisting}
+\end{itemize}
+
