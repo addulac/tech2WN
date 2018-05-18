@@ -21,21 +21,25 @@ We experimented our models and inference on several real world, either directed 
 %
 % Evaluation method (testing set and mesure)
 %
-To evaluate the performance of the models and to illustrate the advantage of the online inference, we designed a experiments based on different size of training set to test the impact of the amount of data on the inference. For all the dataset, we first built a test set  by extracting randomly 20 percent of the edges of the networks and about the same amount of non-links. The remaining data consitute the "full" training set. Then, we subsampled the full training set in order to obtain "sub" training set containg different propotions of the edges (i.e 1, 5, 10, 20, 30, 50, and 100 percent, the former corresponfing to the full trainig set.). Furthermore, we ensure that all the sub training set are inclusive. We repeated this settings 10 times with different seed, to cross validate our results.
+\paragraph{Performance Analysis} To evaluate the performance of the models and to illustrate the advantage of the online inference, we designed an experiment based on different size of training sets to test the impact of the amount of data on the inference. The evaluation rely on a AUC-ROC metric on the missing link prediction task. For weighted models, we considered the probability that an edge exists between two unobserved nodes (i,j) as the probability that they have at least one edge count by $p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{\phih_{kk'}}$.
 
-The all our models implemented with the stochastic collapsed variationnal inference, we set the gradient step parameters to $\tau=1024$ and $\kappa=0.5$, the burn-in period to $T_{burnin}=150$ and for the stratidied sampling, we fix the paramter $M=50$. For MMSB we set the hyperparameters $\lambda_0=\lambda_1=0.1$ and for MMSB, WMMSB and WMMSB-bg we set the latent-class hyperparameters to $\alpha_k=\frac{1}{K}$ and the number of latent classes to $K=10$.
+For all the dataset, we  built a test set by extracting randomly 20 percent of the edges of the networks and about the same amount of non-links. The remaining data constitute the "full" training set. Then, we subsamples the full training set in order to obtain smaller sub training set (subgraphs) containing different proportions of the edges (i.e 1, 5, 10, 20, 30, 50, and 100 percent. The former corresponding to the full training set.). Note that we ensure that all the sub training set are inclusive. We repeated this settings 10 times with different seed, to cross validate our results, and report mean/std results.
 
 % stopping citerion
-For the stopping criteria of the inference, we further held-out 10 percent of the remaining training set is held-out during the inference. The log-likelihood is computed at after each minibatche. When the log-likelihood average increase (on the last 20 measures) is less that 0.001, the inference is stopped. The log-likelihood of a  given set of observations $\D_{test}$  is computed as follows:
+For the stopping criteria of the inference, we further held-out 10 percent of the remaining (sub) training set used as a validation set. After each minibatch iteration, we computed the log-likelihood on this validation set. When the increase of the log-likelihood on average (on the last 20 measures) is less that 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{test}$  is computed as follows:
 \begin{equation*}
 \log p(\D_{test}) = \sum_{i,j \in \D_{test}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
 %\log p(\D_{test}) = \sum_{i,j \in \D_{test}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
 \end{equation*}
 
+For all our models, we set the gradient step parameters to $\tau=1024$ and $\kappa=0.5$, the burn-in period to $T_{burnin}=150$ and for the stratified sampling, we fix the size of the non-edges set to  $M=50$. For MMSB we set the hyperparameters $\lambda_0=\lambda_1=0.1$ and for WMMSB, the shape and scale parameters $r$ et $p$ were fixed to 1. The number of latent classes was fixed to $K=10$ for all models and the latent-class hyperparameters to $\alpha_k=\frac{1}{K}$.
+
+
+We compared our models against two baselines, namely SBM and WSBM that are the non hierarchical counterpart of MMSB and WMMSB and constitutes standard approach for link prediction. For both baselines, we used the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric} that introduces an efficient MCMC inference method for the stochastic block models family. This implementation can be found in the graph-tool framework \cite{peixoto_graph-tool_2014}. The number of classes was again set to $K=10$ for both models.
 
 
 \textcolor{white}{ % trick to make it invisible, only in the footpage.
-\footnote{\url{http://konect.uni-koblenz.de/networks/ca-AstroPh}. We used the cleaned version available in the  graph-tool framenetwork.}
+\footnote{\url{http://konect.uni-koblenz.de/networks/ca-AstroPh}. We used the cleaned version available in the  graph-tool framework.}
 \footnote{\url{hhttp://konect.uni-koblenz.de/networks/ca-cit-HepTh}. We used the cleaned version available in the  graph-tool framework.}
 \footnote{\url{hhttp://konect.uni-koblenz.de/networks/moreno_names}}
 \footnote{\url{hhttp://konect.uni-koblenz.de/networks/radoslaw_email}}
@@ -46,23 +50,15 @@ For the stopping criteria of the inference, we further held-out 10 percent of th
 \footnote{\url{hhttp://konect.uni-koblenz.de/networks/link-dynamic-simplewiki}}
 \footnote{\url{hhttp://konect.uni-koblenz.de/networks/prosper-loans}}
 }
-
-
 \begin{figure}[h]
 \centering
 	\input{img/roc_evolv_fig}
    \label{fig:roc}
 \end{figure}
 
-
-In order to carachterize to wich extent the models can predict the missing links of the networks, an thus recover its topology. For the weighted models, the probability to observe a links is computed as the probability that at least one edge count is generated by:
-\begin{equation*}
-p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{\phih_{kk'}}
-\end{equation*}
-
-The models are compared against two baselines, namely SBM and WSBM that are the non hierarchical counterpart of MMSB and WMMSB. Futhermore, we used the microcanonical stochastic blockmodel of \cite{peixoto2018nonparametric} that introduces an efficient MCMC inference method for the stochastic blockmodels, that are implemented in the graph-tool framework \footnote{\url{peixoto2018nonparametric}}.
-
-In figure \ref{fig:roc}, we compared the performance of the models in terms of AUC-ROC on the different datasets. Generally,  We can see that performance increases with the number of oberved edges (i.e the size of the dataset.). This comportment particularcy pronouced for SBM and WSBM because there inference algorithm is designed to learn on batch dataset, while our models converge faster to their best performance  before it eventually overfit the trainig set. MMSB has a very high variance compared to other models, and while it can be competitive on some dataset (astro-ph, hep-th, moreno-names) it failed on other (propser-loan, slashdot, wiki-link. WWMSB-bg outperforms WWMSB and WMMSB-bg is competitive with the baselines. Furthermore, it outperforms the baseline when the number of missing links is high (1, 5 10 percent of the oberved edge) while its results stay stable between the full training set and the small one.
+The figure \ref{fig:roc}, represents the AUC performances of models depending on the proportion of the training edges used for the inference.  We can observe that the performances increase with the number of data used to learn, not surprisingly. This comportment is particularly pronounced for SBM and WSBM because their inference algorithm is designed to learn on batch dataset, while, our models converge faster to their best performance, due to the strong averaging step of the stochastic gradient descent, before they eventually overfit the training set.
+WWMSB-bg outperforms WWMSB which highlight the importance of the gamma prior parameters in this model. Further, WMMSB-bg is competitive with the baselines and, when the number of missing links is high (i.e the training edges are lower or equal than 20 percent. See also table \ref{table:roc}), it outperforms other models. 
+MMSB is competitive on some dataset (astro-ph, hep-th, moreno\_names) while it failed on the others. Interestingly, one can see than on the dataset where it fails (digg-reply, prosper-loans, slashdot and wiki-link), it has a very large variance. Furthermore, those dataset has a low density compared to astro-ph, hep-th and moreno\_names. Thus, this poor performance can be explained by the fact that the convergence of the model is very sensitive to the sampling choices during the online inference. Indeed, sparse network are known to exhibit a power law distribution in the degree distribution, which implies that some nodes don't have the same importance at all in this kind of networks. Nevertheless, the WMMSB and WMMSB-bg models are less sensitive to those networks and are still competitive, which show that taking into account the edge covariates makes the weighted models less sensitive to the minibatches sampling in sparse networks. Finally, it worth to mention that on dataset prosper-loans, which is the only networks classified as "Interaction" network in the Konnect repository, the baselines failed to learn the topology of the networks and MMSB barely exceed a random classifier, only WMMSB-bg succeed with its best performance above 0.75.
 
 
 
@@ -72,15 +68,6 @@ In figure \ref{fig:roc}, we compared the performance of the models in terms of A
 	\input{img/roc_evolv_tab}
 \label{table:roc}
 \end{table}
-In table \ref{table:roc} we show precise results for 10 and 100 percent of the trainig set. It highlight the \textcolor{red}{to complete}
-
-
-\textcolor{red}{add convergence results and comments}
-
-
-
-
-
 
 
 
@@ -88,15 +75,40 @@ In table \ref{table:roc} we show precise results for 10 and 100 percent of the t
 %
 % Convergence commments
 %
+\paragraph {Convergence Analysis} We evaluated the convergence of WMMSB and WMMSB-bg models. Figure \ref{fig:conv_entropy} shows the convergence of the log-likelihood on a test set composed of 20 percent of the edges of the datasets and about the same amount of non-edges. We used three different set of the hyperparameters shape $r$ and scale $p$ for WMMSB. One can show that the augmented model is less prone to overfitting and that for most of the networks, it outperforms its counterpart terms of log-likelihood. Furthermore, one can see that the models requires a few proportions of the total $N**2$ potential edges to converge.
 
-%\begin{figure}[h]
-%\centering
-%	\input{img/conv_entropy}
-%    \label{fig:conv_entropy}
-%\end{figure}
+\begin{figure}[h]
+\centering
+	\input{img/conv_entropy2}
+    \label{fig:conv_entropy}
+\end{figure}
+
+While, our implementation is in pure python, the algorithm allows fast time convergence and is even comparable with SBM which is implemented in C within graph-tool. Furthermore, in practice, the algorithm exhibits a sublinear time complexity with the numbers of edges, as shown in figure \ref{table:time}.
+
+\begin{table}[h]
+\begin{tabular}{llllll}
+\hline
+                    & MMSB                  & WMMSB-bg              & SBM                  \\
+\hline
+astro-ph      & 361.165 $\pm$ 159.107    & 868.802 $\pm$ 870.965    & 44.646 $\pm$ 4.778      \\
+hep-th        & 170.281 $\pm$ 17.246     & 226.887 $\pm$ 77.84      & 20.366 $\pm$ 4.127      \\
+moreno\_names  & 44.821 $\pm$ 7.717       & 30.362 $\pm$ 11.811      & 5.358 $\pm$ 1.67        \\
+fb\_uc         & 50.927 $\pm$ 17.694      & 66.921 $\pm$ 10.439      & 4.093 $\pm$ 0.907       \\
+digg-reply    & 1803.779 $\pm$ 1100.227  & 2044.334 $\pm$ 1016.157  & 228.661 $\pm$ 81.611    \\
+slashdot      & 4272.667 $\pm$ 1971.346  & 2867.998 $\pm$ 653.092   & 365.437 $\pm$ 82.475    \\
+enron         & 4660.744 $\pm$ 2978.898  & 3544.711 $\pm$ 385.445   & 1313.841 $\pm$ 109.074  \\
+wiki-link     & 13683.093 $\pm$ 6890.663 & 5592.084 $\pm$ 228.13    & 613.841 $\pm$ 113.047   \\
+prosper-loans & 6595.175 $\pm$ 4612.049  & 12255.827 $\pm$ 4878.113 & 1182.409 $\pm$ 183.342  \\
+\hline
+\end{tabular}
+\label{table:time}
+\caption{Inference time in seconds.}
+\end{table}
+
+
 
 %
-% Sim
+% WSim
 %
 %For the weighted models, we further measure the capacity to predict right edge counts with a $l_1$ distance between the real count of the test set and the expected count of the models 
 %
