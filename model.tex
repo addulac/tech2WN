@@ -128,9 +128,15 @@ Setting $q(P) = p(P|Y,Z,\Omega)$ where $p$ is the true distribution and exploiti
 %p_{kk'} \sim \textrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])
 %\end{equation}
 %%
-so that: $\E_{q}[p_{kk'}] = \frac{c\epsilon + N^Y_{kk'}}{c\epsilon + N^Y_{kk'} + c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}]}$.
+so that: 
+\[
+\E_{q}[p_{kk'}] = \frac{c\epsilon + N^Y_{kk'}}{c\epsilon + N^Y_{kk'} + c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}]}
+\]
 
-Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form: $\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}$.
+Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form: 
+\[
+\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
+\]
 %
 %\begin{equation}
 %\E_{q}[r_{kk'}] = \frac{r_0c_0+N^Y_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}

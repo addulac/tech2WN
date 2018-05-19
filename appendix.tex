@@ -67,7 +67,7 @@ In the Beta-Gamma augmentation, the parameters $p$ and $r$ are marginalized in t
 By using a first order Taylor expansion, one obtains:
 
 \begin{equation}
-\gamma_{ijkk'} \propto (N_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (N_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) \nonumber
+\gamma_{ijkk'} \propto (N_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (N_{\leftarrow jk'}^{\Theta^{-i}} + \alpha_{k'}) \mathrm{NB}\left(y_{ij}; N^{Y^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right) \nonumber
 \end{equation}
 
 \paragraph{Optimizing $r_{kk'}$}
@@ -123,7 +123,7 @@ As $r_{kk'} \sim \textrm{Gamma}(a_{kk'},b_{kk'})$, one finally obtains:
 
 \paragraph{Optimizing $p_{kk'}$}
 
-In oder to maximize the ELBO w.r.t $p_{kk}'$, one can let $q(p_{kk'}) = p(p_{kk'} | Y,Z) = E_q(r_{kk'}) [ p(p_{kk'} | Y^{(kk')},Z^{(kk')} ,r_{kk'})]$. As the negative binomial and Beta distributions are conjugate, a closed-form expression can be obtained:
+In oder to maximize the ELBO w.r.t $p_{kk'}$, one can let $q(p_{kk'}) = p(p_{kk'} | Y,Z) = E_q(r_{kk'}) [ p(p_{kk'} | Y^{(kk')},Z^{(kk')} ,r_{kk'})]$. As the negative binomial and Beta distributions are conjugate, a closed-form expression can be obtained:
 
 \begin{align*}
 p(p_{kk'} | Y^{(kk')}, Z^{(kk')}, r_{kk'}) &\propto p(Y^{(kk')| Z^{(kk')}, r_{kk'}} p(r_{kk'}) \\
@@ -188,7 +188,7 @@ To reproduce our results, one can proceed as follows:
 \item Install the XXX project:   %\lstinline|git clone https://github.com/*/XXX|  
     \begin{lstlisting}[language=bash]
           $ git clone https://github.com/*/*
-          $ cd XXX and make install
+          $ cd XXX && make install
     \end{lstlisting}
 \item Fit all the models on all the corpus, and save the results:
 \begin{lstlisting}[language=bash]
