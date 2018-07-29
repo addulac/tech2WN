@@ -1,0 +1,48 @@
+\documentclass{article}
+
+\usepackage{nips_2018_author_response}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+\usepackage{lipsum}
+
+\begin{document}
+
+\paragraph{Data assumptions, Models performance and results interpretations.}
+
+
+The reviewers pointed out some concerns about the experimental evaluation and the interpretation of the results. We give here more explicit statements and explanations of the modeling assumptions, theirs articulations with the experimental results and their interpretation.
+
+We agree that the modeling assumptions for the weighted networks are somewhat implicit in the manuscript. Furthermore, the choice of the experimental design is oriented to assess to what extent the information on the edge's weights can improve performance of a link prediction problem. This choice is motivated by the following assumption:
+\begin{itemize}
+\item assumption 1 (weighted preferential attachment): the probability to observe a new edge, for a given node, increase with its weighted degree. 
+\end{itemize}
+
+In the other hand, stochastic blockmodels are traditionally evaluated on network datasets, that are somehow weighted, but weights are inevitably reduce to edge/non-edge covariate due to the modeling assumption. However, this binary reduction of the graph suggest an other implicit assumption: 
+\begin{itemize}
+\item assumption 2 (network binarization): the probability to generate a new edge, for a given node, depends only of its (unweighted) degree.
+\end{itemize}
+
+The assumptions 1 and 2 are contradictory as phrased but, one can relax the assumptions by considering that the statements are true only asymptotically which make them compatible. Thus, if a statically sufficient number of edges are observed, one assume that the weights won't bring any useful information to predict the probability of a new edge. In the opposite, until a sufficient number of edges are observed, the weighted preferential attachment holds. Two consequences can be drawn from those assumptions; From assumption 1, for a sufficient small subset of the networks, the information of the observed weights should improved the missing edge prediction against the knowledge of the weightless edge only. From assumption 2, for sufficient large subset of the networks, the information of the weights should not improve the new edge prediction.
+
+With regard those explicit assumptions, our experimental results suggest the following elements:
+\begin{itemize}
+\item Comparing the performance of the weighted models against SBM, one can see that for 8 out of 9 networks, the weighted models outperform the SBM when the number of observed edges is below a certain threshold value, and for the 9th networks (enron), all models performs well with no significant difference in performance. These results tend to validate the assumption 1. As mentioned by the review\#2, MMSB seems to suggest otherwise as it outperform WMMSB on hep-th and astro-ph. However, results on this 2 networks should be interpreted with caution as they contains a bias that can penalise the weighted networks. \footnote{For those co-authorship networks, The weights between two co-authors are computed as the sum over their collaboration papers of 1 over the number of co-authors of that paper. As the number of co-authorships for a given paper is unknown, we assumed a fix number of 10 co-authorships for all papers in order to obtain integer weights.}
+\item Comparing again SBM with the weighted networks, one can see that, for 8 out the 9 networks, when a sufficient number of edges are observed, the SBM model either converge to the performance of weighted models or outperforms them, which tend to support assumptions 2. However, as highlighted by the results on the slashdot dataset (which is the only network of type money loan interaction), the assumption seems not to hold and all the non-weighted model fail to learn the connectivity pattern of this network. Hence, it emphasis that modelling weights can matter in link prediction problem.
+\end{itemize}
+
+In our experiments, we wanted to evaluate the models in a large variety of networks type in order to avoid falling in a set of networks that would share some properties that could benefit only weighted model or the unweighted ones. Finally, result suggest that the assumptions formulated may be valid for some type of networks, while not straightforward for other, but mainly that, based on the variety of networks we have tested, modelling weighted edges for link prediction problem matters, especially if only a subset is available OR if one want to subsample the networks edges for scalability raison.
+
+
+\paragraph{Performance metrics}  We observed that AUC-PR gave equivalent results that AUC-ROC results, thus we decided to report only the AUC-ROC measure. The reason is because the test set is built, as described in the paper, such as the number of edges and non-edges are balanced. (20 percent of the edges and about the same amount of non edges.)
+
+\paragraph{Hyper-parameter K} The cross validation of K to used the models in their best regime could have been done. However we fixed K=10  as we assume that is a fair choice to set K equal for all models since the number of classes for all the models compared have the same semantics. They represent the number of latent blocks that should capture structural equivalence of nodes assign to that blocks. (hard assignment for SBM and soft assignment for MMSB like models.)
+
+\end{document}
