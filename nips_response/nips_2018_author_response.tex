@@ -18,9 +18,7 @@
 We wholeheartedly thank the reviewers for the time they have dedicated to this submission as well as for their insightful comments and stimulating questions, to which we reply below.
 
 \paragraph{Modeling assumptions and conclusions}
-
 %The reviewers pointed out some concerns about the experimental evaluation and the interpretation of the results. We give here more explicit statements and explanations of the modeling assumptions, theirs articulations with the experimental results and their interpretation.
-
 We agree that the modeling assumptions for the weighted networks are somewhat implicit in the manuscript. The choice of the experimental design is oriented to assess to what extent the information on the edge weights can improve the link prediction problem. This choice is motivated by the following assumption:
 %
 \begin{itemize}
@@ -43,11 +41,10 @@ Our experimental results support this claim and suggest the following:
 \item We evaluated all models on a variety of network types in order to avoid selecting a set of networks that would benefit only weighted or unweighted models. If this variety makes it more difficult to analyze precisely what types of networks may benefit from modeling weights, our study still reveals that it is important to take into account weights when few edges are available or if one wants to subsample a network for scalability reasons.
 \end{itemize}
 
-\paragraph{}
+\paragraph{The Poisson assumption} A justification was asked by reviewer \#2 of why we did not consider two different distributions for the modeling of \emph{whether or not} an edge exist between nodes AND the count observed at that edge if it exists. We considered that the Poisson law is a natural extension of the Bernoulli law to represent a discrete number of interactions between nodes. Hence, wen predicting whether or not an edge exists between two nodes for weighted models, we simply evaluate the probability that the weight on that edge is greater than zero. We believe that this assumption can be justified by the intuition (at least in the networks we evaluated) that if there exists at least one edge between two nodes, then an edge is assumed to exist in the underlying "binary network".
 
-\paragraph{Collapsed variables} In our inference scheme, both $\Phi$ (block-block probabilities) and $\Theta$ (node-blocks probabilities) are collapsed. Then, their expectations can be recovered from the estimation of the edges membership assignement $z_{ij}$ through the variational disttribution $q(z_{ij})$.
 
-\paragraph{Baseline models and weights prediction} We agree that the experimental section can be strenghtened by adding recent baselines for weighted networks, such as the EPM model, as mentionned by reviewer \#3, as well as a weights prediction study. We will integrate that in the next version of the paper.
+\paragraph{Baseline models and weights prediction} We agree that the experimental section can be strengthened by adding recent baselines for weighted networks, such as the EPM model, as mentioned by reviewer \#3, as well as a weights prediction study. We will integrate that in the next version of the paper.
 
 \paragraph{Performance metrics}  AUC-PR yielded results equivalent to AUC-ROC; we thus reported only the AUC-ROC results. This is due to the construction of the training and test sets, as described in the paper, in which the number of edges and non-edges are similar (20\% percent of the edges and about the same amount of non edges).
 
