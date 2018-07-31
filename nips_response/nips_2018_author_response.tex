@@ -43,6 +43,12 @@ Our experimental results support this claim and suggest the following:
 \item We evaluated all models on a variety of network types in order to avoid selecting a set of networks that would benefit only weighted or unweighted models. If this variety makes it more difficult to analyze precisely what types of networks may benefit from modeling weights, our study still reveals that it is important to take into account weights when few edges are available or if one wants to subsample a network for scalability reasons.
 \end{itemize}
 
+\paragraph{}
+
+\paragraph{Collapsed variables} In our inference scheme, both $\Phi$ (block-block probabilities) and $\Theta$ (node-blocks probabilities) are collapsed. Then, their expectations can be recovered from the estimation of the edges membership assignement $z_{ij}$ through the variational disttribution $q(z_{ij})$.
+
+\paragraph{Baseline models and weights prediction} We agree that the experimental section can be strenghtened by adding recent baselines for weighted networks, such as the EPM model, as mentionned by reviewer \#3, as well as a weights prediction study. We will integrate that in the next version of the paper.
+
 \paragraph{Performance metrics}  AUC-PR yielded results equivalent to AUC-ROC; we thus reported only the AUC-ROC results. This is due to the construction of the training and test sets, as described in the paper, in which the number of edges and non-edges are similar (20\% percent of the edges and about the same amount of non edges).
 
 \paragraph{Hyper-parameter K} We fixed K=10 in this study to have a first comparison \textit{mutatis mutandis} between the different models (the latent classes play the same role in all models, even though the assignment is hard for SBM and soft for MMSB-like models). This said, we agree that it is also important to cross-validate K for each model and compare the results obtained by doing so. We will do that.
