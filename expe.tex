@@ -15,7 +15,7 @@ We experimented our models on several real world networks, directed and undirect
 \subsection{Experimental setup}
 As standard in social network analysis, the evaluation of the models is based on the missing link prediction task using the AUC-ROC score. For weighted models, we consider the probability that an edge exists between two unobserved nodes $(i,j)$ belonging to the test set, namely:
 \[
-p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{\phih_{kk'}}
+p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{-\phih_{kk'}}
 \]
 
 For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-links. The remaining data constitutes the "full" training set. Then, in order to assess how the models behave when few training data is available, we sub-sampled this full training set in order to obtain smaller sub-training sets (subgraphs) containing different proportions of the edges (i.e 1\%, 5\%, 10\%, 20\%, 30\%, 50\%, and 100\%). Note that we ensure that all the sub-training sets are inclusive. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sub-training sets are reported, for each proportion, as final results.
