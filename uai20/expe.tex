@@ -1,0 +1,120 @@
+\section{Experimental validation}
+\label{sec:exps}
+
+We experimented our models on several real world networks, directed and undirected. Theirs statistics and properties are summarized in table \ref{table:corpus} and detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/networks/}. For both astro-ph and hep-ph datasets, we used the cleaned version available in the  graph-tool framework.
+%The aim of these experiments is to illustrate the advantage of the online inference and to evaluate the performances of the models.
+
+\begin{table}[h]
+\bgroup
+\def\arraystretch{1} % 1 is the default, change whatever you need
+	\input{img/corpus}
+\egroup
+\label{table:corpus}
+\end{table}
+
+\subsection{Experimental setup}
+As standard in social network analysis, the evaluation of the models is based on the missing link prediction task using the AUC-ROC score. For weighted models, we consider the probability that an edge exists between two unobserved nodes $(i,j)$ belonging to the test set, namely:
+\[
+p(y_{ij} \geq 1 | \Thetah, \Phih) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{-\phih_{kk'}}
+\]
+
+For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-links. The remaining data constitutes the "full" training set. Then, in order to assess how the models behave when few training data is available, we sub-sampled this full training set in order to obtain smaller sub-training sets (subgraphs) containing different proportions of the edges (i.e 1\%, 5\%, 10\%, 20\%, 30\%, 50\%, and 100\%). Note that we ensure that all the sub-training sets are inclusive. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sub-training sets are reported, for each proportion, as final results.
+
+% stopping citerion
+For deciding when to stop the inference process, 10\% of the training set used serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
+\begin{equation*}
+\log p(\D_{set}) = \sum_{i,j \in \D_{set}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
+%\log p(\D_{test}) = \sum_{i,j \in \D_{test}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
+\end{equation*}
+
+For all our models, the gradient step parameters  $\tau$ and $\kappa$ were fixed respectively to  $1024$ and $0.5$, the burn-in period $T_{burnin}$ to $150$; for stratified sampling, $M$ was set to $50$, the size of $s_0^{i,m}, \, 1 \le m \le M$ being equal to the number of nodes to which $i$ is not connected to divided by $M$. For MMSB, the hyperparameters $\lambda_0$ and $\lambda_1$ were set to $0.1$. For WMMSB, the shape and scale parameters $r$ et $p$ were fixed to $1$ and for WMMSB, the beta-gamma hyperparameters were fixed to  $c_0=10$, $r_0=1$, $c=100$ and $\epsilon=10^{-6}$. The number of latent classes $K$ was fixed to $10$ for all models and the latent-class hyperparameters $\alpha_k$ to $\frac{1}{K}$. Our implementation is available online\footnote{https://github.com/***/*** (anonymized)}. In addition, we consider here two standard link prediction models, the stochastic block model, referred to as SBM, and its weighted extension, referred to as WSBM. For these two models, the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric} has been used since it integrates an efficient MCMC inference method for the stochastic block model family.  The number of classes was also set to $K=10$.
+
+Variational inference, used here for MMSB models, and MCMC, used for SBM models, lead to different performance, the latter usually yielding better models than the former \cite{asuncion2009smoothing}. Indeed, despite the fact that the MMSB models considered here rely on more realistic assumptions regarding the distribution of nodes over latent classes, the approximations made on the likelihood for scalable inference purposes penalize MMSB models when it comes to prediction accuracy. This said, the strong averaging step of the stochastic gradient descent allows for faster convergence so that, as the models are more realistic, they may yield better performance when the amount of training data is limited. This is indeed what we observe in practice.
+
+%\textcolor{white}{ % trick to make it invisible, only in the footpage.
+%\footnote{\url{http://konect.uni-koblenz.de/networks/ca-AstroPh}. We used the cleaned version available in the  graph-tool framework.}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/ca-cit-HepTh}. We used the cleaned version available in the  graph-tool framework.}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/moreno_names}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/radoslaw_email}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/opsahl-ucsocial}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/munmun_digg_reply}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/slashdot-threads}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/enron}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/link-dynamic-simplewiki}}
+%\footnote{\url{hhttp://konect.uni-koblenz.de/networks/prosper-loans}}
+%}
+
+\begin{figure}[h]
+\centering
+	\input{img/roc_evolv_fig2}
+   \label{fig:roc}
+\end{figure}
+
+\subsection{Results}
+Figure \ref{fig:roc} gives the AUC/ROC scores for the different models when using 1\%, 5\%, 10\%, 20\%, 30\% and 50\% of the training data, for 6 networks (the complete results, over all training set size and networks are given in the supplementary material). As one can note, MMSB models outperform the other models when the amount of training data is limited. Among these models, WMMSB-bg is the best performing one, which highlights the importance of the Beta and Gamma priors used. The poor performance of MMSB on some networks can be explained by the fact that the convergence of the model is very sensitive to the sampling choices done during the online inference, as illustrated by the high variance in the results. When the amount of training data is sufficient (which depends on the network considered), SBM models tend to be better. As discussed before, we attribute this to the MCMC method used in SBM models. Surprisingly, and contrary to what is happening for MMSB models, WSBM does not really outperform SBM; this model does not seem to be able to make a good use of the edge covariates. 
+
+Table~\ref{table:roc}, which displays the results of MMSB, WMMSB-bg, SBM and WSBM for all networks when using 10\% and 100\% of the training data, confirms these elements. As one can note, using all training data, SBM outperforms WSBM on 5 datasets. Interestingly, there is an important degradation for SBM models when only 10\% of the training set is used. MMSB models are more stable in this aspect, showing that the stochastic variational inference used in MMSB models allows one to learn a correct model with few data.
+
+Finally, it is worth mentioning that on the dataset prosper-loans, the only network classified as "Interaction" in the Konnect repository, most models fail to learn the topology. In particular, MMSB barely exceeds a random classifier. Only the weighted MMSB models, WMMSB and WMMSB-bg, succeed in predicting new edges, with a performance above 0.75 when using only 10\% of the training data.
+ 
+%MMSB is competitive on some datasets (astro-ph, hep-th, moreno\_names) while it fails on the others. Interestingly, one can see than on the datasets where it fails (digg-reply, prosper-loans, slashdot and wiki-link), the variance is very large. This behavior could be exploited to indicate if the model is suited for capturinfg the structure of a given network. Furthermore, those datasets have a low density compared to astro-ph, hep-th and moreno\_names. Thus, this poor performance can be explained by the fact that the convergence of the model is very sensitive to the sampling choices done during the online inference. Indeed, sparse networks are known to exhibit a degree distribution following a power law, which implies that some nodes do not have the same importance but the sampling does not integrate this property. In this regard, WMMSB and WMMSB-bg models are less sensitive for those networks and are still competitive. This result confirm  that taking into account the edge covariates makes the weighted models less sensitive to the minibatches sampling in sparse networks. Finally, it worth to mention that on the dataset prosper-loans, which is the only network classified as "Interaction" network in the Konnect repository, the baselines failed to learn the topology of the networks and MMSB barely exceeds a random classifier; only WMMSB-bg succeeds with the best performance above 0.75.
+
+% Table Roc comments
+\begin{table}
+\centering
+	\input{img/roc_evolv_tab}
+\label{table:roc}
+\end{table}
+
+%
+% Convergence commments
+%
+\subsection {Convergence analysis} %We studied in a deeper way the convergence of WMMSB and WMMSB-bg models on the different datasets. 
+Figure \ref{fig:conv_entropy} shows the evolution of the log-likelihood for the MMSB-based models on a validation set composed of 20\% of links and non-links for each network. We used three different sets for the hyperparameters shape $r$ and scale $p$ of WMMSB. Regardless of the values of these hyperparameters, one can observe that the augmented model WMMSB-bg is less prone to overfitting, usually converges to a better solution and only needs a small proportion of the total number $N^2$ of edges to do so.
+
+\begin{figure}[h]
+\centering
+	\input{img/conv_entropy3}
+    \label{fig:conv_entropy}
+\end{figure}
+
+%Lastly, the complexity of the MMSB-based models with the inference scheme used here is linear in the number of nodes, meaning that it can be sublinear in the number of edges when the network is not too sparse. This has to be contrasted to the complexity of SBM-based models, that is linear in the number of edges. As our implementation, available online\footnote{https://github.com/***/*** (nonymized)}, is in Python whereas the one for SBM models is in C, a direct comparison of the running time of each model is not possible.
+
+%While our implementation is in python, the time convergence of the algorithm is fast and it is even comparable with SBM which is implemented in C. Furthermore, in practice, the algorithm exhibits a sublinear time complexity with the numbers of edges, as shown Table \ref{table:time}.
+%
+%\begin{table}[h]
+%\begin{tabular}{llllll}
+%\hline
+%                    & MMSB                  & WMMSB-bg              & SBM                  \\
+%\hline
+%astro-ph      & 361.165 $\pm$ 159.107    & 868.802 $\pm$ 870.965    & 44.646 $\pm$ 4.778      \\
+%hep-th        & 170.281 $\pm$ 17.246     & 226.887 $\pm$ 77.84      & 20.366 $\pm$ 4.127      \\
+%moreno\_names  & 44.821 $\pm$ 7.717       & 30.362 $\pm$ 11.811      & 5.358 $\pm$ 1.67        \\
+%fb\_uc         & 50.927 $\pm$ 17.694      & 66.921 $\pm$ 10.439      & 4.093 $\pm$ 0.907       \\
+%digg-reply    & 1803.779 $\pm$ 1100.227  & 2044.334 $\pm$ 1016.157  & 228.661 $\pm$ 81.611    \\
+%slashdot      & 4272.667 $\pm$ 1971.346  & 2867.998 $\pm$ 653.092   & 365.437 $\pm$ 82.475    \\
+%enron         & 4660.744 $\pm$ 2978.898  & 3544.711 $\pm$ 385.445   & 1313.841 $\pm$ 109.074  \\
+%wiki-link     & 13683.093 $\pm$ 6890.663 & 5592.084 $\pm$ 228.13    & 613.841 $\pm$ 113.047   \\
+%prosper-loans & 6595.175 $\pm$ 4612.049  & 12255.827 $\pm$ 4878.113 & 1182.409 $\pm$ 183.342  \\
+%\hline
+%\end{tabular}
+%\label{table:time}
+%\caption{Inference time in seconds.}
+%\end{table}
+
+
+
+%
+% WSim
+%
+%For the weighted models, we further measure the capacity to predict right edge counts with a $l_1$ distance between the real count of the test set and the expected count of the models 
+%
+%\begin{equation*}
+%D_{l_1}(D_{test} ||  \{\Thetah, \Phih\}) = \sum_{i,j \in \D_{test}} | y_{ij} - \E[y_{ij}|\Thetah, \Phih] |
+%\end{equation*}
+
+
+
+
+
+

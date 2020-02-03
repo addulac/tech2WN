@@ -1,0 +1,109 @@
+%\documentclass[runningheads]{llncs}
+
+\documentclass{article}
+\usepackage{nips_2018}
+
+
+%\usepackage[cmex10]{amsmath, mathtools}
+\usepackage{amsmath}
+%\usepackage[fleqn]{amsmath}
+%\usepackage{amssymb,amsbsy,amsfonts,amsthm}
+\usepackage{amssymb,amsbsy,amsfonts}
+\usepackage{bm}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{fancyvrb}
+\usepackage{yfonts}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{adjustbox}
+%\usepackage[margin=6.5em]{geometry}
+\usepackage{makecell} % thicker table separator
+\usepackage{booktabs}
+
+
+\usepackage{subfigure}
+\usepackage{wrapfig}
+\usepackage{tikz}
+%\input{../tikz.conf}
+
+\usetikzlibrary{bayesnet}
+
+%%%%%%%%%%% Box 
+\usepackage{calc}%    For the \widthof macro
+\usepackage{xparse}%  For \NewDocumentCommand
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+
+
+%\input{./header.tex}
+%%%%%%%%%% Math
+\renewcommand{\text}{\textnormal}
+%\newcommand{\pr}{\mathbf{p}}
+\newcommand{\pr}{p}
+\newcommand{\p}{p}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\divkk}{\mathbb{K}}
+\newcommand{\entropy}{\mathbb{H}}
+\newcommand{\gem}{\mathrm{GEM}}
+\newcommand{\Mult}{\mathrm{Mult}}
+\newcommand{\DP}{\mathrm{DP}}
+\newcommand{\IBP}{\mathrm{IBP}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\D}{\mathcal{D}}
+\renewcommand{\L}{\mathcal{L}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\unit}{1\!\!1}
+\newcommand{\zij}{z_{i\rightarrow j}}
+\newcommand{\zji}{z_{i\leftarrow j}}
+\newcommand{\Thetah}{\hat\Theta}
+\newcommand{\Phih}{\hat\Phi}
+\newcommand{\thetah}{\hat\theta}
+\newcommand{\phih}{\hat\phi}
+
+\newcommand\mms[1]{\vcenter{\hbox{$\scriptstyle #1$}}}
+
+%\renewcommand{\Phi}{\mat{\Phi}}
+
+
+%\date{avril 2015}
+
+%\newtheorem{definition}{Definition}[section]
+%\newtheorem{proposition}{Proposition}[section]
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{corollary}{Corollary}[section]
+%\newtheorem{proof}{Proof}[section]
+
+
+\begin{document}
+
+\title{Mixed-Membership Stochastic Block Models for Weighted Networks}
+	
+\maketitle
+
+\begin{abstract}
+We propose in this study a mixed-membership stochastic block (MMSB) model for weighted networks that can efficiently be learned through a coupling of collapsed and stochastic variational inference. This model, that is the first "weighted" MMSB model to our knowledge, can be deployed on large networks comprising millions of edges. The experiments, conducted on diverse real-world networks, show that this model outperforms previously proposed models when the number of edges used to learn the model is limited.
+%We propose an online learning algorithm designed to model binary, weighted, directed or undirected networks. It relies on a probabilistic framework inherited from the mixed-membership stochastic blockmodel. The inference combines the advantages of Variational Inference, in particular to derive stochastic gradient descent of the variational objectives which enables mini-batches updates, and Collapse Gibbs Sampling that weaken the assumption made by the classical mean-field approximation of the posterior distribution. We study the convergence of the inference and we evaluate the performance of the models on several real world networks. Our experiments show that our algorithm exhibits fast convergence and have competitive  results on links prediction task especially when the network is partially observed. Futhermore, we show that the weighted MMSB (WMMSB) with an Beta-Gamma priors proposed (WMMSB-bg) signifanctly improves link prediction on most of the weighted networks tested compared to MMSB.
+\end{abstract}
+
+
+\input{intro}
+\input{model}
+\input{related}
+\input{expe}
+\input{conclusion}
+
+\clearpage
+\bibliographystyle{unsrt}
+%\bibliographystyle{splncs04}
+
+\bibliography{./a}
+
+%\clearpage
+%\appendix
+%\input{appendix}
+
+\end{document}
+

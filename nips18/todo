@@ -1,0 +1,4 @@
+
+* sensibility wmmsb to K
+* sensibility wmmsb to minbatch size (put on the same figure how the performance evolve (decrease!) to show the trade-off and the interest of minibatch
+* weight prediction + "infinite edge partition" model
