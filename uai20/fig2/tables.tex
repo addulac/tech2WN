@@ -1,0 +1,66 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+\usepackage{placeins} % \FloatBarrier
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+\begin{document}
+
+\paragraph{Models description}~\\
+
+\begin{itemize}
+\item MMSB-scvb : MMSB with SCVB inference scheme
+\item WMMSB-bg : WMMSB with SCVB inference scheme (and beta-gamma optimization)
+\item EPM : (Hierarchical Gamma Process) Edge Partition Model
+\item SBM-ai : SBM with variational inference (Aicher' model)
+\item WSBM-ai-n : pure WSBM with variational inference with Normal kernel (Aicher' model)
+\item WSBM-ai-p :pure WSBM with variational inference with Poisson kernel (Aicher' model)
+\item SBM-gt : microcanonical SBM (Peixoto' model)
+\item WSBM-gt : microcanonical WSBM (Peixoto' model)
+\end{itemize}
+
+
+\begin{table}
+\caption{Comparison of the link prediction performance of models in terms of AUC-ROC when using 10\% of the training data and for K=10.}
+\resizebox{1\textwidth}{!}{ 
+\input{roc_training10}
+}
+\end{table}
+
+\begin{table}
+\caption{Comparison of the link prediction performance of models in terms of AUC-ROC when using 100\% of the training data and for K=10.}
+\resizebox{1\textwidth}{!}{ 
+\input{roc_training100}
+}
+\end{table}
+
+\begin{table}
+\caption{Comparison of the weight prediction performance of models in terms of MSE when using 10\% of the training data and for K=10.}
+\resizebox{1\textwidth}{!}{ 
+\input{wsim_training10}
+}
+\end{table}
+
+\begin{table}
+\caption{Comparison of the weight prediction performance of models in terms of MSE when using 100\% of the training data and for K=10.}
+\resizebox{1\textwidth}{!}{ 
+\input{wsim_training100}
+}
+\end{table}
+
+\begin{table}
+\caption{Comparison of the inference time (in hours) of the models when using 100\% of the training data and for K=10.}
+\resizebox{1\textwidth}{!}{ 
+\input{timing_100_k10}
+}
+\end{table}
+
+
+\end{document}
