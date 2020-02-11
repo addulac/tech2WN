@@ -1,7 +1,11 @@
 %\documentclass[runningheads]{llncs}
 
-\documentclass{article}
-\usepackage{nips_2018}
+\documentclass[letterpaper]{article}
+\usepackage{uai2020}
+\usepackage[margin=1in]{geometry}
+\usepackage{ulem}
+
+\usepackage{times}
 
 
 %\usepackage[cmex10]{amsmath, mathtools}
@@ -21,6 +25,8 @@
 %\usepackage[margin=6.5em]{geometry}
 \usepackage{makecell} % thicker table separator
 \usepackage{booktabs}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\color{blue}\scriptsize}
 
 
 \usepackage{subfigure}
@@ -94,6 +100,11 @@ We propose in this study a mixed-membership stochastic block (MMSB) model for we
 \input{related}
 \input{expe}
 \input{conclusion}
+
+\clearpage
+
+\section{Supplementary material of \textit{Mixed-Membership Stochastic Block Models for Weighted Networks}}
+\input{appendix}
 
 \clearpage
 \bibliographystyle{unsrt}
