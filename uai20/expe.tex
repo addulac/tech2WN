@@ -16,18 +16,18 @@ We experimented our models on several real world networks, directed and undirect
 
 Our evaluation is based on a missing weight prediction task using a MSE score. We compared our proposed models with several implementation of stochasticl block models; The microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric} which integrates an efficient MCMC inference method for the stochastic block model family stochastic block model, and its weighted extension, referred respectively to as SBM-gt and WSBM-gt; The SBM and WSBM implementations of \cite{aicher2014learning} which used a generic variational inference for the exponential family, referred to as SBM-ai for the Bernoulli kernel, SBM-ai-n for the normal kernel and SBM-ai-p for the Poisson kernel. Lastly, the Edge Partition Model (EPM) proposed by ~\cite{zhou2015infinite} which is based on a MCMC inference referred to as EPM.
 
-For the models in the mixed-membership class (*MMSB and EPM), we used the infered posterior distribution to estimate the missing weights. Thus for *MMSB model, we have
+For the models in the weighted mixed-membership class WMMSB and EPM, we used the infered posterior distribution to estimate the missing weights, such as
 \[
 %p(y_{ij} \geq 1 | \Thetah, \Phih) = \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{-\phih_{kk'}}
-p(y_{ij} | \Thetah, \Phih) = \sum_{kk'} \thetah_{ik} \thetah_{jk'} \text{Poi}(\phih_{kk'})
+\hat y_{ij} | \Thetah, \Phih = \sum_{kk'} \thetah_{ik} \thetah_{jk'} \phih_{kk'}
 \]
 
-Since the SBMs are based on link prediction, we do not have a posterior distribution adapted for weight prediction. Therefore, we used a post estimation of the average weight value in each class interaction based on the observed data. That is, let $O_{kl}$ be a set of observable links (and non links) between the inferred latent class $k$ and $l$, the prediction of a missing link between the class $l$ and $k$ is given by
+Since the SBMs are based on link prediction, we do not have a posterior distribution adapted for weight prediction. Therefore, we used a post estimation of the average weight value in each class interaction based on the observed data. That is, let $O_{kk'}$ be a set of observable links (and non links) between the inferred latent class $k$ and $k'$. The prediction of a missing link between the class $k$ and $k'$ is given by
 \[
-\hat y_{ij} | e_i \in \text{class } l, e_j \in \text{class }l  = \sum_{y_{ij} \in O_{kl}} \frac{y_{ij}}{\# O_{kl}}
+\hat y_{ij} | e_i \in \text{class } k, e_j \in \text{class }k' = \sum_{y_{ij} \in O_{kk'}} \frac{y_{ij}}{\# O_{kk'}}
 \]
 
-Note that we used the same method for the weighted version of the SBM models of the Aicher and Peixoto model. 
+Note that we used the same method for the weighted version of the SBM models of the Aicher and Peixoto models as we observed eihter no significative difference or even better results using the later.
 
 For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-links. The remaining data constitutes the training set. We repetead this sampling 10  times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sub-training sets are reported, for each proportion, as final results.
 
@@ -80,7 +80,7 @@ Figure \ref{fig:k_evolv} shows the MSE score for several number of latent classe
 \label{table:time}
 \end{table*}
 
-Table \ref{table:time} shows the inference time of the models on the different dataset in hours. The models *MMSB, SBM-ai-* and *SBM-gt are implemented respectively in Python, Matlab and C++ (with a Python wrapper \cite{peixoto_graph-tool_2014}), which must be considered when comparing the models, Furthermore, and hard limit to 25 hours was set for the inference time to limit the computing cost. That being said, the *SBM-gt is the fastest model while EPM is the slowest and can take more than 20 times compared to *MMSB inference. Most, notably, the inference of *MMSB with SCVB is fit millions of edge in less than 2 hours, while implemented in python, which is encouraging in the development of this inference scheme.
+Table \ref{table:time} shows the inference time of the models on the different dataset in hours. The models MMSB, WMMSB, SBM-ai-b/n/p and SBM-gt and WSBM-gt are implemented respectively in Python, Matlab and C++ (with a Python wrapper \cite{peixoto_graph-tool_2014}), which must be considered when comparing the models, Furthermore, and hard limit to 25 hours was set for the inference time to limit the computing cost. That being said, the SBM-gt is the fastest model while EPM is the slowest and can take more than 20 times compared to the inference of MMSB and WMMSB. Most, notably, the inference of MMSB and WMMSB with the SCVB inference scheme fit millions of edge in less than 2 hours, while implemented in python, which is encouraging in the development of this inference scheme.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
