@@ -1,8 +1,10 @@
 \section{Experimental validation}
 \label{sec:exps}
 
-We experimented our models on several real world networks, directed and undirected. Theirs statistics and properties are summarized in table \ref{table:corpus} and detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/networks/}. For both astro-ph and hep-ph datasets, we used the cleaned version available in the  graph-tool framework.
+We evaluated the predictive performances of our models on several real world networks, directed and undirected. Theirs characteristics and properties are summarized in Table \ref{table:corpus} and detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/networks/}. For both astro-ph and hep-ph datasets, we used the cleaned version available in the  graph-tool framework.
 %The aim of these experiments is to illustrate the advantage of the online inference and to evaluate the performances of the models.
+This evaluation is based on a missing weight prediction task using the MSE score. 
+For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-linked pairs of nodes. The remaining data constitutes the training set. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sub-training sets are reported as final results.
 
 \begin{table*}[t]
 \bgroup
@@ -14,25 +16,26 @@ We experimented our models on several real world networks, directed and undirect
 
 \subsection{Experimental setup}
 
-Our evaluation is based on a missing weight prediction task using a MSE score. We compared our proposed models with several implementation of stochasticl block models; The microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric} which integrates an efficient MCMC inference method for the stochastic block model family stochastic block model, and its weighted extension, referred respectively to as SBM-gt and WSBM-gt; The SBM and WSBM implementations of \cite{aicher2014learning} which used a generic variational inference for the exponential family, referred to as SBM-ai for the Bernoulli kernel, SBM-ai-n for the normal kernel and SBM-ai-p for the Poisson kernel. Lastly, the Edge Partition Model (EPM) proposed by ~\cite{zhou2015infinite} which is based on a MCMC inference referred to as EPM.
 
-For the models in the weighted mixed-membership class WMMSB and EPM, we used the infered posterior distribution to estimate the missing weights, such as
+We compared our models with several implementations of the state of the art. In the stochastic block model family, we considered the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric} which integrates an efficient MCMC inference method and its weighted extension, referred respectively to as SBM-gt and WSBM-gt. In the exponential family, we chose the SBM and WSBM implementations of \cite{aicher2014learning} which use a generic variational inference with several kernels, referred to as SBM-ai for the Bernoulli kernel, WSBM-ai-n for the Normal kernel and WSBM-ai-p for the Poisson kernel. Lastly, we compared also our models to the Edge Partition Model (EPM) proposed by ~\cite{zhou2015} which is based on a MCMC inference.
+
+
+For the models belonging to the weighted mixed-membership class, WMMSB and EPM, we used the inferred posterior distribution to estimate the missing weights by:
 \[
 %p(y_{ij} \geq 1 | \Thetah, \Phih) = \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{-\phih_{kk'}}
 \hat y_{ij} | \Thetah, \Phih = \sum_{kk'} \thetah_{ik} \thetah_{jk'} \phih_{kk'}
 \]
-
-Since the SBMs are based on link prediction, we do not have a posterior distribution adapted for weight prediction. Therefore, we used a post estimation of the average weight value in each class interaction based on the observed data. That is, let $O_{kk'}$ be a set of observable links (and non links) between the inferred latent class $k$ and $k'$. The prediction of a missing link between the class $k$ and $k'$ is given by
+Since the SBM models have been designed for solving the link prediction task, we do not have a posterior distribution adapted for weight prediction. Therefore, we used a post estimation of the average weight value in each classes interaction based on the observed data. More formally, given $O_{kk'}$, a set of observable links (and non links) between the inferred latent classes $k$ and $k'$, the prediction of a missing link between the classes $k$ and $k'$ is given by:
 \[
 \hat y_{ij} | e_i \in \text{class } k, e_j \in \text{class }k' = \sum_{y_{ij} \in O_{kk'}} \frac{y_{ij}}{\# O_{kk'}}
 \]
 
-Note that we used the same method for the weighted version of the SBM models of the Aicher and Peixoto models as we observed eihter no significative difference or even better results using the later.
+Note that we used the same method for the weighted versions of the Aicher and Peixoto SBM models as we observed no significant difference and even better results using this latter estimation.
 
-For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-links. The remaining data constitutes the training set. We repetead this sampling 10  times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sub-training sets are reported, for each proportion, as final results.
+%For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-links. The remaining data constitutes the training set. We repetead this sampling 10  times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sub-training sets are reported, for each proportion, as final results.
 
 % stopping citerion
-For deciding when to stop the inference process, 10\% of the training set used serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
+For deciding when to stop the inference process, 10\% of the training set serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
 \begin{equation*}
 \log p(\D_{set}) = \sum_{i,j \in \D_{set}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
 %\log p(\D_{test}) = \sum_{i,j \in \D_{test}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j)
@@ -54,9 +57,9 @@ For all our models, the gradient step parameters  $\tau$ and $\kappa$ were fixed
 %%%% Prediction performance
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Table \ref{table:mse}, gives the MSE score for the different models and for all networks. To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although th models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by other link prediction method. 
-As one can note, WMMSB-gt outperforms other models except for the network moreno\_names. 
-The fact that this network is the only one in the category of linguistic network and that it is relatively small could explain this result. EPM outperforms other models, apart from WMMSB-gt. Other models expose comparable results.
+Table \ref{table:mse}, gives the MSE scores for the different models and for all networks. To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although the models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by a link prediction method. 
+As one can note, WMMSB-bg outperforms all the other models on the different datasets except for the network moreno\_names. 
+The fact that this network is the only one in the category of linguistic network and that it is relatively small could explain this result. \textbf{CL : je ne suis pas d'accord avec phrase suivante} EPM outperforms other models, apart from WMMSB-bg. The other models expose comparable results.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Sensibility on K 
@@ -68,8 +71,9 @@ The fact that this network is the only one in the category of linguistic network
 	\input{fig2/wsim_k_evo}
    \label{fig:k_evolv}
 \end{figure}
+Figure \ref{fig:k_evolv} shows the MSE score for $K$, the number of latent classes, varying from 10 to 50 and for six datasets. One can see that for the different methods, the result is relatively stable, in a lesser extent on the networks hep\_th and fb\_uc. Thus, the choice of this parameter has a limited impact on the performances of the models. Nevertheless, it should be notice that for $K$ equals  to 50, EPM has not been able to handle the datasets.
 
-Figure \ref{fig:k_evolv} shows the MSE score for several number of latent classes. One can see that the result are stable with the number of classes between 10 and 50.
+\textbf{CL: Pbl axe 2 indique Wsim et non MSE}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Timing performance
@@ -79,14 +83,15 @@ Figure \ref{fig:k_evolv} shows the MSE score for several number of latent classe
 	\input{fig2/timing_100_k10.tex}
 \label{table:time}
 \end{table*}
+Table \ref{table:time} presents the inference time of the models on the different dataset in hours. The models MMSB-scvb and WMMSB-gt are implemented in Python, SBM-ai-b/WSBM-ai-n/WSBM-ai-p in Matlab and SBM-gt and WSBM-gt in C++ (with a Python wrapper \cite{peixoto_graph-tool_2014}), which must be considered when comparing the timing. Furthermore, a hard limit  was set at 25 hours for the inference time to limit the computing cost. We can observe that SBM-gt is the fastest model while EPM is the slowest. This last one can take more than 20 times the inference duration of MMSB and WMMSB; which confirms its incapacity to handle the networks with $K$ equals 50 as seen previously. Notably, the inference of MMSB and WMMSB with the SCVB inference scheme fits millions of edges in less than 2 hours, while it is implemented in Python, which is very satisfying and allows to expect better performances  with optimized implementations for this inference scheme.
 
-Table \ref{table:time} shows the inference time of the models on the different dataset in hours. The models MMSB, WMMSB, SBM-ai-b/n/p and SBM-gt and WSBM-gt are implemented respectively in Python, Matlab and C++ (with a Python wrapper \cite{peixoto_graph-tool_2014}), which must be considered when comparing the models, Furthermore, and hard limit to 25 hours was set for the inference time to limit the computing cost. That being said, the SBM-gt is the fastest model while EPM is the slowest and can take more than 20 times compared to the inference of MMSB and WMMSB. Most, notably, the inference of MMSB and WMMSB with the SCVB inference scheme fit millions of edge in less than 2 hours, while implemented in python, which is encouraging in the development of this inference scheme.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Convergence of *MMSB SCVB inference
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Figure \ref{fig:conv_entropy} shows the evolution of the log-likelihood for the MMSB-based models on the test set. We used three different sets for the hyperparameters shape $r$ and scale $p$ of WMMSB. Regardless of the values of these hyperparameters, one can observe that the augmented model WMMSB-bg is less prone to overfitting, usually converges to a better solution and only needs a small proportion of the total number $N^2$ of edges to do so.
+\textbf{CL : detail sur les 3 ensembles a preciser ?} 
 
 \begin{figure}[h]
 \centering
