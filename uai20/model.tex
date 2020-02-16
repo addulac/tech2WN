@@ -13,7 +13,7 @@ y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \,\, \p
 \end{align*}
 %
 where $r$ and $\frac{1-p}{p}$ are the shape and rate parameters of the Gamma distribution. The Poisson-Gamma combination in WMMSB is interesting as it directly leads to: $y_{ij}|_{Z} \sim \textrm{NB}(r,p)$, where $\textrm{NB}$ denotes the negative binomial distribution. This latter distribution allows one to represent overdispersed count data and has been used in different contexts.%, as in computational linguistics to model bursts in texts \cite{church-1995}.
- Another advantage of the Poisson distribution is the fact that a truncated version of it, the Zero Truncated Poisson distribution, can easily be obtained by ???. This latter version can directly be used to predict weights on existing links in networks. Lastly, note that the above models are valid for both directed and undirected graphs, the matrix $\Bs{\Phi} = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
+ Another advantage of the Poisson distribution is the fact that a truncated version of it, the Zero Truncated Poisson distribution, can easily be obtained by dividing the probability mass of the original distribution by $(1 - e^{\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}})$. This latter version can directly be used to predict weights on existing links in networks, as in that case $y_{ij} > 0$. Lastly, note that the above models are valid for both directed and undirected graphs, the matrix $\Bs{\Phi} = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
 
 \textbf{A Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them through class-dependent shape and rate parameters in the above Gamma distribution. We propose here to model the class-dependent shape parameter with another Gamma distribution and the class-dependent rate parameter with a Beta prior:
 %
@@ -60,12 +60,18 @@ where $\textrm{H}$ denotes the entropy. The goal of variational inference is the
 %q(\Pi) = q(\Theta, {\Bs{\Phi}} | Z) q(Z)
 %\end{equation*}
 %%
-with $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial with parameter $\gamma_{ij}$. The evidence is then lower bounded by:
+with, forall $(i,j)$, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial with parameter $\gamma_{ijkk'}$. The evidence is then lower bounded by:
 %
 \begin{equation*}
-\log p({\B{Y}}|\Omega) \geq \underbrace{\E_{q}[\log p({\B{Y}}, Z)] + \textrm{H}[q(Z)]}_{\L_Z}.
+\log p({\B{Y}}|\Omega) \geq \underbrace{\E_{q}[\log p({\B{Y}}, Z)] + \textrm{H}[q(Z)]}_{\L_Z},
 \end{equation*}
-
+%
+with $\L_Z$ being defined by:
+%
+\begin{align*}
+???
+\end{align*}
+%
 Maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion and a Gaussian approximation, following \cite{teh2007collapsed,asuncion2009smoothing}, yields the following updates:
 %
 \begin{align} \label{eq:maximization}
@@ -149,7 +155,7 @@ Lastly, as for its true distribution, the variational distribution for $r_{kk'}$
 
 \subsection{Stochastic variational inference with stratified sampling}
 
-Stochastic variational inference aims at optimizing ELBO through noisy yet unbiased estimates of its natural gradient computed on sampled data points. Different sampling strategies \cite{gopalan2013efficient,kim2013efficient} can be used. Following the study in \cite{gopalan2013efficient}, we rely here on stratified sampling that allows one to control the number of links and non-links used in the inference process. For each node $i, \, 1 \le i \le N$, one first constructs a set, denoted $s_1^i$, containing all the nodes to which $i$ is connected to as well as $M$ sets of equal size, denoted $s_0^{i,m}, \, 1 \le m \le M$, each containing a sample of the nodes to which $i$ is not connected to\footnote{The sampling is here uniform over the nodes not connected to $i$ with replacement; sampling without replacement led to poorer results in our experiments.}. We will denote by $S_0^i$ the set of all $s_0^{i,m}$ sets. The sets thus obtained, for all nodes, constitute minibatches that can be sampled and used to update the global counts in Eq.~\ref{eq:sss}. The combined scheme is summarized below:
+Stochastic variational inference can then be used to optimize the collapsed ELBO through unbiased, yet noisy, estimates of its natural gradient computed on sampled data points. Different sampling strategies \cite{gopalan2013efficient,kim2013efficient} have been proposed for that purpose. Following the study in \cite{gopalan2013efficient}, we rely here on stratified sampling that allows one to control the number of links and non-links used in the inference process. For each node $i, \, 1 \le i \le N$, one first constructs a set, denoted $s_1^i$, containing all the nodes to which $i$ is connected to as well as $M$ sets of equal size, denoted $s_0^{i,m}, \, 1 \le m \le M$, each containing a sample of the nodes to which $i$ is not connected to\footnote{The sampling is here uniform over the nodes not connected to $i$ with replacement; sampling without replacement led to poorer results in our experiments.}. We will denote by $S_0^i$ the set of all $s_0^{i,m}$ sets. The sets thus obtained, for all nodes, constitute minibatches that can be sampled and used to update the global counts in Eq.~\ref{eq:sss}. The combined scheme is summarized below:
 %
 \begin{enumerate}
 \item Sample a node $i$ uniformly from all nodes in the graph; with probability $\frac{1}{2}$, either select $s_1^i$ or any set from $S_0^i$ (in the latter case, the selection is uniform over the sets in $S_0^i$). We will denote by $s_i$ the set selected and by $|s_i|$ its cardinality.
