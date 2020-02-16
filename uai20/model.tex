@@ -1,37 +1,35 @@
 \section{Mixed-membership stochastic block models and (un)weighted graphs}
 \label{sec:model}
 
-As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We consider the adjacency matrix $Y=(y_{ij})_{ij\in N^2}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} > 0$ otherwise.
+As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We furthermore consider the matrix $Y=(y_{ij})_{ij\in N^2}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} \in \mathbb{Z}_{>0}$ otherwise. When the network is unweighted, $y_{ij} \in \{0,1\}$ and $Y$ is the adjacency matrix.
 
-Mixed-membership stochastic block (MMSB) models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$, sometimes referred to as the \textit{kernel} distribution, that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\alpha$ are $K$-dimensional vectors, $K$ denoting  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ an associated (usually drawn from a conjugate distribution) parameter that represents the relations between classes. For unweighted graphs, $F$ is usually Bernoulli and $\phi$ its conjugate Beta distribution.
+Mixed-membership stochastic block models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$, sometimes referred to as the \textit{kernel} distribution, that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\alpha$ are $K$-dimensional vectors, $K$ denoting  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ a variable, usually drawn from a conjugate distribution, that represents the relations between classes. A standard choice for $F$ is the Bernoulli distribution, $\phi$ being the conjugate Beta distribution: $y_{ij} \sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \, \phi_{kk'} \sim \textrm{Beta}(\lambda_0, \lambda_1)$. We refer to this model as the MMSB model.
 
-Many real networks nevertheless rely on graphs in which edges are naturally weighted. In co-authorship networks, for example, it is standard to consider edges weighted according to the number of collaborations between authors \cite{newman2001scientific}. In communication networks, the weights are based on the number of messages sent from the sender to the receiver. In text mining and natural language processing applications, it is also common to use word graphs in which edges are weighted on the basis of the number of times the words co-occur (in a sentence, paragraph or document). In all these cases, weights are integers that can naturally be modeled with Poisson distributions. Relying on its conjugate Gamma distribution for $\phi$, one finally obtains the following models, denoted MMSB for unweighted graphs and WMMSB for weighted graphs:
-%
-\[
-\theta_i \sim \textrm{Dir}(\alpha), \,\, z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i), \,\, z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j)
-\]
-%
-and:
+A natural way to model weights that correspond to positive integers is to use Poisson distributions. Considering a conjugate Gamma distribution for $\phi$, one can define a first weighted extension of MMSB, which we will refer to as WMMSB, through:
 %
 \begin{align*} \label{eq:generative}
-y_{ij} &\sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}),\quad \phi_{kk'} \sim \textrm{Beta}(\lambda_0, \lambda_1), \\& \textrm{  \textit{for unweighted graphs (MMSB)}} \\
-y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \quad \phi_{kk'} \sim \textrm{Gamma}(r, \frac{p}{1-p}), \\& \textrm{  \textit{for weighted graphs (WMMSB)}}
+\theta_i & \sim \textrm{Dir}(\alpha), \,\, z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i), \,\, z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j) \\
+y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \,\, \phi_{kk'} \sim \textrm{Gamma}(r, \frac{1-p}{p}),
 \end{align*}
 %
-The choice made here for the Poisson and Gamma distributions in WMMSB allows one to represent overdispersed count data as one has $y_{ij} \sim \textrm{NB}(r,p)$ \cite{zhou2012beta}, where $\textrm{NB}$ denotes the negative binomial distribution. Furthermore, the above models are valid for both directed and undirected graphs, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
+where $r$ and $\frac{1-p}{p}$ are the shape and rate parameters of the Gamma distribution. The Poisson-Gamma combination in WMMSB is interesting as it directly leads to: $y_{ij}|_{Z} \sim \textrm{NB}(r,p)$, where $\textrm{NB}$ denotes the negative binomial distribution. This latter distribution allows one to represent overdispersed count data and has been used in different contexts, as in computational linguistics to model bursts in texts \cite{church-1995}. Lastly, note that the above models are valid for both directed and undirected graphs, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric in the latter case.
 
-%In the following we will denote the set of the model parameters $\Pi = \{ \Theta, \Phi, Z \}$ with $\Theta = (\theta_{ik})_{i,k \in \{1,..,N\}\times \{1,..,K\}}$ and the set of model hyper-parameters $\Omega$.
-
-\textbf{Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them. Following the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}, we model here the rate parameter of the Gamma distribution used in WMMSB with a Beta prior and its shape parameter with another Gamma distribution of the form:
+\textbf{A Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them through class-dependent shape and rate parameters in the above Gamma distribution. We propose here to model the class-dependent shape parameter with another Gamma distribution and the class-dependent rate parameter with a Beta prior:
 %
 \begin{gather*}
-r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0) \qquad p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)) \\
-\phi_{kk'} \sim \textrm{Gamma}(r_{kk'}, \frac{p_{kk'}}{1-p_{kk'}})
+r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0), \, p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)).
+%\phi_{kk'} \sim \textrm{Gamma}(r_{kk'}, \frac{p_{kk'}}{1-p_{kk'}})
 \end{gather*}
 %
-The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form: $y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}})$. As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes now play a prominent role in the model. We will denote this model as WMMSB-bg.
+The variable $y_{ij}$ is again distributed according to a negative binomial distribution, of the form:
+%
+\begin{equation}\label{eq:yNB}
+y_{ij}|_{Z} \sim \textrm{NB}(r_{z_{i \rightarrow j} z_{i \leftarrow j}},p_{z_{i \rightarrow j} z_{i \leftarrow j}}).
+\end{equation}
+%
+As one can note, and contrary to WMMSB, the parameters of the negative binomial distribution depend this time on the classes selected for each node, meaning that classes now play a prominent role in the model. We will refer to this model as WMMSB-bg.
 
-As for most hierarchical Bayesian model, exact inference is intractable and one must resort to approximate inference. In the next section we propose a stochastic collapsed variational inference algorithm for the above models (MMSB, WMMSB, WMMSB-bg).
+The above extension exploits again the conjugacy of the distributions considered and is reminiscent of the Beta-Gamma-Gamma-Poisson model \cite{zhou2012beta} and the Gamma-Negative Binomial process \cite{zhou2015negative}. However, as for most hierarchical Bayesian models, exact inference is intractable and one must resort to approximate inference. The next section describes the variational inference scheme we have followed for that.
 
 \section{Inference}
 \label{sec:inference}
