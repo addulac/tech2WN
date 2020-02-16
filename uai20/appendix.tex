@@ -1,4 +1,7 @@
+%\section*{Supplementary material of \textit{Mixed-Membership Stochastic Block Models for Weighted Networks}}
+
 \section{Derivation of the collapsed variational updates}
+\label{app:collap}
 
 The derivation of the collapsed variational updates is first obtained by maximizing the ELBO w.r.t $\gamma_{ijkk'}$ with:
 %
@@ -40,7 +43,9 @@ By applying a first order Taylor expansion on Eq.~\eqref{eq1}, following \cite{t
 
 Finally, using a Gaussian approximation (as in \textit{e.g.} \cite{asuncion2009smoothing}), one can estimate the expectations $E_{q(Z^{-ij})}[n_{\rightarrow ik}^{\Theta^{-j}}], E_{q(Z^{-ij})}[n_{\leftarrow jk}^{\Theta^{-i}}]$ and  $E_{q(Z^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}]$ with the counts defined in Eq. 2 of Section 3.1.
 
-\section{Beta-Gamma updates}
+\vspace{0.1cm}
+\noindent \large{\textbf{Beta-Gamma updates}}}
+\vspace{0.1cm}
 
 In the WMMSB-bg model, the collapsed variational distribution takes the form:
 
@@ -162,25 +167,25 @@ p_{kk'} \sim \mathrm{Beta}(c\epsilon + N^Y_{kk'}, c(1-\epsilon) + N^\Phi_{kk'} E
 %The exact summing formulation of $N^*=\sum_{ij,*}$ is given in section 3.1. For undirected network, $c$ is equal to 2 because each pair occurs in two set, and $c$ is 1 for directed network.
 
 
-\section{Reproducible Research}
-
-We published our implementation within a platform that aims to ease the development of reproducible complex experiments. We are maintaining this platform that we released under open-source license.\footnote{The name of the project is anonymized.}
-
-To reproduce our results, one can proceed as follows:
-\begin{itemize}
-\item Install the XXX project:   %\lstinline|git clone https://github.com/*/XXX|  
-    \begin{lstlisting}[language=bash]
-          $ git clone https://github.com/*/*
-          $ cd XXX && make install
-    \end{lstlisting}
-\item Fit all the models on all the corpus, and save the results:
-\begin{lstlisting}[language=bash]
-        $ XXX online_roc -x fit -w --repeat 0 1 2 3 4 5 6 7 8 9 
-\end{lstlisting}
-\item Parallelization can be obtained by adding the options \lstinline|--cores NUMBER_OF_CORES|,
-\item Figures can be plotted with the command:  
-\begin{lstlisting}[language=bash]
-        $ XXX online_roc -x roc_evolution2 --repeat 0 1 2 3 4 5 6 7 8 9
-\end{lstlisting}
-\end{itemize}
-
+%\section{Reproducible Research}
+%
+%We published our implementation within a platform that aims to ease the development of reproducible complex experiments. We are maintaining this platform that we released under open-source license.\footnote{The name of the project is anonymized.}
+%
+%To reproduce our results, one can proceed as follows:
+%\begin{itemize}
+%\item Install the XXX project:   %\lstinline|git clone https://github.com/*/XXX|  
+%    \begin{lstlisting}[language=bash]
+%          $ git clone https://github.com/*/*
+%          $ cd XXX && make install
+%    \end{lstlisting}
+%\item Fit all the models on all the corpus, and save the results:
+%\begin{lstlisting}[language=bash]
+%        $ XXX online_roc -x fit -w --repeat 0 1 2 3 4 5 6 7 8 9 
+%\end{lstlisting}
+%\item Parallelization can be obtained by adding the options \lstinline|--cores NUMBER_OF_CORES|,
+%\item Figures can be plotted with the command:  
+%\begin{lstlisting}[language=bash]
+%        $ XXX online_roc -x roc_evolution2 --repeat 0 1 2 3 4 5 6 7 8 9
+%\end{lstlisting}
+%\end{itemize}
+%
