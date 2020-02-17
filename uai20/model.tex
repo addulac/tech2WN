@@ -66,11 +66,16 @@ with, forall $(i,j)$, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ b
 \log p({\B{Y}}|\Omega) \geq \underbrace{\E_{q}[\log p({\B{Y}}, Z)] + \textrm{H}[q(Z)]}_{\L_Z},
 \end{equation*}
 %
-with $\L_Z$ being defined by:
+with $\E_{q}[\log p({\B{Y}}, Z)]$ being defined by:
+\[
+\sum_Z q(Z) \log p(Y, Z),
+\]
 %
-\begin{align*}
-???
-\end{align*}
+and $\textrm{H}[q(Z)]$ being defined by:
+%
+\[
+\sum_Z q(Z) \log q(Z).
+\]
 %
 Maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion and a Gaussian approximation, following \cite{teh2007collapsed,asuncion2009smoothing}, yields the following updates:
 %
