@@ -104,14 +104,15 @@ Table \ref{table:time} presents the inference time of the models on the differen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Convergence of *MMSB SCVB inference
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Figure \ref{fig:conv_entropy} shows the evolution of the log-likelihood for the MMSB-based models on the test set. We used three different sets for the hyperparameters shape $r$ and scale $p$ of WMMSB. Regardless of the values of these hyperparameters, one can observe that the augmented model WMMSB-bg is less prone to overfitting, usually converges to a better solution and only needs a small proportion of the total number $N^2$ of edges to do so.
+Figure \ref{fig:conv_entropy} shows the evolution of the log-likelihood for the MMSB-based models on the test set for enron, slashdot and proper-loans datasets. We used three different sets for the hyperparameters shape $r$ and scale $p$ of WMMSB. Regardless of the values of these hyperparameters, one can observe that the augmented model WMMSB-bg is less prone to overfitting, usually converges to a better solution and only needs a small proportion of the total number $N^2$ of edges to do so.
 \textbf{CL : detail sur les 3 ensembles a preciser ?} 
 
-\begin{figure}[h]
+\begin{figure*}[h]
 \centering
-	\input{img/conv_entropy3}
+	%\input{img/conv_entropy3}
+	\input{img/conv_entropy4}
     \label{fig:conv_entropy}
-\end{figure}
+\end{figure*}
 
 
 
