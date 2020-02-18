@@ -1,25 +1,26 @@
 \section{Mixed-membership stochastic block models and (un)weighted graphs}
 \label{sec:model}
 
-As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We furthermore consider the matrix $\B{Y}=(y_{ij})_{1 \le i,j \le N}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} \in \mathbb{Z}_{>0}$ otherwise. When the network is unweighted, $y_{ij} \in \{0,1\}$ and $\B{Y}$ is the adjacency matrix.
+As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We furthermore consider the matrix $Y=(y_{ij})_{1 \le i,j \le N}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} \in \mathbb{Z}_{>0}$ otherwise. When the network is unweighted, $y_{ij} \in \{0,1\}$ and $Y$ is the adjacency matrix.
 
-Mixed-membership stochastic block models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$, sometimes referred to as the \textit{kernel} distribution, that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\boldsymbol{\theta}_i \sim \textrm{Dir}(\boldsymbol{\alpha})$, where $\boldsymbol{\theta}_i$ and $\boldsymbol{\alpha}$ are $K$-dimensional vectors, $K$ denoting  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\Bs{\theta}_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\Bs{\theta}_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ a variable, usually drawn from a conjugate distribution, that represents the relations between classes. A standard choice for $F$ is the Bernoulli distribution, $\phi$ being the conjugate Beta distribution: $y_{ij} \sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \, \phi_{kk'} \sim \textrm{Beta}(\lambda_0, \lambda_1)$. We refer to this model as the MMSB model.
+Mixed-membership stochastic block models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$, sometimes referred to as the \textit{kernel} distribution, that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\boldsymbol{\alpha}$ are $K$-dimensional vectors, $K$ denoting  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ a variable, usually drawn from a conjugate distribution, that represents the relations between classes. A standard choice for $F$ is the Bernoulli distribution, $\phi$ being the conjugate Beta distribution: $y_{ij} \sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \, \phi_{kk'} \sim \textrm{Beta}(\lambda_0, \lambda_1)$. We refer to this model as the MMSB model.
 
 A natural way to model weights that correspond to positive integers is to use Poisson distributions. Considering a conjugate Gamma distribution for $\phi$, one can define a first weighted extension of MMSB, which we will refer to as WMMSB, through:
 %
 \begin{align*} \label{eq:generative}
-\Bs{\theta}_i & \sim \textrm{Dir}(\Bs{\alpha}), \,\, z_{i\rightarrow j} \sim \textrm{Cat}(\Bs{\theta}_i), \,\, z_{i\leftarrow j} \sim \textrm{Cat}(\Bs{\theta}_j), \\
+\theta_i & \sim \textrm{Dir}(\alpha), \,\, z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i), \,\, z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j), \\
 y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \,\, \phi_{kk'} \sim \textrm{Gamma}(r, \frac{1-p}{p}),
 \end{align*}
 %
-where $r$ and $\frac{1-p}{p}$ are the shape and rate parameters of the Gamma distribution. Note that both directed and undirected graphs can be considered with the above formulation, the matrix $\Bs{\Phi} = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric for undirected graphs.
+where $r$ and $\frac{1-p}{p}$ are the shape and rate parameters of the Gamma distribution. Note that both directed and undirected graphs can be considered with the above formulation, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric for undirected graphs.
 
 The Poisson-Gamma combination in WMMSB is interesting as it directly leads to: $y_{ij}|_{Z} \sim \textrm{NB}(r,p)$, where $\textrm{NB}$ denotes the negative binomial distribution. This latter distribution allows one to represent overdispersed count data and has been used in different contexts.%, as in computational linguistics to model bursts in texts \cite{church-1995}.
- Another advantage of the Poisson distribution is the fact that a truncated version of it, the Zero Truncated Poisson distribution, can easily be obtained by dividing the probability mass of the original distribution by $(1 - e^{\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}})$. This latter version can directly be used to predict weights on existing links in networks, as in that case $y_{ij} > 0$. Lastly, by marginalizing over the variables $Z_{i \rightarrow j}$ and $Z_{i \leftarrow j}$, which take values in $\{1, \cdots, K\}$, one obtains:
+ Another advantage of the Poisson distribution is the fact that a truncated version of it, the Zero Truncated Poisson distribution, can easily be obtained by dividing the probability mass of the original distribution by $(1 - e^{\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}})$. This latter version can directly be used to predict weights on existing links in networks, as in that case $y_{ij} > 0$. Lastly, by marginalizing over the variables $z_{i \rightarrow j}$ and $z_{i \leftarrow j}$, which take values in $\{1, \cdots, K\}$, one obtains:
  %
  \begin{equation}\label{eq:PoiCombin}
- y_{ij}|_{\Bs{\Theta},\Bs{\Phi}} \sim \sum_{kk'} \theta_{ik} \theta_{jk'} \textrm{Poi}(\phi_{kk'})
+ y_{ij}|_{\Theta,\Phi} \sim \sum_{kk' \in \{1,..,K\}^2} \theta_{ik} \theta_{jk'} \textrm{Poi}(\phi_{kk'}).
  \end{equation}
+%
 
 \textbf{A Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them through class-dependent shape and rate parameters in the above Gamma distribution. We propose here to model the class-dependent shape parameter with another Gamma distribution and the class-dependent rate parameter with a Beta prior:
 %
@@ -52,145 +53,134 @@ We first provide below the results obtained through collapsed variational infere
 
 \subsection{Collapsed variational inference}
 
-In the remainder, we use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index. Furthermore, $\Pi$ will denote the model parameters : $\Pi = (\Bs{\Theta},\Bs{\Phi},\B{Z})$ for MMSB and WMMSB, where $\Bs{\Theta}$ is a $K \times N$ matrix, $\Bs{\Phi}$ a $K \times K$ matrix and $\B{Z}$ an $N \times N$ matrix, and $\Pi = (\Bs{\Theta},\Bs{\Phi},\B{Z},\B{R},\B{P})$ for WMMSB-bg, where $\B{R}$ and $\B{P}$ are $K \times K$ matrices. Lastly, $\Omega$ will denote the hyperparameters ($\Omega = (\alpha,\lambda_0,\lambda_1)$ for MMSB, $\Omega = (\alpha,r,p)$ for WMMSB and $\Omega = (\alpha, c_0, r_0, c, \epsilon)$ for WMMSB-bg).
+In the remainder, we use the notation $n^{-ij}$ to indicate that the superscript $ij$ is excluded from the underlying count variable, and $n_{\bm{.}}$ to indicate a sum over the dotted subscript index. Furthermore, $\Pi$ will denote the model parameters : $\Pi = (\Theta,\Phi,Z)$ for MMSB and WMMSB, where $\Theta$ is a $K \times N$ matrix, $\Phi$ a $K \times K$ matrix and $Z$ an $N \times N$ matrix, and $\Pi = (\Theta,\Phi,Z,R,P)$ for WMMSB-bg, where $R$ and $P$ are $K \times K$ matrices. Lastly, $\Omega$ will denote the hyperparameters ($\Omega = (\alpha,\lambda_0,\lambda_1)$ for MMSB, $\Omega = (\alpha,r,p)$ for WMMSB and $\Omega = (\alpha, c_0, r_0, c, \epsilon)$ for WMMSB-bg).
 
-From Jensen's inequality, for any distribution $q$, one has: $\log p({\B{Y}} | \Omega) \ge \E_{q}[\log p({\B{Y}}, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]$,
+From Jensen's inequality, for any distribution $q$, one has: $\log p({Y} | \Omega) \ge \E_{q}[\log p({Y}, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]$,
 %%
 %\begin{equation*}
-%\log p({\B{Y}} | \Omega) \ge \E_{q}[\log p({\B{Y}}, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
+%\log p({Y} | \Omega) \ge \E_{q}[\log p({Y}, \Pi\ | \Omega)] + \textrm{H}[q(\Pi)]
 %\end{equation*}
 %%
-where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2007collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB: $q(\Pi) = q({\Bs{\Theta}}, {\Bs{\Phi}} | Z) q(Z)$,
+where $\textrm{H}$ denotes the entropy. The goal of variational inference is then to find $q$ that maximizes the right-hand side of the above inequality, usually referred to as the Evidence Lower BOund (ELBO). In its collapsed version, following \cite{teh2007collapsed}, one weakens the mean-field assumption made over the variational distribution, leading to, for MMSB and WMMSB: $q(\Pi) = q(\theta, \Phi | Z) q(Z)$.
 %%
 %\begin{equation*}
-%q(\Pi) = q(\Theta, {\Bs{\Phi}} | Z) q(Z)
+%q(\Pi) = q(\Theta, \Phi | Z) q(Z)
 %\end{equation*}
 %%
-with, forall $(i,j)$, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ being multinomial with parameter $\gamma_{ijkk'}$. The evidence is then lower bounded by:
+For all $(i,j)$, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ follows a multinomial distribution with parameters $\gamma_{ijkk'}, \, (k,k') \in \{1, \cdots, K\}^2$. The evidence is then lower bounded by:
 %
 \begin{equation*}
-\log p({\B{Y}}|\Omega) \geq \underbrace{\E_{q}[\log p({\B{Y}}, Z)] + \textrm{H}[q(Z)]}_{\L_Z},
+\log p({Y}|\Omega) \geq \underbrace{\E_{q}[\log p({Y}, Z)] + \textrm{H}[q(Z)]}_{\L_Z}.
 \end{equation*}
-%
-with $\E_{q}[\log p({\B{Y}}, Z)]$ being defined by:
-\[
-\sum_Z q(Z) \log p(Y, Z),
-\]
-%
-and $\textrm{H}[q(Z)]$ being defined by:
-%
-\[
-\sum_Z q(Z) \log q(Z).
-\]
 %
 The derivation of the collapsed variational updates is obtained by maximizing the ELBO w.r.t $\gamma_{ijkk'}$:
 %
 \begin{align*}
-\frac{\partial \L_Z}{\partial \gamma_{ijkk'}} &= \frac{\partial }{\partial \gamma_{ijkk'}} \sum_{{\B{Z}}^{-ij}}\sum_{k_1=1}^K\sum_{k_2=1}^K  q({\B{Z}}^{-ij}) \gamma_{ijk_1 k_2} \\
-& (\log p({\B{Y}}, {\B{Z}}^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2|\Omega)+ \\
-& \log q({\B{Z}}^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2) )   \\
-& = E_{q({\B{Z}}^{-ij})}[ p({\B{Y}}, {\B{Z}}^{-ij}, z_{i\rightarrow j}=k, z_{i\leftarrow j}=k'|\Omega))] \\
-& + H[{\B{Z}}^{-ij}] -\log(\gamma_{ijkk'}) +1.
+\frac{\partial \L_Z}{\partial \gamma_{ijkk'}} &= \frac{\partial }{\partial \gamma_{ijkk'}} \left( \sum_{{Z}^{-ij}}\sum_{k_1=1}^K\sum_{k_2=1}^K  q({Z}^{-ij}) \gamma_{ijk_1 k_2} \right. \\
+& (\log p({Y}, {Z}^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2|\Omega)+ \\
+& \left. \log q({Z}^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2) ) \frac{}{} \right) \\
+& = E_{q({Z}^{-ij})}[ p({Y}, {Z}^{-ij}, z_{i\rightarrow j}=k, z_{i\leftarrow j}=k'|\Omega))] \\
+& + H[{Z}^{-ij}] -\log(\gamma_{ijkk'}) +1.
 \end{align*}
 %
 By equating this derivative to zero, one obtains the following update:
-\begin{equation} \label{eq1}
-\gamma_{ijkk'} \propto e^{E_{q({\B{Z}}^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {\B{Y}}^{-ij}, {\B{Z}}^{-ij}, \Omega)]},
+\begin{equation} \label{eq:maximization}
+\gamma_{ijkk'} \propto e^{E_{q({Y}^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {Y}^{-ij}, {Y}^{-ij}, \Omega)]},
 \end{equation}
 %
-with  $P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {\B{Y}}^{-ij}, {\B{Z}}^{-ij}, \Omega)$ being the collapsed Gibbs update of WMMSB. They take the form:
+with  $P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {Y}^{-ij}, {Z}^{-ij}, \Omega)$ being the collapsed Gibbs update of WMMSB. They take the form:
 %
 \begin{align*}
-P(z_{i\rightarrow j} & = k, z_{i\leftarrow j}=k' |{\B{Y}}^{-ij}, {\B{Z}}^{-ij}, \Omega) \\
-& \propto (n_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}} + \alpha_k) (n_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}} + \alpha_{k'}) \\
-& \mathrm{NB}\left(y_{ij}; n^{{\B{Y}}^{-ij}}_{kk'} + r, \frac{p}{p\,n^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + 1} \right),
+P(z_{i\rightarrow j} & = k, z_{i\leftarrow j}=k' |{Y}^{-ij}, {Z}^{-ij}, \Omega) \\
+& \propto (n_{\rightarrow ik}^{\theta^{-j}} + \alpha_k) (n_{\leftarrow jk}^{\theta^{-i}} + \alpha_{k'}) \\
+& \mathrm{NB}\left(y_{ij}; n^{{Y}^{-ij}}_{kk'} + r, \frac{p}{p\,n^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right),
 \end{align*}
 %
 with count statistics given by:
 
 %\begin{align} \label{eq:sss}
-%    n^{{\Bs{\Theta}}}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & n^{{\Bs{\Theta}}}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
-%    n^{{\Bs{\Phi}}}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & n^{{\B{Y}}}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
+%    n^{\theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & n^{\theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
+%    n^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & n^{{Y}}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
 %\end{align}
 
 \begin{align*}                                                                                                                                        
-&n^{{\Bs{\Theta}}}_{\rightarrow ik} = \sum_j \delta(\zij=k), \\
-&n^{{\B{Y}}}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k'), \\
-&n^{{\Bs{\Phi}}}_{\bm{.}kk'} = \sum_{ij} \delta( \zij=k, \zji=k').
+&n^{\theta}_{\rightarrow ik} = \sum_j \delta(\zij=k), \\
+&n^{{Y}}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k'), \\
+&n^{\Phi}_{\bm{.}kk'} = \sum_{ij} \delta( \zij=k, \zji=k').
 \end{align*}   
 
-By applying a first order Taylor expansion on Eq.~\eqref{eq1}, following \cite{teh2007collapsed}, one obtains:
+By applying a first order Taylor expansion on Eq.~\eqref{eq:maximization}, following \cite{teh2007collapsed}, one obtains:
 %
 \begin{align*}
-\gamma_{ijkk'} \propto & (E_{q({\B{Z}}^{-ij})}[n_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}}] + \alpha_k) (E_{q({\B{Z}}^{-ij})}[n_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}}] + \alpha_{k'}) \\
-& \mathrm{NB}\left(y_{ij}; E_{q({\B{Z}}^{-ij})}[n^{{\B{Y}}^{-ij}}_{kk'}] + r,  p' \right),
+\gamma_{ijkk'} \propto & (E_{q({Z}^{-ij})}[n_{\rightarrow ik}^{\theta^{-j}}] + \alpha_k) (E_{q({Z}^{-ij})}[n_{\leftarrow jk}^{\theta^{-i}}] + \alpha_{k'}) \\
+& \mathrm{NB}\left(y_{ij}; E_{q({Z}^{-ij})}[n^{{Y}^{-ij}}_{kk'}] + r,  p' \right),
 \end{align*}
 %
 with:
 %
 \[
-p' = \frac{p}{p\,E_{q({\B{Z}}^{-ij})}[n^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'}] + 1}.
+p' = \frac{p}{p\,E_{q({Z}^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}] + 1}.
 \]
 %
-Finally, using a Gaussian approximation (as in \textit{e.g.} \cite{asuncion2009smoothing}), one obtains, setting $E_{q({\B{Z}}^{-ij})}[n_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}}] = N^{{\Bs{\Theta}}}_{\rightarrow ik}$, $E_{q({\B{Z}}^{-ij})}[n_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}}] = N^{{\Bs{\Theta}}}_{\leftarrow jk'}$, $E_{q({\B{Z}}^{-ij})}[n^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'}] = N^{{\Bs{\Phi}}}_{xkk'}$ and $_{q({\B{Z}}^{-ij})}[n^{{\B{Y}}^{-ij}}_{kk'}] = N^{{\B{Y}}}_{kk'}$:
+Finally, using a Gaussian approximation (as in \textit{e.g.} \cite{asuncion2009smoothing}), one obtains, setting $E_{q({Z}^{-ij})}[n_{\rightarrow ik}^{\theta^{-j}}] = N^{\theta}_{\rightarrow ik}$, $E_{q({Z}^{-ij})}[n_{\leftarrow jk}^{\theta^{-i}}] = N^{\theta}_{\leftarrow jk'}$, $E_{q({Z}^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}] = N^{\Phi}_{xkk'}$ and $_{q({Z}^{-ij})}[n^{{Y}^{-ij}}_{kk'}] = N^{{Y}}_{kk'}$:
 %
 \begin{align} \label{eq:sss}
-   N^{{\Bs{\Theta}}}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'},       & N^{{\Bs{\Theta}}}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'},  \nonumber \\
-   N^{{\Bs{\Phi}}}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'},  & E &= \sum_{ij} y_{ij}\gamma_{ijkk'}.
+   N^{\theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'},       & N^{\theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'},  \nonumber \\
+   N^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'},  & E &= \sum_{ij} y_{ij}\gamma_{ijkk'}.
 \end{align}
 %
 In this inference scheme, the parameters $\gamma_{....}$ are the local parameters while the count statistics $N^{.}_{..}$ represent the sufficient statistics and global counts. Finally, the model parameters can be recovered from their estimates as follows:
 %
 \begin{align*}
-\hat \theta_{ik} &= \frac{N^{{\Bs{\Theta}}}_{\rightarrow ik} + N^{{\Bs{\Theta}}}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}}, \\
+\hat \theta_{ik} &= \frac{N^{\theta}_{\rightarrow ik} + N^{\theta}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}}, \\
 \hat \phi_{kk'}&=\begin{cases}
-     \frac{N^{{\Bs{\Phi}}}_{1 kk'} + \lambda_1}{N^{{\Bs{\Phi}}}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ \textit{for MMSB}}, \\
-    \frac{p(N^{\B{Y}}_{kk'} + r)}{N^{{\Bs{\Phi}}}_{\bm{.}kk'} - p + 1}  & \textrm{ \textit{for WMMSB}}.  % \\
-%    \frac{\E_{q}[p_{kk'}](N^{\B{Y}}_{kk'} + \E_{q}[r_{kk'}])}{N^{{\Bs{\Phi}}}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}  & \textrm{ for WMMSB-bg}
+     \frac{N^{\Phi}_{1 kk'} + \lambda_1}{N^{\Phi}_{\bm{.}kk'} + \lambda_{\bm{.}}} & \textrm{ \textit{for MMSB}}, \\
+    \frac{p(N^{Y}_{kk'} + r)}{N^{\Phi}_{\bm{.}kk'} - p + 1}  & \textrm{ \textit{for WMMSB}}.  % \\
+%    \frac{\E_{q}[p_{kk'}](N^{Y}_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}  & \textrm{ for WMMSB-bg}
     \end{cases}
 \end{align*}
 
 \textbf{Beta-Gamma augmentation} For WMMSB-bg, the derivation is slightly more complex and is fully detailed in Appendix~\ref{app:collap}. We just provide here the main steps of this derivation.
 
-We consider the following collapsed variational distribution for WMMSB-bg: $q(\Pi) = q({\Bs{\Theta}}, {\Bs{\Phi}}|Z, {\B{R}}, {\B{P}})q(Z)q({\B{R}})q({\B{P}})$,
+We consider the following collapsed variational distribution for WMMSB-bg: $q(\Pi) = q(\theta, \Phi|Z, {R}, P)q(Z)q({R})q(P)$,
 %%
 %\begin{equation*}
-%q(\Pi) = q({\Bs{\Theta}}, {\Bs{\Phi}}|Z, {\B{R}}, {\B{P}})q(Z)q({\B{R}})q({\B{P}})
+%q(\Pi) = q(\theta, \Phi|Z, {R}, {Y})q(Z)q({R})q({Y})
 %\end{equation*}
 %%
-with ${\B{R}}=(r_{kk'}), {\B{P}}=(p_{kk'}), \, 1 \le k,k' \le K$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$.
+with ${R}=(r_{kk'}), P=(p_{kk'}), \, 1 \le k,k' \le K$. As before, $q(z_{i \rightarrow j}, z_{i \leftarrow j}|\gamma_{ij})$ is multinomial with parameter $\gamma_{ij}$.
 
 The same development as above applies for the parameters $\gamma_{ijkk'}$, given here also by Eq.~\ref{eq:maximization}. Furthermore, the predictive link probability and $\hat \phi_{kk'}$ now take the form:
 %
 \begin{align*}
-p(y_{ij} | {\B{Y}}^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega) \sim \\
-\mathrm{NB}\left(y_{ij}; N^{{\B{Y}}^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + 1} \right),
+p(y_{ij} | {Y}^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega) \sim \\
+\mathrm{NB}\left(y_{ij}; N^{{Y}^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right),
 \end{align*}
 %
 and:
 %
 \begin{align*}
-\hat \phi_{kk'} = \frac{\E_{q}[p_{kk'}](N^{\B{Y}}_{kk'} + \E_{q}[r_{kk'}])}{N^{{\Bs{\Phi}}}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}.
+\hat \phi_{kk'} = \frac{\E_{q}[p_{kk'}](N^{Y}_{kk'} + \E_{q}[r_{kk'}])}{N^{\Phi}_{\bm{.}kk'} - \E_{q}[p_{kk'}] + 1}.
 \end{align*}
 %
-Setting $q({\B{P}}) = p({\B{P}}|{\B{Y}},Z,\Omega)$ where $p$ is the true distribution and exploiting the conjugacy of the Beta and the negative binomial distributions leads to a Beta distribution for $p_{kk'}$: $p_{kk'} \sim \textrm{Beta}(c\epsilon + N^{\B{Y}}_{kk'}, c(1-\epsilon) + N^{\Bs{\Phi}}_{kk'}\E_{q}[r_{kk'}])$,
+Setting $q({P}) = p({P}|{Y},Z,\Omega)$ where $p$ is the true distribution and exploiting the conjugacy of the Beta and the negative binomial distributions leads to a Beta distribution for $p_{kk'}$: $p_{kk'} \sim \textrm{Beta}(c\epsilon + N^{Y}_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])$,
 %%
 %\begin{equation} \label{eq:pk_update}
-%p_{kk'} \sim \textrm{Beta}(c\epsilon + N^{\B{Y}}_{kk'}, c(1-\epsilon) + N^{\Bs{\Phi}}_{kk'}\E_{q}[r_{kk'}])
+%p_{kk'} \sim \textrm{Beta}(c\epsilon + N^{Y}_{kk'}, c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}])
 %\end{equation}
 %%
 so that:
 \[
-\E_{q}[p_{kk'}] = \frac{c\epsilon + N^{\B{Y}}_{kk'}}{c\epsilon + N^{\B{Y}}_{kk'} + c(1-\epsilon) + N^{\Bs{\Phi}}_{kk'}\E_{q}[r_{kk'}]}.
+\E_{q}[p_{kk'}] = \frac{c\epsilon + N^{Y}_{kk'}}{c\epsilon + N^{Y}_{kk'} + c(1-\epsilon) + N^\Phi_{kk'}\E_{q}[r_{kk'}]}.
 \]
 
 Lastly, as for its true distribution, the variational distribution for $r_{kk'}$ is taken in the Gamma family:  $q(r_{kk'}) \sim \textrm{Gamma}(a_{kk'},b_{kk'})$. Even though $a_{kk'}$ can not be estimated explicitly, one only needs to have access to the expectation of $r_{kk'}$, that takes the following form:
 \[
-\E_{q}[r_{kk'}] = \frac{r_0c_0+N^{\B{Y}}_{kk'}}{c_0  -N^{\Bs{\Phi}}_{kk'}\log(1-p_{kk'})}.
+\E_{q}[r_{kk'}] = \frac{r_0c_0+N^{Y}_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}.
 \]
 %
 %\begin{equation}
-%\E_{q}[r_{kk'}] = \frac{r_0c_0+N^{\B{Y}}_{kk'}}{c_0  -N^{\Bs{\Phi}}_{kk'}\log(1-p_{kk'})}
+%\E_{q}[r_{kk'}] = \frac{r_0c_0+N^{Y}_{kk'}}{c_0  -N^\Phi_{kk'}\log(1-p_{kk'})}
 %\end{equation}
 
 \subsection{Stochastic variational inference with stratified sampling}
@@ -200,17 +190,17 @@ Stochastic variational inference can then be used to optimize the collapsed ELBO
 \begin{enumerate}
 \item Sample a node $i$ uniformly from all nodes in the graph; with probability $\frac{1}{2}$, either select $s_1^i$ or any set from $S_0^i$ (in the latter case, the selection is uniform over the sets in $S_0^i$). We will denote by $s_i$ the set selected and by $|s_i|$ its cardinality.
 \item For each node $j \in s_i$, compute $\gamma_{ijkk'}$ through Eq.~\ref{eq:maximization} and intermediate global counts acc. to: {\small
-$\hat N^{{\Bs{\Theta}}}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, \,\, \hat N^{{\Bs{\Theta}}}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'}, \,\, \hat N^{{\Bs{\Phi}}}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, \,\, \hat N^{{\B{Y}}}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij}$
+$\hat N^{\theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, \,\, \hat N^{\theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'}, \,\, \hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, \,\, \hat N^{{Y}}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij}$
 }\\
 %\begin{align}
-%\hat N^{{\Bs{\Theta}}}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{{\Bs{\Theta}}}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
-%\hat N^{{\Bs{\Phi}}}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{{\B{Y}}}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
+%\hat N^{\theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
+%\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{{Y}}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
 %\end{align}
 where $C$ is a constant that is $2$ for undirected graphs and $1$ for directed graphs and $g(s_i) = \frac{1}{Nm}$ if $s_i \in S_0^i$ and $\frac{1}{N}$ otherwise.
-\item Update of the global counts (online version of Eq.~\ref{eq:sss}): {\small $N^{{\Bs{\Theta}}}_{\rightarrow ik} \leftarrow (1 - \rho^{i,{\Bs{\Theta}}}_t) N^{{\Bs{\Theta}}}_{\rightarrow ik} + \rho^{i,{\Bs{\Theta}}}_t \hat N^{{\Bs{\Theta}}}_{\rightarrow ik}, \,\, N^{{\Bs{\Theta}}}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,{\Bs{\Theta}}}_t) N^{{\Bs{\Theta}}}_{\leftarrow jk'} + \rho^{i,{\Bs{\Theta}}}_t \hat N^{{\Bs{\Theta}}}_{\leftarrow jk'}, \,\, N^{{\Bs{\Phi}}}_{xkk'} \leftarrow (1 - \rho^{{\Bs{\Phi}}}_t) N^{{\Bs{\Phi}}}_{xkk'} + \rho^{{\Bs{\Phi}}}_t \hat N^{{\Bs{\Phi}}}_{xkk'}, \,\, N^{{\B{Y}}}_{kk'} \leftarrow (1 - \rho^{{\B{Y}}}_t) N^{{\B{Y}}}_{kk'} + \rho^{{\B{Y}}}_t \hat N^{{\B{Y}}}_{kk'}$}
+\item Update of the global counts (online version of Eq.~\ref{eq:sss}): {\small $N^{\theta}_{\rightarrow ik} \leftarrow (1 - \rho^{i,\theta}_t) N^{\theta}_{\rightarrow ik} + \rho^{i,\theta}_t \hat N^{\theta}_{\rightarrow ik}, \,\, N^{\theta}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,\theta}_t) N^{\theta}_{\leftarrow jk'} + \rho^{i,\theta}_t \hat N^{\theta}_{\leftarrow jk'}, \,\, N^{\Phi}_{xkk'} \leftarrow (1 - \rho^{\Phi}_t) N^{\Phi}_{xkk'} + \rho^{\Phi}_t \hat N^{\Phi}_{xkk'}, \,\, N^{{Y}}_{kk'} \leftarrow (1 - \rho^{{Y}}_t) N^{{Y}}_{kk'} + \rho^{{Y}}_t \hat N^{{Y}}_{kk'}$}
 %\begin{align}
-%N^{{\Bs{\Theta}}}_{\rightarrow ik} \leftarrow (1 - \rho^{i,{\Bs{\Theta}}}_t) N^{{\Bs{\Theta}}}_{\rightarrow ik} + \rho^{i,{\Bs{\Theta}}}_t \hat N^{{\Bs{\Theta}}}_{\rightarrow ik}, & \,\,\, N^{{\Bs{\Theta}}}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,{\Bs{\Theta}}}_t) N^{{\Bs{\Theta}}}_{\leftarrow jk'} + \rho^{i,{\Bs{\Theta}}}_t \hat N^{{\Bs{\Theta}}}_{\leftarrow jk'} \nonumber \\
-%N^{{\Bs{\Phi}}}_{xkk'} \leftarrow (1 - \rho^{{\Bs{\Phi}}}_t) N^{{\Bs{\Phi}}}_{xkk'} + \rho^{{\Bs{\Phi}}}_t \hat N^{{\Bs{\Phi}}}_{xkk'}, & \,\,\, N^{{\B{Y}}}_{kk'} \leftarrow (1 - \rho^{{\B{Y}}}_t) + \rho^{{\B{Y}}}_t \hat N^{{\B{Y}}}_{kk'} \nonumber
+%N^{\theta}_{\rightarrow ik} \leftarrow (1 - \rho^{i,\theta}_t) N^{\theta}_{\rightarrow ik} + \rho^{i,\theta}_t \hat N^{\theta}_{\rightarrow ik}, & \,\,\, N^{\theta}_{\leftarrow jk'} \leftarrow (1 - \rho^{i,\theta}_t) N^{\theta}_{\leftarrow jk'} + \rho^{i,\theta}_t \hat N^{\theta}_{\leftarrow jk'} \nonumber \\
+%N^{\Phi}_{xkk'} \leftarrow (1 - \rho^{\Phi}_t) N^{\Phi}_{xkk'} + \rho^{\Phi}_t \hat N^{\Phi}_{xkk'}, & \,\,\, N^{{Y}}_{kk'} \leftarrow (1 - \rho^{{Y}}_t) + \rho^{{Y}}_t \hat N^{{Y}}_{kk'} \nonumber
 %\end{align}
 \item $\rho^*_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$.
 \item Go back to step 1 till convergence.
@@ -218,9 +208,9 @@ where $C$ is a constant that is $2$ for undirected graphs and $1$ for directed g
 %
 As one can note, the intermediate global counts correspond to a restriction, on minibatches, of the complete computation given in Eq.~\ref{eq:sss}. The value of $C$ is due to the fact that in undirected networks, each edge can be seen twice. The terms $\frac{1}{|s_i|}$ and $\frac{1}{Cg(s_i)}$ serve as a normalization in the gradient-like updates of the global counts (as there are more non-links than links, each non-link minibatch, representing a smaller fraction of the non-links, leads to more conservative updates). The "gradient steps" $\rho^*$ are discussed below (Robbins-Monro condition).
 
-Lastly, to be able to efficiently compute such quantities as $N^{{\Bs{\Phi}}^{-ij}}$ used for the computation of the link probability, one needs to store in memory, for each pair of nodes $(i,j)$, a $K \times K$ matrix, which is not feasible for large networks. Thus, following \cite{foulds2013stochastic}, we replace here $N^{{\Bs{\Phi}}^{-ij}}$ by $N^{{\Bs{\Phi}}}$, which amounts to assume that the contribution of each individual pair of nodes is negligible compared to all other pairs, a reasonable assumption when the network is large. %The complete code for the inference will be made available in GitHub upon acceptance.
+Lastly, to be able to efficiently compute such quantities as $N^{\Phi^{-ij}}$ used for the computation of the link probability, one needs to store in memory, for each pair of nodes $(i,j)$, a $K \times K$ matrix, which is not feasible for large networks. Thus, following \cite{foulds2013stochastic}, we replace here $N^{\Phi^{-ij}}$ by $N^{\Phi}$, which amounts to assume that the contribution of each individual pair of nodes is negligible compared to all other pairs, a reasonable assumption when the network is large. %The complete code for the inference will be made available in GitHub upon acceptance.
 
-\textbf{Robbins-Monro condition} The convergence of stochastic variational inference is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global counts $\rho^{\Bs{\Phi}}$ and $\rho^{\B{Y}}$ accounting respectively for  $N^{\Bs{\Phi}}$ and $N^{\B{Y}}$. For $N^{\Bs{\Theta}}$, we maintain individual gradient steps $\rho_i^{{\Bs{\Theta}}}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance. Furthermore, to increase the speed of the inference, we update the global count $N^{\Bs{\Phi}}$ and $N^{\B{Y}}$ only after a minibatch round. For the global count  $N^{\Bs{\Theta}}$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
+\textbf{Robbins-Monro condition} The convergence of stochastic variational inference is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global counts $\rho^\Phi$ and $\rho^{Y}$ accounting respectively for  $N^\Phi$ and $N^{Y}$. For $N^\theta$, we maintain individual gradient steps $\rho_i^{\theta}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance. Furthermore, to increase the speed of the inference, we update the global count $N^\Phi$ and $N^{Y}$ only after a minibatch round. For the global count  $N^\theta$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
 %, which consists to update the class assignment of nodes after observing a bunch of dyad.
 This heuristic provides a trade-off between updating the global statistics after each observation, which slows down the inference and may result in bad local optima, and updating them only after minibatches that are potentially large (proportional to the number of nodes).
 
@@ -231,8 +221,8 @@ This heuristic provides a trade-off between updating the global statistics after
 %Our SCVI algorithm is summarized in pseudo-code \ref{algo:scvb}.
 %
 %\begin{algorithm}
-%\KwIn{Random initialization of $N^{\Bs{\Theta}}, N^\Phi, N^{\B{Y}}$.}
-%\KwOut{${\Bs{\Theta}}h, \Phih$.}
+%\KwIn{Random initialization of $N^\theta, N^\Phi, N^{Y}$.}
+%\KwOut{$\thetah, \Phih$.}
 %\Begin{
 %$t \gets 0$ \\
 %\While{Convergence criteria not met}{
@@ -240,15 +230,15 @@ This heuristic provides a trade-off between updating the global statistics after
 %    \ForEach{$i,j \in S_t$}{
 %        Maximize local parameters $\gamma_{ij}$ from \eqref{eq:maximization}.\\
 %        \If{burn-in finished}{
-%            Compute intermediate gradient $\hat N^{\Bs{\Theta}}$ from \eqref{eq:sss}.\\
-%            Update global statistic $N^{{\Bs{\Theta}} (t)}$.\\
-%            Update gradient step $\rho^{\Bs{\Theta}}_t$.\\
+%            Compute intermediate gradient $\hat N^\theta$ from \eqref{eq:sss}.\\
+%            Update global statistic $N^{\theta (t)}$.\\
+%            Update gradient step $\rho^\theta_t$.\\
 %        }
 %    }
 %
 %    Compute intermediate gradient $\hat N^\Phi$ and $\hat N^Y$  from \eqref{eq:sss}.\\
 %    Update global statistics $N^{\Phi (t)}$ and $N^{Y (t)}$.\\
-%    Update gradient steps $\rho^\Phi_t$ and $\rho^{\Bs{\Theta}}_t$.\\
+%    Update gradient steps $\rho^\Phi_t$ and $\rho^\theta_t$.\\
 %	Sample $P$ and $R$ from \eqref{eq:pk_update} \eqref{eq:rk_update}.\\
 %    $t \gets t + 1$ .
 %    }
