@@ -77,36 +77,63 @@ and $\textrm{H}[q(Z)]$ being defined by:
 \sum_Z q(Z) \log q(Z).
 \]
 %
-Maximizing $\L_Z$ w.r.t $\gamma_{ijkk'}$ under a zero order Taylor expansion and a Gaussian approximation, following \cite{teh2007collapsed,asuncion2009smoothing}, yields the following updates:
-%
-\begin{align} \label{eq:maximization}
-\gamma_{ijkk'} \propto &(N_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}} + \alpha_k) (N_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}} + \alpha_{k'}) \nonumber\\
-  &p(y_{ij} | {\B{Y}}^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega),
-\end{align}
-%
-where the elements $N^{{\Bs{\Theta}}}$ are defined in Eqs~\eqref{eq:sss}. Depending on the model considered, the predictive link distribution
-%$p(y_{ij}|{\B{Y}}^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega)$
-takes the following form:
+The derivation of the collapsed variational updates is obtained by maximizing the ELBO w.r.t $\gamma_{ijkk'}$:
 %
 \begin{align*}
-&\quad p(y_{ij} | {\B{Y}}^{-ij}, Z^{- ij}, \zij=k, \zji=k',\Omega) = \\
-&\begin{cases}
-    \left( \frac{ N^{{\Bs{\Phi}}^{-ij}}_{1 kk'} + \lambda_1}{N^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{y_{ij}} \left( 1- \frac{ N^{{\Bs{\Phi}}^{-ij}}_{1 kk'} + \lambda_1}{N^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + \lambda_{\bm{.}}}\right)^{1-y_{ij}}  & \textrm{\textit{for MMSB}}, \\
-    \mathrm{NB}\left(y_{ij}; N^{{\B{Y}}^{-ij}}_{kk'} + r, \frac{p}{p\,N^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{\textit{for WMMSB}}. % \\
-%    \sim \mathrm{NB}\left(y_{ij}; N^{{\B{Y}}^{-ij}}_{kk'} + \E_{q}[r_{kk'}], \frac{\E_{q}[p_{kk'}]}{\E_{q}[p_{kk'}]\,N^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + 1} \right) & \textrm{ for WMMSB-bg}
-\end{cases}
+\frac{\partial \L_Z}{\partial \gamma_{ijkk'}} &= \frac{\partial }{\partial \gamma_{ijkk'}} \sum_{{\B{Z}}^{-ij}}\sum_{k_1=1}^K\sum_{k_2=1}^K  q({\B{Z}}^{-ij}) \gamma_{ijk_1 k_2} \\
+& (\log p({\B{Y}}, {\B{Z}}^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2|\Omega)+ \\
+& \log q({\B{Z}}^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2) )   \\
+& = E_{q({\B{Z}}^{-ij})}[ p({\B{Y}}, {\B{Z}}^{-ij}, z_{i\rightarrow j}=k, z_{i\leftarrow j}=k'|\Omega))] \\
+& + H[{\B{Z}}^{-ij}] -\log(\gamma_{ijkk'}) +1.
 \end{align*}
+%
+By equating this derivative to zero, one obtains the following update:
+\begin{equation} \label{eq1}
+\gamma_{ijkk'} \propto e^{E_{q({\B{Z}}^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {\B{Y}}^{-ij}, {\B{Z}}^{-ij}, \Omega)]},
+\end{equation}
+%
+with  $P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {\B{Y}}^{-ij}, {\B{Z}}^{-ij}, \Omega)$ being the collapsed Gibbs update of WMMSB. They take the form:
+%
+\begin{align*}
+P(z_{i\rightarrow j} & = k, z_{i\leftarrow j}=k' |{\B{Y}}^{-ij}, {\B{Z}}^{-ij}, \Omega) \\
+& \propto (n_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}} + \alpha_k) (n_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}} + \alpha_{k'}) \\
+& \mathrm{NB}\left(y_{ij}; n^{{\B{Y}}^{-ij}}_{kk'} + r, \frac{p}{p\,n^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'} + 1} \right),
+\end{align*}
+%
+with count statistics given by:
 
-The different count statistics $N^*$ are estimated from the variational parameters $\gamma_{ijkk'}$ by:
+%\begin{align} \label{eq:sss}
+%    n^{{\Bs{\Theta}}}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & n^{{\Bs{\Theta}}}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
+%    n^{{\Bs{\Phi}}}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & n^{{\B{Y}}}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
+%\end{align}
+
+\begin{align*}                                                                                                                                        
+&n^{{\Bs{\Theta}}}_{\rightarrow ik} = \sum_j \delta(\zij=k), \\
+&n^{{\B{Y}}}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k'), \\
+&n^{{\Bs{\Phi}}}_{\bm{.}kk'} = \sum_{ij} \delta( \zij=k, \zji=k').
+\end{align*}   
+
+By applying a first order Taylor expansion on Eq.~\eqref{eq1}, following \cite{teh2007collapsed}, one obtains:
+%
+\begin{align*}
+\gamma_{ijkk'} \propto & (E_{q({\B{Z}}^{-ij})}[n_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}}] + \alpha_k) (E_{q({\B{Z}}^{-ij})}[n_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}}] + \alpha_{k'}) \\
+& \mathrm{NB}\left(y_{ij}; E_{q({\B{Z}}^{-ij})}[n^{{\B{Y}}^{-ij}}_{kk'}] + r,  p' \right),
+\end{align*}
+%
+with:
+%
+\[
+p' = \frac{p}{p\,E_{q({\B{Z}}^{-ij})}[n^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'}] + 1}.
+\]
+%
+Finally, using a Gaussian approximation (as in \textit{e.g.} \cite{asuncion2009smoothing}), one obtains, setting $E_{q({\B{Z}}^{-ij})}[n_{\rightarrow ik}^{{\Bs{\Theta}}^{-j}}] = N^{{\Bs{\Theta}}}_{\rightarrow ik}$, $E_{q({\B{Z}}^{-ij})}[n_{\leftarrow jk}^{{\Bs{\Theta}}^{-i}}] = N^{{\Bs{\Theta}}}_{\leftarrow jk'}$, $E_{q({\B{Z}}^{-ij})}[n^{{\Bs{\Phi}}^{-ij}}_{\bm{.}kk'}] = N^{{\Bs{\Phi}}}_{xkk'}$ and $_{q({\B{Z}}^{-ij})}[n^{{\B{Y}}^{-ij}}_{kk'}] = N^{{\B{Y}}}_{kk'}$:
 %
 \begin{align} \label{eq:sss}
-    N^{{\Bs{\Theta}}}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'},       & N^{{\Bs{\Theta}}}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'},  \nonumber \\
-    N^{{\Bs{\Phi}}}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'},  & N^{{\B{Y}}}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}.
+   N^{{\Bs{\Theta}}}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'},       & N^{{\Bs{\Theta}}}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'},  \nonumber \\
+   N^{{\Bs{\Phi}}}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'},  & E &= \sum_{ij} y_{ij}\gamma_{ijkk'}.
 \end{align}
 %
-In this inference scheme, $\gamma_{ij}$ are the \emph{local} parameters while the count statistics $N^*$ represent the \emph{sufficient} statistics (or global counts).
-
-Finally, the model parameters can be recovered from their estimates as follows:
+In this inference scheme, the parameters $\gamma_{....}$ are the local parameters while the count statistics $N^{.}_{..}$ represent the sufficient statistics and global counts. Finally, the model parameters can be recovered from their estimates as follows:
 %
 \begin{align*}
 \hat \theta_{ik} &= \frac{N^{{\Bs{\Theta}}}_{\rightarrow ik} + N^{{\Bs{\Theta}}}_{\leftarrow ik} + \alpha_k}{2N + \alpha_{\bm{.}}}, \\
@@ -117,7 +144,9 @@ Finally, the model parameters can be recovered from their estimates as follows:
     \end{cases}
 \end{align*}
 
-\textbf{Beta-Gamma augmentation} For WMMSB-bg model, we consider the following collapsed variational distribution: $q(\Pi) = q({\Bs{\Theta}}, {\Bs{\Phi}}|Z, {\B{R}}, {\B{P}})q(Z)q({\B{R}})q({\B{P}})$,
+\textbf{Beta-Gamma augmentation} For WMMSB-bg, the derivation is slightly more complex and is fully detailed in Appendix~\ref{app:collap}. We just provide here the main steps of this derivation.
+
+We consider the following collapsed variational distribution for WMMSB-bg: $q(\Pi) = q({\Bs{\Theta}}, {\Bs{\Phi}}|Z, {\B{R}}, {\B{P}})q(Z)q({\B{R}})q({\B{P}})$,
 %%
 %\begin{equation*}
 %q(\Pi) = q({\Bs{\Theta}}, {\Bs{\Phi}}|Z, {\B{R}}, {\B{P}})q(Z)q({\B{R}})q({\B{P}})
