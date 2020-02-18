@@ -1,62 +1,11 @@
 %\section*{Supplementary material of \textit{Mixed-Membership Stochastic Block Models for Weighted Networks}}
 
-\section{Derivation of the collapsed variational updates}
+\section{Derivation of the collapsed variational updates for WMMSB-bg}
 \label{app:collap}
-
-The derivation of the collapsed variational updates is first obtained by maximizing the ELBO w.r.t $\gamma_{ijkk'}$ with:
-%
-\begin{align*}
-\frac{\partial \L_Z}{\partial \gamma_{ijkk'}} &= \frac{\partial }{\partial \gamma_{ijkk'}} \sum_{Z^{-ij}}\sum_{k_1=1}^K\sum_{k_2=1}^K  q(Z^{-ij}) \gamma_{ijk_1 k_2} \\
-& (\log p(Y, Z^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2|\Omega)+ \\
-& \log q(Z^{-ij}, z_{i\rightarrow j}=k_1, z_{i\leftarrow j}=k_2) )   \\
-& = E_{q(Z^{-ij})}[ p(Y, Z^{-ij}, z_{i\rightarrow j}=k, z_{i\leftarrow j}=k'|\Omega))] \\
-& + H[Z^{-ij}] -\log(\gamma_{ijkk'}) +1.
-\end{align*}
-%
-By equating this derivative to zero, one obtains the following update:
-\begin{equation} \label{eq1}
-\gamma_{ijkk'} \propto e^{E_{q(Z^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega)]},
-\end{equation}
-%
-with  $P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega)$ being the collapsed Gibbs update of WMMSB, of the form:
-%
-\begin{align*}
-P(z_{i\rightarrow j} & = k, z_{i\leftarrow j}=k' |Y^{-ij}, Z^{-ij}, \Omega) \\
-& \propto (n_{\rightarrow ik}^{\Theta^{-j}} + \alpha_k) (n_{\leftarrow jk}^{\Theta^{-i}} + \alpha_{k'}) \\
-& \mathrm{NB}\left(y_{ij}; n^{Y^{-ij}}_{kk'} + r, \frac{p}{p\,n^{\Phi^{-ij}}_{\bm{.}kk'} + 1} \right),
-\end{align*}
-%
-with count statistics given by the following equations:
-
-%\begin{align} \label{eq:sss}
-%    n^{\Theta}_{\rightarrow ik} &= \sum_{j, k'} \gamma_{ijkk'}        & n^{\Theta}_{\leftarrow jk'} &= \sum_{i, k} \gamma_{ijkk'}  \nonumber \\
-%    n^{\Phi}_{xkk'} &= \sum_{ij:y_{ij}=x} \gamma_{ijkk'}  & n^{Y}_{kk'} &= \sum_{ij} y_{ij}\gamma_{ijkk'}
-%\end{align}
-
-\begin{align*}                                                                                                                                        
-&n^{\Theta}_{\rightarrow ik} = \sum_j \delta(\zij=k)\\
-&n^{Y}_{kk'} = \sum_{ij} y_{ij}\delta(\zij=k, \zji=k') \\
-&n^{\Phi}_{\bm{.}kk'} = \sum_{ij} \delta( \zij=k, \zji=k').
-\end{align*}   
-
-By applying a first order Taylor expansion on Eq.~\eqref{eq1}, following \cite{teh2007collapsed}, one obtains:
-%
-\begin{align*}
-\gamma_{ijkk'} \propto & (E_{q(Z^{-ij})}[n_{\rightarrow ik}^{\Theta^{-j}}] + \alpha_k) (E_{q(Z^{-ij})}[n_{\leftarrow jk}^{\Theta^{-i}}] + \alpha_{k'}) \\
-& \mathrm{NB}\left(y_{ij}; E_{q(Z^{-ij})}[n^{Y^{-ij}}_{kk'}] + r,  p' \right),
-\end{align*}
-%
-with:
-%
-\[
-p' = \frac{p}{p\,E_{q(Z^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}] + 1}.
-\]
-%
-Finally, using a Gaussian approximation (as in \textit{e.g.} \cite{asuncion2009smoothing}), one can estimate the expectations $E_{q(Z^{-ij})}[n_{\rightarrow ik}^{\Theta^{-j}}], E_{q(Z^{-ij})}[n_{\leftarrow jk}^{\Theta^{-i}}]$ and  $E_{q(Z^{-ij})}[n^{\Phi^{-ij}}_{\bm{.}kk'}]$ with the counts defined in Eq. 2 of Section 3.1.
 
 %%%%%%%
 %\vspace{0.7cm}
-\section*{Beta-Gamma updates}
+%\section*{Beta-Gamma updates}
 %\vspace{0.1cm}
 %%%%%%%
 
