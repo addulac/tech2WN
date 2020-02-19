@@ -14,10 +14,12 @@ y_{ij} &\sim \textrm{Poi}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \,\, \p
 %
 where $r$ and $\frac{1-p}{p}$ are the shape and rate parameters of the Gamma distribution. Note that both directed and undirected graphs can be considered with the above formulation, the matrix $\Phi = (\phi_{kk'})_{k,k' \in \{1,..,K\}^2}$ being symmetric for undirected graphs.
 
-The Poisson-Gamma combination in WMMSB is interesting as it directly leads to: $y_{ij}|_{Z} \sim \textrm{NB}(r,p)$, where $\textrm{NB}$ denotes the negative binomial distribution. This latter distribution allows one to represent overdispersed count data and has been used in different contexts. Another advantage of the Poisson distribution is the fact that a truncated version of it, the Zero Truncated Poisson distribution, can easily be obtained by dividing the probability mass of the original distribution by $(1 - e^{\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}})$. This latter version can directly be used to predict weights on existing links in networks, as in that case $y_{ij} > 0$. Lastly, by marginalizing over the variables $z_{i \rightarrow j}$ and $z_{i \leftarrow j}$, which take values in $\{1, \cdots, K\}$, one obtains:
+The Poisson-Gamma combination in WMMSB is interesting as it directly leads to: $y_{ij}|_{Z} \sim \textrm{NB}(r,p)$, where $\textrm{NB}$ denotes the negative binomial distribution. This latter distribution allows one to represent overdispersed count data and has been used in different contexts.
+% Another advantage of the Poisson distribution is the fact that a truncated version of it, the Zero Truncated Poisson distribution, can easily be obtained by dividing the probability mass of the original distribution by $(1 - e^{\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}})$. This latter version can directly be used to predict weights on existing links in networks, as in that case $y_{ij} > 0$. 
+Lastly, by marginalizing over the variables $z_{i \rightarrow j}$ and $z_{i \leftarrow j}$, which take values in $\{1, \cdots, K\}$, one obtains:
  %
  \begin{equation}\label{eq:PoiCombin}
- y_{ij}|_{\Theta,\Phi} \sim \sum_{kk' \in \{1,..,K\}^2} \theta_{ik} \theta_{jk'} \textrm{Poi}(\phi_{kk'}).
+ y_{ij}|_{\Theta,\Phi} \sim \sum_{1 \le k,k' \le K} \theta_{ik} \theta_{jk'} \textrm{Poi}(\phi_{kk'}).
  \end{equation}
 %
 
