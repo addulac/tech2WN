@@ -4,7 +4,7 @@
 We evaluated the performance of the above models on several real world weighted networks, both directed and undirected. Theirs characteristics and properties are summarized in Table \ref{table:corpus} and detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/networks/}. For both astro-ph and hep-ph datasets, we used the cleaned versions available in the  graph-tool framework.
 %The aim of these experiments is to illustrate the advantage of the online inference and to evaluate the performances of the models.
 %This evaluation is based on a missing weight prediction task using the MSE score. 
- For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-linked pairs of nodes. The remaining data constitutes the training set. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sets are reported as final results.
+ For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-linked pairs of nodes\footnote{This selection, used in other studies, aims at simulating dense parts of the networks on which people usually focus.}. The remaining data constitutes the training set. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sets are reported as final results.
 
 \begin{table*}[t]
 \bgroup
@@ -14,7 +14,7 @@ We evaluated the performance of the above models on several real world weighted 
 \label{table:corpus}
 \end{table*}
 
-In the remainder, for the MMSB, WMMSB and WMMSB-bg models, the gradient step parameters  $\tau$ and $\kappa$ were fixed respectively to  $1024$ and $0.5$, the burn-in period $T_{burnin}$ to $150$; for stratified sampling, $M$ was set to $50$, the size of $s_0^{i,m}, \, 1 \le m \le M$ being equal to the number of nodes to which $i$ is not connected to divided by $M$. For MMSB, the hyperparameters $\lambda_0$ and $\lambda_1$ were set to $0.1$. For WMMSB, $r$ et $p$ were set to $1$ ??? and for WMMSB-bg the hyperparameters were set to  $c_0=10$, $r_0=1$, $c=100$ and $\epsilon=10^{-6}$. The number of latent classes $K$ was fixed to $10$ for all models and the latent-class hyperparameters $\alpha_k$ to $\frac{1}{K}$. The implementation of these models is available online\footnote{https://github.com/***/*** (anonymized)}. For deciding when to stop the inference process, 10\% of the training set used serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
+In the remainder, for the MMSB, WMMSB and WMMSB-bg models, the gradient step parameters  $\tau$ and $\kappa$ were fixed respectively to  $1024$ and $0.5$, the burn-in period $T_{burnin}$ to $150$; for stratified sampling, $M$ was set to $50$, the size of $s_0^{i,m}, \, 1 \le m \le M$ being equal to the number of nodes to which $i$ is not connected to divided by $M$. For MMSB, the hyperparameters $\lambda_0$ and $\lambda_1$ were set to $0.1$. For WMMSB, $r$ and $p$ were set to $1$ and $1/2$ respectively, whereas for WMMSB-bg the hyperparameters were set to  $c_0=10$, $r_0=1$, $c=100$ and $\epsilon=10^{-6}$. For all three models, the latent-class hyperparameters $\alpha_k, \, 1 \le k \le K$ are set to $\frac{1}{K}$. The implementation of these models is available online\footnote{https://github.com/***/*** (anonymized)}. For deciding when to stop the inference process, 10\% of the training set used serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
 %
 \begin{equation*}
 \log p(\D_{set}) = \sum_{i,j \in \D_{set}} \log p(y_{ij} | \phih_{kk'}) p(k|\thetah_i) p(k'|\thetah_j).
@@ -22,20 +22,20 @@ In the remainder, for the MMSB, WMMSB and WMMSB-bg models, the gradient step par
 \end{equation*}
 %
 
-Predicting links and predicting weights on links are too different tasks, and there is no guarantee that a model performing well on one task will perform well on the other. We nevertheless assess the behavior of the weighted mixed-membership model we have introduced in the context of these two tasks to fully illustrate its performance, however giving more emphasis to weight prediction.
+Predicting links and predicting weights on links are too different tasks, and there is no guarantee that a model performing well on one task will perform well on the other. Even though we focus in this study on the weight prediction problem, we still want, for completeness reasons, to illustrate the behavior of the different models on the link prediction task.
 
 \subsection{Link prediction}
 
-We want to illustrate here how the MMSB and WMMSB-bg models behave for link prediction. In addition to these models, we consider here two standard link prediction models, the stochastic block model, referred to as SBM, and its weighted extension, referred to as WSBM. For these two models, the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric} has been used since it integrates an efficient MCMC inference method for the stochastic block model family.  In all models, the number of classes is set to $K=10$. 
+In addition to the proposed mixed-membership models, we consider here two standard link prediction models, the stochastic block model, referred to as SBM, and its weighted extension, referred to as WSBM. We use the most recent version of these two models, namely the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric}, which relies on an efficient MCMC inference method. In all models, the number of classes is set to $K=10$. 
 
 As usual, the missing link prediction task is evaluated with the AUC-ROC score. For weighted models, we simply predict here a link through the probability that an edge exists between two unobserved nodes $(i,j)$ belonging to the test set, namely:
 \[
-p(y_{ij} \geq 1 | \Bs{\Thetah}, \Bs{\Phih}) = 1 - \sum_{kk'} \thetah_{ik} \thetah_{jk'} e^{-\phih_{kk'}}
+p(y_{ij} \geq 1 | \Bs{\Thetah}, \Bs{\Phih}) = 1 - \sum_{1 \le k,k' \le K} \thetah_{ik} \thetah_{jk'} e^{-\phih_{kk'}}
 \]
 
 %Variational inference, used here for MMSB models, and MCMC, used for SBM models, lead to different performance, the latter usually yielding better models than the former \cite{asuncion2009smoothing}. Indeed, despite the fact that the MMSB models considered here rely on more realistic assumptions regarding the distribution of nodes over latent classes, the approximations made on the likelihood for scalable inference purposes penalize MMSB models when it comes to prediction accuracy. This said, the strong averaging step of the stochastic gradient descent allows for faster convergence so that, as the models are more realistic, they may yield better performance when the amount of training data is limited. This is indeed what we observe in practice.
 
-Table~\ref{table:roc} summarizes the results obtained with the above mentioned models when using 10\% and 100\% of the training data. As one can note, using all training data, SBM outperforms WSBM on 5 datasets and is the best performing model when the complete training set is used. This can be attributed to the fact that SBM directly aims at predicting links, unlike the weighted models, and does so via MCMC inference, which is known to yield accurate estimate when there is sufficient data. Interestingly, there is an important degradation for SBM models when only 10\% of the training set is used. MMSB models are more stable in this aspect, showing that the stochastic variational inference used in MMSB models allows one to learn a correct model with few data.
+Table~\ref{table:roc} summarizes the results obtained with the above mentioned models when using 10\% and 100\% of the training data. As one can note, using all training data, SBM outperforms WSBM on 5 datasets and is the best performing model when the complete training set is used. This can be attributed to the fact that SBM directly aims at predicting links, unlike the weighted models, and does so via MCMC inference, which is known to yield accurate estimate when there is sufficient data. The mixed-membership family does not yield good results in this setting and is only interestingly, in particular WMMSB-bg, on four datasets (astro\_ph, digg\_reply, enron, and prosper\_loans). There is however an important degradation for SBM models when only 10\% of the training set is used. MMSB models are more stable in this case, indicating that the stochastic variational inference used in MMSB models allows one to learn a correct model with few data. Lastly, among the models proposed in this study, WMMSB-bg outperforms WMMSB. We rely, for this reason, on the former in the remainder of the study.
 
 \begin{table*}[t]
 \centering
@@ -45,29 +45,31 @@ Table~\ref{table:roc} summarizes the results obtained with the above mentioned m
 
 \subsection{Weight prediction}
 
-The weight prediction task consists in predicting weights on existing links, \textit{i.e.} links for which one knows that $y_{ij} > 0$. For this task, in addition to the previous models, we consider three other stochastic block models, among which two are weighted, from \cite{aicher2014learning} which use a generic variational inference scheme with several kernels: a Bernoulli kernel for the model referred to as SBM-ai, a Normal kernel for the model referred to as WSBM-ai-n and a Poisson kernel for the model referred to as WSBM-ai-p. Lastly, we also consider the Edge Partition Model (EPM) proposed in~\cite{zhou2015} (see Section~\ref{sec:relwork}, the inference of which relies on MCMC.
+For this task, in addition to the previous models, we consider three other stochastic block models from \cite{aicher2014learning}, among which two are weighted. These models are based on a generic variational inference scheme with several kernels: a Bernoulli kernel for the model referred to as SBM-ai, a Normal kernel for the model referred to as WSBM-ai-n, and a Poisson kernel for the model referred to as WSBM-ai-p. Lastly, we also consider the Edge Partition Model (EPM) proposed in~\cite{zhou2015} (see Section~\ref{sec:relwork}, the inference of which relies on MCMC.
 
 For both WMMSB-bg and EPM, we used the inferred posterior distribution to estimate the missing weights by:
 %
+\begin{equation}\label{eq:assign}
+\hat y_{ij} | \Bs{\Thetah}, \Bs{\Phih} = \sum_{1 \le k,k' \le K} \thetah_{ik} \thetah_{jk'} \phih_{kk'}
+\end{equation}
+%
+%Note that the Zero Truncated Poisson version of WMMSB-bg would lead to:
+%%
+%\[
+%\hat y_{ij} | \Bs{\Thetah}, \Bs{\Phih} = \sum_{kk'} \thetah_{ik} \thetah_{jk'} \frac{\phih_{kk'}}{(1 - \exp(-\phih_{kk'}))}
+%\]
+%%
+%In practice however, even though the latter version is more appropriate, we have not seen any significant difference between the two versions and present only the results obtained with the former so as to be on the same setting as the other models.
+%
+Since the stochastic block models have been primarily designed for solving the link prediction task, we do not have a posterior distribution adapted for weight prediction. Therefore, we used an estimation of the average weight value in each interaction based on the observed data. More precisely, let $N_k$ denote the number of nodes assigned to class $k$ by the model in the training set. The prediction of the weight on the link between two nodes $i$ and $j$ of the test set, respectively of class $k$ and $k'$, is given by:
+%
 \[
-\hat y_{ij} | \Bs{\Thetah}, \Bs{\Phih} = \sum_{kk'} \thetah_{ik} \thetah_{jk'} \phih_{kk'}
+\hat y_{ij} | i \in k, j \in k' = \sum_{(i',j') \in \mathcal{T}_s, i' \in k, j' \in k} \frac{y_{i'j'}}{N_k N_{k'}}.
 \]
 %
-Note that the Zero Truncated Poisson version of WMMSB-bg would lead to:
-%
-\[
-\hat y_{ij} | \Bs{\Thetah}, \Bs{\Phih} = \sum_{kk'} \thetah_{ik} \thetah_{jk'} \frac{\phih_{kk'}}{(1 - \exp(-\phih_{kk'}))}
-\]
-%
-In practice however, even though the latter version is more appropriate, we have not seen any significant difference between the two versions and present only the results obtained with the former so as to be on the same setting as the other models.
-
-Since the stochastic block models have been primarily designed for solving the link prediction task, we do not have a posterior distribution adapted for weight prediction. Therefore, we used a post estimation of the average weight value in each interaction based on the observed data. More formally, given $O_{kk'}$ the number of observed links and non links between the inferred latent classes $k$ and $k'$, the prediction of the weight on the link between two nodes $i$ and $j$ of class $k$ and $k'$ is given by:
-%
-\[
-\hat y_{ij} | e_i \in \text{class } k, e_j \in \text{class }k' = \sum_{y_{ij} \in O_{kk'}} \frac{y_{ij}}{\# O_{kk'}}.
-\]
-%
-The same method is used for the weighted stochastic block models WSBM, WSBM-ai, WSBM-ai-n and WSBM-ai-p as we observed no significant difference \textcolor{red}{With what?} and even better results using this latter estimation.
+where $i \in k$ means that node $i$ was assigned to class $k$ by the model and $\mathcal{T}_s$ denotes the training set.
+ 
+The same method is used for the weighted stochastic block models WSBM, WSBM-ai, WSBM-ai-n and WSBM-ai-p as this method yielded even better results than the one directly making use of the expectation of $y_{ij}$ as in Eq.~\ref{eq:assign}.
 
 \begin{table*}[t]
 \centering
@@ -75,7 +77,8 @@ The same method is used for the weighted stochastic block models WSBM, WSBM-ai, 
 \label{table:mse}
 \end{table*}
 
-Table \ref{table:mse}, gives the MSE scores for the different models and for all networks. To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although the models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by a link prediction method. 
+Table \ref{table:mse}, gives the MSE scores for the different models and for all networks. For all models, the number of latent classes $K$ is set to 10.
+%To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although the models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by a link prediction method. 
 As one can note, WMMSB-bg outperforms all the other models on the different datasets except for the network moreno\_names. 
 The fact that this network is the only one in the category of linguistic network and that it is relatively small could explain this result. \textbf{CL : je ne suis pas d'accord avec phrase suivante} EPM outperforms other models, apart from WMMSB-bg. The other models expose comparable results.
 
