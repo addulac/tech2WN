@@ -23,7 +23,9 @@ Lastly, by marginalizing over the variables $z_{i \rightarrow j}$ and $z_{i \lef
  \end{equation}
 %
 
-\paragraph{A Beta-Gamma augmentation} The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them through class-dependent shape and rate parameters in the above Gamma distribution. We propose here to model the class-dependent shape parameter with another Gamma distribution and the class-dependent rate parameter with a Beta prior:
+\subsection{A Beta-Gamma augmentation} 
+
+The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them through class-dependent shape and rate parameters in the above Gamma distribution. We propose here to model the class-dependent shape parameter with another Gamma distribution and the class-dependent rate parameter with a Beta prior:
 %
 \begin{gather*}
 r_{kk'} \sim \textrm{Gamma}(c_0r_0, 1/c_0), \, p_{kk'} \sim \textrm{Beta}(c\epsilon, c(1-\epsilon)).
@@ -214,6 +216,14 @@ As one can note, the intermediate global counts correspond to a restriction, on 
 Lastly, to be able to efficiently compute such quantities as $N^{\Phi^{-ij}}$ used for the computation of the link probability, one needs to store in memory, for each pair of nodes $(i,j)$, a $K \times K$ matrix, which is not feasible for large networks. Thus, following \cite{foulds2013stochastic}, we replace here $N^{\Phi^{-ij}}$ by $N^{\Phi}$, which amounts to assume that the contribution of each individual pair of nodes is negligible compared to all other pairs, a reasonable assumption when the network is large. %The complete code for the inference will be made available in GitHub upon acceptance.
 
 \subsubsection{Robbins-Monro condition} 
+
+\begin{table*}[t]
+\bgroup
+\def\arraystretch{1} % 1 is the default, change whatever you need
+	\input{img/corpus}
+\egroup
+\label{table:corpus}
+\end{table*}
 
 The convergence of stochastic variational inference is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global counts $\rho^\Phi$ and $\rho^{Y}$ accounting respectively for  $N^\Phi$ and $N^{Y}$. For $N^\theta$, we maintain individual gradient steps $\rho_i^{\theta}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance. Furthermore, to increase the speed of the inference, we update the global count $N^\Phi$ and $N^{Y}$ only after a minibatch round. For the global count  $N^\theta$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
 %, which consists to update the class assignment of nodes after observing a bunch of dyad.

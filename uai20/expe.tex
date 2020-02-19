@@ -6,14 +6,6 @@ We evaluated the performance of the above models on several real world weighted 
 %This evaluation is based on a missing weight prediction task using the MSE score. 
  For all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-linked pairs of nodes\footnote{This selection, used in other studies, aims at simulating dense parts of the networks on which people usually focus.}. The remaining data constitutes the training set. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sets are reported as final results.
 
-\begin{table*}[t]
-\bgroup
-\def\arraystretch{1} % 1 is the default, change whatever you need
-	\input{img/corpus}
-\egroup
-\label{table:corpus}
-\end{table*}
-
 In the remainder, for the MMSB, WMMSB and WMMSB-bg models, the gradient step parameters  $\tau$ and $\kappa$ were fixed respectively to  $1024$ and $0.5$, the burn-in period $T_{burnin}$ to $150$; for stratified sampling, $M$ was set to $50$, the size of $s_0^{i,m}, \, 1 \le m \le M$ being equal to the number of nodes to which $i$ is not connected to divided by $M$. For MMSB, the hyperparameters $\lambda_0$ and $\lambda_1$ were set to $0.1$. For WMMSB, $r$ and $p$ were set to $1$ and $1/2$ respectively, whereas for WMMSB-bg the hyperparameters were set to  $c_0=10$, $r_0=1$, $c=100$ and $\epsilon=10^{-6}$. For all three models, the latent-class hyperparameters $\alpha_k, \, 1 \le k \le K$ are set to $\frac{1}{K}$. The implementation of these models is available online\footnote{https://github.com/***/*** (anonymized)}. For deciding when to stop the inference process, 10\% of the training set used serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
 %
 \begin{equation*}
@@ -26,6 +18,12 @@ Predicting links and predicting weights on links are two different tasks, and th
 
 \subsection{Link prediction}
 
+\begin{table*}[t]
+\centering
+	\input{img/roc_evolv_tab}
+\label{table:roc}
+\end{table*}
+
 In addition to the proposed mixed-membership models, we consider here two standard link prediction models, the stochastic block model, referred to as SBM, and its weighted extension, referred to as WSBM. We use the most recent version of these two models, namely the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric}, which relies on an efficient MCMC inference method. In all models, the number of classes is set to $K=10$ (as illustrated below, the choice of the number of latent classes, in between 10 and 50, does not have an important impact on these models).
 
 As usual, the missing link prediction task is evaluated with the AUC-ROC score. For weighted models, we simply predict here a link through the probability that an edge exists between two unobserved nodes $(i,j)$ belonging to the test set, namely:
@@ -36,12 +34,6 @@ p(y_{ij} \geq 1 | \Bs{\Thetah}, \Bs{\Phih}) = 1 - \sum_{1 \le k,k' \le K} \theta
 %Variational inference, used here for MMSB models, and MCMC, used for SBM models, lead to different performance, the latter usually yielding better models than the former \cite{asuncion2009smoothing}. Indeed, despite the fact that the MMSB models considered here rely on more realistic assumptions regarding the distribution of nodes over latent classes, the approximations made on the likelihood for scalable inference purposes penalize MMSB models when it comes to prediction accuracy. This said, the strong averaging step of the stochastic gradient descent allows for faster convergence so that, as the models are more realistic, they may yield better performance when the amount of training data is limited. This is indeed what we observe in practice.
 
 Table~\ref{table:roc} summarizes the results obtained with the above mentioned models when using 10\% and 100\% of the training data. As one can note, when the complete training set is used (100 \%), SBM outperforms WSBM on 5 datasets and is overall the best performing model. This can be attributed to the fact that SBM directly aims at predicting links, unlike the weighted models, and does so via MCMC inference, which is known to yield accurate estimate when there is sufficient data. The mixed-membership family does not yield good results in this setting (100\%) and is only interesting, in particular via WMMSB-bg, on four datasets (astro\_ph, digg\_reply, enron, and prosper\_loans). Within this family, WMMSB-bg outperforms the other models on seven datasets (hep-th, moreno\_names, fb\_uc, digg\_reply, slashdot, wiki-link and prosper\_loans). For this reason, we will not use its simpler version, WMMSB, in the remainder of this study. Lastly, there is however an important degradation for SBM models when only 10\% of the training set is used. Mixed-membership stochastic block models are more stable in this case (except on enron and wiki-link), indicating that the stochastic variational inference used in these models is appropriate with relatively few data. %Lastly, among the models proposed in this study, WMMSB-bg outperforms WMMSB. We rely, for this reason, on the former in the remainder of the study.
-
-\begin{table*}[t]
-\centering
-	\input{img/roc_evolv_tab}
-\label{table:roc}
-\end{table*}
 
 \subsection{Weight prediction}
 
@@ -105,6 +97,13 @@ Figure \ref{fig:k_evolv} displays, for three datasets, the evolution of the MSE 
 
 \subsubsection{Inference time} 
 
+\begin{figure*}[t]
+\centering
+	%\input{img/conv_entropy3}
+	\input{img/conv_entropy4}
+    \label{fig:conv_entropy}
+\end{figure*}
+
 Table \ref{table:time} displays the inference time, in hours, of the different models on all datasets. The mixed-membership models, MMSB and WMMSB-bg, are implemented in Python, while SBM-ai, WSBM-ai-n, WSBM-ai-p and EPM are implemented in Matlab and SBM and WSBM in C++ (with a Python wrapper \cite{peixoto_graph-tool_2014}). For all models, a hard limit was set at 25 hours for the inference time, to limit the computing cost. As one can observe, overall SBM (results in bold) is the fastest model and EPM (results in italics) the slowest one. Even though this latter model performs well in terms of weight prediction compared to stochastic block models, it can be more than 50 times slower than SBM. The mixed-membership model WMMSB-bg, which outperforms the other models in terms of weight prediction, can be up to 20 times faster than EPM. It is definitely slower than SBM but the difference remains reasonable as WMMSB-bg can be learned from millions of edges in less than 2 hours. Of course, the different implementations (python, Matlab, C++) render the comparison difficult and the results we are presenting should be understood with this difference in mind. They nevertheless reflect the behavior of the current, available implementations of the different models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,12 +112,8 @@ Table \ref{table:time} displays the inference time, in hours, of the different m
 \subsubsection{Convergence analysis} 
 
 Lastly, Figure \ref{fig:conv_entropy} shows the evolution of the log-likelihood for the WMMSB and WMMSB-bg models on the test set for the enron, slashdot and proper-loans datasets. The number of visited edges correspond to the number of edges used to infer the model (remember that the inference is stopped, for all models, when the likelihood  on the validation set no longer increases). We used three different sets of values for the hyperparameters $r$ and $p$ of WMMSB: $\{(10,0.5); (1,1); (0.5,10)\}$. Regardless of the values of these hyperparameters, one can observe that the augmented model WMMSB-bg converges to a better solution, in terms of likelihood, than the other models on enron and slashdot. The curve on slashfot further shows that the WMMSB models were stopped earlier than WMMSB-bg, illustrating the fact that this latter model, due to its additional prior assumptions, seems to be less prone to overfitting.
-\begin{figure*}[h]
-\centering
-	%\input{img/conv_entropy3}
-	\input{img/conv_entropy4}
-    \label{fig:conv_entropy}
-\end{figure*}
+
+
 
 
 
