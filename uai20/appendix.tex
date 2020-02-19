@@ -32,11 +32,12 @@ with:
 
 \paragraph{Optimizing $\gamma_{ijkk'}$}
 
-In the Beta-Gamma augmentation, the parameters $p$ and $r$ are marginalized in the update given by Eq.~\eqref{eq1}:
+In the Beta-Gamma augmentation, the parameters $p$ and $r$ are marginalized in the update given by:
 %
-\begin{equation}
-\gamma_{ijkk'} \propto e^{E_{q(Z^{-ij})} [\log E_{q(r_{kk'})}[E_{q(p_{kk'})}[ P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega) ] ] ]}. \nonumber
-\end{equation}
+\begin{align*}
+&\gamma_{ijkk'} \propto \nonumber\\
+&e^{E_{q(Z^{-ij})} [\log E_{q(r_{kk'})}[E_{q(p_{kk'})}[ P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | Y^{-ij}, Z^{-ij}, \Omega) ] ] ]}
+\end{align*}
 %
 By using a first order Taylor expansion, one obtains:
 %
