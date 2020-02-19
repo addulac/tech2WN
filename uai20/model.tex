@@ -87,9 +87,10 @@ The derivation of the collapsed variational updates is obtained by maximizing th
 \end{align*}
 %
 By equating this derivative to zero, one obtains the following update:
-\begin{equation} \label{eq:maximization}
-\gamma_{ijkk'} \propto e^{E_{q({Y}^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {Y}^{-ij}, {Y}^{-ij}, \Omega)]},
-\end{equation}
+\begin{align} \label{eq:maximization}
+&\gamma_{ijkk'} \propto \nonumber\\
+&\exp E_{q({Y}^{-ij})} [\log P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {Y}^{-ij}, {Y}^{-ij}, \Omega)],
+\end{align}
 %
 with  $P(z_{i\rightarrow j}=k, z_{i\leftarrow j}=k' | {Y}^{-ij}, {Z}^{-ij}, \Omega)$ being the collapsed Gibbs update of WMMSB. They take the form:
 %
