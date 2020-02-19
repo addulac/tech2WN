@@ -22,7 +22,7 @@ In the remainder, for the MMSB, WMMSB and WMMSB-bg models, the gradient step par
 \end{equation*}
 %
 
-Predicting links and predicting weights on links are too different tasks, and there is no guarantee that a model performing well on one task will perform well on the other. Even though we focus in this study on the weight prediction problem, we still want, for completeness reasons, to illustrate the behavior of the different models on the link prediction task.
+Predicting links and predicting weights on links are two different tasks, and there is no guarantee that a model performing well on one task will perform well on the other. Even though we focus in this study on the weight prediction problem, we still want, for completeness reasons, to illustrate the behavior of the different models on the link prediction task.
 
 \subsection{Link prediction}
 
@@ -45,7 +45,7 @@ Table~\ref{table:roc} summarizes the results obtained with the above mentioned m
 
 \subsection{Weight prediction}
 
-For this task, in addition to the previous models, we consider three other stochastic block models from \cite{aicher2014learning}, among which two are weighted. These models are based on a generic variational inference scheme with several kernels: a Bernoulli kernel for the model referred to as SBM-ai, a Normal kernel for the model referred to as WSBM-ai-n, and a Poisson kernel for the model referred to as WSBM-ai-p. Lastly, we also consider the Edge Partition Model (EPM) proposed in~\cite{zhou2015} (see Section~\ref{sec:relwork}, the inference of which relies on MCMC.
+For this task, in addition to the previous models, we consider three other stochastic block models from \cite{aicher2014learning}, among which two are weighted. These models are based on a generic variational inference scheme with several kernels: a Bernoulli kernel for the model referred to as SBM-ai, a Normal kernel for the model referred to as WSBM-ai-n, and a Poisson kernel for the model referred to as WSBM-ai-p. Lastly, we also consider the Edge Partition Model (EPM) proposed in~\cite{zhou2015} (see Section~\ref{sec:rl}), the inference of which relies on MCMC.
 
 For both WMMSB-bg and EPM, we used the inferred posterior distribution to estimate the missing weights by:
 %
@@ -77,20 +77,20 @@ The same method is used for the weighted stochastic block models WSBM, WSBM-ai, 
 \label{table:mse}
 \end{table*}
 
-Table \ref{table:mse}, gives the MSE scores for the different models and for all networks. For all models, the number of latent classes $K$ is set to 10.
-%To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although the models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by a link prediction method. 
-As one can note, WMMSB-bg outperforms all the other models on the different datasets except for the network moreno\_names. 
-The fact that this network is the only one in the category of linguistic network and that it is relatively small could explain this result. \textbf{CL : je ne suis pas d'accord avec phrase suivante} EPM outperforms other models, apart from WMMSB-bg. The other models expose comparable results.
-
-
-\begin{figure}[h]
+\begin{figure*}[ht]
 \centering
-	\input{fig2/wsim_k_evo}
+	\input{fig2/wsim_k_evo-1}
    \label{fig:k_evolv}
-\end{figure}
-Figure \ref{fig:k_evolv} shows the MSE score for $K$, the number of latent classes, varying from 10 to 50 and for six datasets. One can see that for the different methods, the result is relatively stable, in a lesser extent on the networks hep\_th and fb\_uc. Thus, the choice of this parameter has a limited impact on the performances of the models. Nevertheless, it should be notice that for $K$ equals  to 50, EPM has not been able to handle the datasets.
+\end{figure*}
 
-\textbf{CL: Pbl axe 2 indique Wsim et non MSE}
+Table \ref{table:mse} provides the mean squared error (MSE) scores for the different models and for all networks. For all models, the number of latent classes $K$ is set to 10.
+%To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although the models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by a link prediction method. 
+As one can note, the overall best performing model is WMMSB-bg, which yields the best results on 6 out of 9 datasets. MMSB, the other representative of the mixed-membership family, yields the best result on astro\_ph while EPM is the best performing model on fb\_uc and moreno\_names, even though the difference with respect to WMMSB-bg on fb\_uc is not large. Overall, the stochastic block models and their weighted versions do not perform well compared to WMMSB-bg (and to a lesser extent to EPM), which shows the importance of the soft class assignment mechanism present in mixed-membership models. 
+
+%outperforms all the other models on the different datasets except for the network moreno\_names. 
+%The fact that this network is the only one in the category of linguistic network and that it is relatively small could explain this result. \textbf{CL : je ne suis pas d'accord avec phrase suivante} EPM outperforms other models, apart from WMMSB-bg. The other models expose comparable results.
+
+\paragraph{Impact of the number of classes} Figure \ref{fig:k_evolv} displays, for three datasets, the evolution of the MSE scores when the number of latent classes, $K$, varies from 10 to 50  (additional results are provided in Appendix~\ref{app:K}). As one can see, the results are relatively stable for all models. This is particularly true for the WMMSB-bg model. Note that the EPM model, due to its reliance on MCMC for inference, was not able to handle as many as 50 latent classes in a reasonable time (see below). This model also displays high variance when $K$ increases on the enron network, reflecting the fact that the variance of the weights in this network is by far the most important (see Table~\ref{table:corpus}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Timing performance
