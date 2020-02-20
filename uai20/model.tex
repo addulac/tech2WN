@@ -2,7 +2,7 @@
 \label{sec:model}
 
 As usual, we consider here that a network is represented by a graph $G=(V,E)$ where $V$ is the set of nodes such that $N=|V|$ and E the set of edges. We furthermore consider the matrix $Y=(y_{ij})_{1 \le i,j \le N}$ such that $y_{ij}=0$ if $(i,j) \notin E$ and $y_{ij} \in \mathbb{Z}_{>0}$ otherwise. When the network is unweighted, $y_{ij} \in \{0,1\}$ and $Y$ is the adjacency matrix.
-
+\subsection{Weighted version of MMSB (WMMSB)} 
 Mixed-membership stochastic block models extend stochastic block models \cite{airoldi2009mixed} by allowing nodes to "belong" to several blocks (or classes) through a given (usually Dirichlet) probability distribution. Prior to generate a link between two nodes, a particular class is selected for each node. The link is then generated according to a probability distribution $F$, sometimes referred to as the \textit{kernel} distribution, that depends on the selected classes. The generative process behind such models can be summarized as: (a) For each node $i$, draw $\theta_i \sim \textrm{Dir}(\alpha)$, where $\theta_i$ and $\boldsymbol{\alpha}$ are $K$-dimensional vectors, $K$ denoting  the number of classes considered; (b) Generate two sets of latent class memberships, $Z_\rightarrow = \{z_{i\rightarrow j} \sim \textrm{Cat}(\theta_i),  1 \le i,j \le N\}$ and $Z_\leftarrow = \{z_{i\leftarrow j} \sim \textrm{Cat}(\theta_j),  1 \le i,j \le N\}$, with categorical draws; (c) Generate or not a link between two nodes $(i,j)$ according to $y_{ij} \sim F(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}})$, where $F$ is a distribution in the exponential family and $\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}$ a variable, usually drawn from a conjugate distribution, that represents the relations between classes. A standard choice for $F$ is the Bernoulli distribution, $\phi$ being the conjugate Beta distribution: $y_{ij} \sim \textrm{Bern}(\phi_{z_{i \rightarrow j}z_{i \leftarrow j}}), \, \phi_{kk'} \sim \textrm{Beta}(\lambda_0, \lambda_1)$. We refer to this model as the MMSB model.
 
 A natural way to model weights that correspond to positive integers is to use Poisson distributions. Considering a conjugate Gamma distribution for $\phi$, we define a first weighted extension of MMSB, which we will refer to as WMMSB, through:
@@ -23,7 +23,7 @@ Lastly, by marginalizing over the variables $z_{i \rightarrow j}$ and $z_{i \lef
  \end{equation}
 %
 
-\subsection{A Beta-Gamma augmentation} 
+\subsection{A Beta-Gamma augmentation (WMMSB-bg)} 
 
 The generative process for WMMSB defined above assumes that the parameters of the Poisson distributions used to generate links are drawn from the same Gamma distribution. Having a unique prior over these parameters however limits the ability of the model to capture the variance in the relations between the latent classes. Hierarchical extensions can be used here to have a better representation of the classes and the relations between them through class-dependent shape and rate parameters in the above Gamma distribution. We propose here to model the class-dependent shape parameter with another Gamma distribution and the class-dependent rate parameter with a Beta prior:
 %
