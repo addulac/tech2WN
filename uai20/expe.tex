@@ -65,7 +65,7 @@ The same method is used for the weighted stochastic block models WSBM, WSBM-ai, 
 
 \begin{table*}[t]
 \centering
-	\input{fig2/wsim3_training100}
+	\input{fig2/wsim_training100}
 \label{table:mse}
 \end{table*}
 
@@ -77,7 +77,7 @@ The same method is used for the weighted stochastic block models WSBM, WSBM-ai, 
 
 Table \ref{table:mse} provides the mean squared error (MSE) scores for the different models and for all networks. For all models, the number of latent classes $K$ is set to 10.
 %To evaluate the ability of the models to reconstruct the missing weights, we compute the MSE only on the missing edges of the test data. Although the models are also able to predict the presence or absence of edges,  we considered that the question of recovering the edges structure should be addressed separately by a link prediction method. 
-As one can note, the overall best performing model is WMMSB-bg, which yields the best results on 6 out of 9 datasets. MMSB, the other representative of the mixed-membership family, yields the best result on astro\_ph while EPM is the best performing model on fb\_uc and moreno\_names, even though the difference with respect to WMMSB-bg on fb\_uc is not large. Overall, the stochastic block models and their weighted versions do not perform well compared to WMMSB-bg (and to a lesser extent to EPM), which shows the importance of the soft class assignment mechanism present in mixed-membership models. 
+As one can note, the overall best performing model is WMMSB-bg, which yields the best results on 8 out of 9 datasets. MMSB, the other representative of the mixed-membership family, yields the best result on astro\_ph while EPM is the best performing model on fb\_uc and moreno\_names, even though the difference with respect to WMMSB-bg on fb\_uc is not large. Overall, the stochastic block models and their weighted versions do not perform well compared to WMMSB-bg (and to a lesser extent to EPM), which shows the importance of the soft class assignment mechanism present in mixed-membership models. 
 
 %outperforms all the other models on the different datasets except for the network moreno\_names. 
 %The fact that this network is the only one in the category of linguistic network and that it is relatively small could explain this result. \textbf{CL : je ne suis pas d'accord avec phrase suivante} EPM outperforms other models, apart from WMMSB-bg. The other models expose comparable results.
