@@ -34,7 +34,14 @@
 
 \flushbottom \twocolumn \sloppy
 
-% Fredrik Johansson 2020: Checked
+% Fredrik Johansson 2020:
+% - Checked
+% - Removed line 107 which caused the footnotemarker * for the \thanks command
+%   on the title page to overlap with the thanks note itself.
+%   Former line: \def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}
+% - Added notice string for conference + year
+% - NOTE TO FUTURE PUBLICATION CHAIR: The notice string should not be displayed
+%   for non-accepted submissions. An option for draft/accepted should be added
 %
 % Li Chou 2019: checked
 %
@@ -90,10 +97,28 @@ the offending package(s), or layout-changing commands and try again.
 
 \fi}
 
+%
+% CONFERENCE/YEAR-SPECIFIC SETTINGS
+%
+\newcommand{\@conferenceordinal}{36\textsuperscript{th}}
+\newcommand{\@conferenceyear}{2020}
+\newcommand{\@conferencelocation}{Toronto, Canada}
+\newcommand{\@conferencevolume}{124}  % To be assigned by JMLR/PMLR
+\newcommand{\Notice@String}{\textit{Proceedings of the \@conferenceordinal{} Conference on Uncertainty in Artificial Intelligence (UAI)}, PMLR volume \@conferencevolume{}, \@conferenceyear.}
+
+
+% add conference notice to bottom of first page
+\newcommand{\ftype@noticebox}{8}
+\newcommand{\@notice}{%
+  % give a bit of extra room back to authors on first page
+  \enlargethispage{2.9\baselineskip}%
+  \@float{noticebox}[b]%
+    \vspace{-0.8em}
+    \footnotesize\Notice@String{}%
+  \end@float%
+}
 
 \def\addcontentsline#1#2#3{}
-
-
 
 \def\maketitle{\par
 
@@ -101,7 +126,7 @@ the offending package(s), or layout-changing commands and try again.
 
    \def\thefootnote{\fnsymbol{footnote}}
 
-   \def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}
+   %\def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}
 
    \twocolumn[\@maketitle] \@thanks
 
@@ -145,7 +170,7 @@ the offending package(s), or layout-changing commands and try again.
 
 }}
 
-\renewenvironment{abstract}{\centerline{\large\bf Abstract}\vspace{0.5ex}\begin{quote}}{\par\end{quote}\vskip 1ex}
+\renewenvironment{abstract}{\@notice\centerline{\large\bf Abstract}\vspace{0.5ex}\begin{quote}}{\par\end{quote}\vskip 1ex}
 
 
 
