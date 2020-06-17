@@ -4,10 +4,11 @@
 We evaluated the performance of the above models on several real world weighted networks, both directed and undirected. Theirs characteristics and properties are summarized in Table 1 and detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/networks/}. For both astro-ph and hep-ph datasets, we used the cleaned versions available in the  graph-tool framework.
 %The aim of these experiments is to illustrate the advantage of the online inference and to evaluate the performances of the models.
 %This evaluation is based on a missing weight prediction task using the MSE score. 
-In most large scale, real-life networks, the data is zero-inflated. However, predicting links (and weights) on mostly inactive regions of a network is usually not interesting, and researchers and practitioners have focused on predicting what's happening in active regions of the network. One standard way to focus on active regions without making too many assumptions is to consider a test set that is balanced between links and non-links, as done in \cite{kim2013efficient}. 
+In most large scale, real-life networks, the data is zero-inflated. However, predicting links (and weights) on mostly inactive regions of a network is usually not interesting, and researchers and practitioners have focused on predicting what's happening in active regions of the network. A standard way to focus on active regions without making many assumptions is to consider a test set, balanced between links and non-links, as done in \cite{kim2013efficient}. 
  Thus, for all the datasets, we built a test set by extracting randomly 20 percent of the edges of the network and about the same amount of non-linked pairs of nodes.
 % \footnote{This selection, used in other studies, aims at simulating dense parts of the networks on which people usually focus.}. 
- The remaining data constitutes the training set. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sets are reported as final results. All our experiments were designed using a Python environment that facilitate reproducible research and that we have open sourced\footnote{https://github.com/dtrckd/pymake}.
+ The remaining data constitutes the training set. We repeated this sampling 10 times with different seeds to cross validate our results. The average values (and standard deviations) computed on the ten sets are reported. 
+All our experiments were designed using a Python environment that facilitate reproducible research \footnote{https://github.com/dtrckd/pymake}.
 
 In the remainder, for the MMSB, WMMSB and WMMSB-bg models, the gradient step parameters  $\tau$ and $\kappa$ were fixed respectively to  $1024$ and $0.5$, the burn-in period to $150$; for stratified sampling, $M$ was set to $50$, the size of $s_0^{i,m}, \, 1 \le m \le M$ being equal to the number of nodes to which $i$ is not connected to divided by $M$. For MMSB, the hyperparameters $\lambda_0$ and $\lambda_1$ were set to $0.1$. For WMMSB, $r$ and $p$ were set to $1$ and $1/2$ respectively, whereas for WMMSB-bg the hyperparameters were set to  $c_0=10$, $r_0=1$, $c=100$ and $\epsilon=10^{-6}$. For all three models, the latent-class hyperparameters $\alpha_k, \, 1 \le k \le K$ are set to $\frac{1}{K}$. The implementation of these models is available online\footnote{https://github.com/dtrckd/ml}. For deciding when to stop the inference process, 10\% of the training set used serves as a validation set on which the log-likelihood is computed after each minibatch iteration. When the increase of the log-likelihood, averaged over the last 20 measures, is less than 0.001, the inference is stopped. The log-likelihood of a given set of observations $\D_{set}$  is given by:
 %
@@ -20,7 +21,7 @@ Predicting links and predicting weights on links are two different tasks, and th
 
 \subsection{Link prediction}
 
-\begin{table*}[t]
+\begin{table*}[ht]
 \centering
 	\input{img/roc_evolv_tab}
 \label{table:roc}
@@ -65,7 +66,7 @@ where $i \in k$ means that node $i$ was assigned to class $k$ by the model and $
  
 The same method is used for the weighted stochastic block models WSBM, WSBM-ai, WSBM-ai-n and WSBM-ai-p as this method yielded even better results than the one directly making use of the expectation of $y_{ij}$ as in Eq.~\ref{eq:assign}.
 
-\begin{table*}[t]
+\begin{table*}[ht]
 \centering
 	\input{fig2/wsim3_training100}
 \label{table:mse}
@@ -75,6 +76,21 @@ The same method is used for the weighted stochastic block models WSBM, WSBM-ai, 
 \centering
 	\input{fig2/wsim_k_evo-1}
    \label{fig:k_evolv}
+\end{figure*}
+
+
+\subsubsection{Inference time} 
+\begin{table*}[ht]
+\centering
+	\input{fig2/timing_100_k10.tex}
+\label{table:time}
+\end{table*}
+
+\begin{figure*}[ht]
+\centering
+	%\input{img/conv_entropy3}
+	\input{img/conv_entropy4}
+    \label{fig:conv_entropy}
 \end{figure*}
 
 Table \ref{table:mse} provides the mean squared error (MSE) scores for the different models and for all networks. For all models, the number of latent classes $K$ is set to 10.
@@ -91,22 +107,6 @@ Figure \ref{fig:k_evolv} displays, for three datasets, the evolution of the MSE 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Timing performance
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table*}[t]
-\centering
-	\input{fig2/timing_100_k10.tex}
-\label{table:time}
-\end{table*}
-
-\subsubsection{Inference time} 
-
-\begin{figure*}[t]
-\centering
-	%\input{img/conv_entropy3}
-	\input{img/conv_entropy4}
-    \label{fig:conv_entropy}
-\end{figure*}
-
-Table \ref{table:time} displays the inference time, in hours, of the different models on all datasets. The mixed-membership models, MMSB, WMMSB-bg,  SBM-ai, WSBM-ai-n and WSBM-ai-p are implemented in Python, while  EPM is implemented in Matlab and SBM and WSBM in C++ (with a Python wrapper \cite{peixoto_graph-tool_2014}). For all models, a hard limit was set at 25 hours for the inference time, to limit the computing cost. As one can observe, overall SBM (results in bold) is the fastest model and EPM (results in italics) the slowest one. Even though this latter model performs well in terms of weight prediction compared to stochastic block models, it can be more than 50 times slower than SBM. The mixed-membership model WMMSB-bg, which outperforms the other models in terms of weight prediction, can be up to 20 times faster than EPM. It is definitely slower than SBM but the difference remains reasonable as WMMSB-bg can be learned from millions of edges in less than 2 hours. Of course, the different implementations (python, Matlab, C++) render the comparison difficult and the results we are presenting should be understood with this difference in mind. They nevertheless reflect the behavior of the current, available implementations of the different models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Convergence of *MMSB SCVB inference

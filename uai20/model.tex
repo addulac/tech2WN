@@ -46,7 +46,7 @@ The above extension exploits again the conjugacy of the distributions considered
 \label{sec:inference}
 
 %One drawback of doing inference with Gibbs sampling for MMSB models, as is standard, is the quadratic complexity in the number of nodes. If one wants to use MMSB models and its weighted extensions on large networks, one needs to rely on other techniques, as variational inference.
-Variational Inference (VI) and MCMC are two popular methods for learning the parameters of Bayesian models that (roughly speaking) realize a trade-off between time complexity (in particular wrt the size of the training set), one of the main advantages of VI, and accuracy in approximating the posterior distribution, one of the main advantages of MCMC. We have chosen the former as we are interested in a version of our model that scales to large datasets \footnote{Several studies have tried to scale MCMC to large datasets, using either, as far as we know, divide-and-conquer or subsampling approaches. But, as noted in \cite{Bardenet2017}, ``divide-and-conquer approaches have yet to solve a recombination method'' (on MCMC estimates computed on subsets of the data), while subsampling approaches only guarantee control of the approximation of the true posterior distribution in few situations that are ``rarely satisfied in practice'', thus losing the main advantage of MCMC methods.}.
+Variational Inference (VI) and MCMC are two popular methods for learning the parameters of Bayesian models that (roughly speaking) realize a trade-off between time complexity (in particular wrt the size of the training set), one of the main advantages of VI, and accuracy in approximating the posterior distribution, one of the main advantages of MCMC. We have chosen the former as we are interested in a version of our model that scales to large datasets \footnote{Several studies have tried to scale MCMC to large datasets, using either, as far as we know, divide-and-conquer or subsampling approaches. But, as noted in \cite{Bardenet2017}, divide-and-conquer approaches have yet to solve a recombination method (on MCMC estimates computed on subsets of the data), while subsampling approaches only guarantee control of the approximation of the true posterior distribution in few situations that are rarely satisfied in practice, thus losing the main advantage of MCMC methods.}.
 Collapsed variational Bayes inference presents the advantage, over standard variational inference, to rely on weaker assumptions and has proven to be efficient on the latent Dirichlet allocation model \cite{teh2007collapsed}. Recent advances in stochastic variational inference \cite{hoffman2013stochastic}, notably based on well-designed sampling techniques \cite{gopalan2013efficient,kim2013efficient}, have furthermore shown that it is possible to speed-up (collapsed) variational inference with online updates based on minibatches.
 %so that the overall complexity is only linear in the number of edges and quadratic in the number of latent classes.
 Coupling collapsed and stochastic variational inference thus leads here to an efficient inference method that can be used on large networks.
@@ -202,7 +202,7 @@ Stochastic variational inference can then be used to optimize the collapsed ELBO
 &\hat N^{\theta}_{\rightarrow ik} \mathrel{+}= \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, \,\, \hat N^{\theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'}, \\
 &\hat N^{\Phi}_{xkk'} \mathrel{+}= \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, \,\, \hat N^{{Y}}_{kk'} \mathrel{+}= \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij}
 \end{align*}
-}\\
+}
 %\begin{align}
 %\hat N^{\theta}_{\rightarrow ik} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \sum_{k'} \gamma_{ijkk'}, & \,\, \hat N^{\theta}_{\leftarrow jk'} = \frac{1}{Cg(s_i)} \sum_{k} \gamma_{ijkk'} \nonumber \\
 %\hat N^{\Phi}_{xkk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'}, & \,\, \hat N^{{Y}}_{kk'} += \frac{1}{|s_i|} \frac{1}{Cg(s_i)} \gamma_{ijkk'} y_{ij} \nonumber
@@ -232,11 +232,10 @@ Lastly, to be able to efficiently compute such quantities as $N^{\Phi^{-ij}}$ us
 \subsubsection{Robbins-Monro condition} 
 
 \begin{table*}[t]
-\bgroup
+\tiny
 \def\arraystretch{1} % 1 is the default, change whatever you need
 	\input{img/corpus}
 \label{table:corpus}
-\egroup
 \end{table*}
 
 The convergence of stochastic variational inference is guaranteed under the Robbin-Monro condition \cite{robbins1951stochastic} that imposes constraints on the gradient step, $\sum \rho_t = \infty$ and $\sum \rho_t^2 < \infty$ which can be obtained with $\rho_t = \frac{1}{(\tau +t)^\kappa}$ with $\kappa \in (0.5, 1]$. Thus, we maintain a gradient step for each of the global counts $\rho^\Phi$ and $\rho^{Y}$ accounting respectively for  $N^\Phi$ and $N^{Y}$. For $N^\theta$, we maintain individual gradient steps $\rho_i^{\theta}$ for $1\leq i\leq N$, following \cite{miller2009nonparametric}; this improved both convergence and prediction performance. Furthermore, to increase the speed of the inference, we update the global count $N^\Phi$ and $N^{Y}$ only after a minibatch round. For the global count  $N^\theta$, we update it after a burn-in period $T_{burnin}$ such that $T_{burnin} \leq |S|$.
