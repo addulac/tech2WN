@@ -1,6 +1,13 @@
 \section{Experimental validation}
 \label{sec:exps}
 
+\begin{table*}[t]
+\centering
+	\input{img/roc_evolv_tab}
+\label{table:roc}
+\end{table*}
+
+
 We evaluated the performance of the above models on several real world weighted networks, both directed and undirected. Theirs characteristics and properties are summarized in Table 1 and detailed descriptions are available in the online Koblenz network collection\footnote{http://konect.uni-koblenz.de/networks/}. For both astro-ph and hep-ph datasets, we used the cleaned versions available in the  graph-tool framework.
 %The aim of these experiments is to illustrate the advantage of the online inference and to evaluate the performances of the models.
 %This evaluation is based on a missing weight prediction task using the MSE score. 
@@ -21,12 +28,6 @@ Predicting links and predicting weights on links are two different tasks, and th
 
 \subsection{Link prediction}
 
-\begin{table*}[ht]
-\centering
-	\input{img/roc_evolv_tab}
-\label{table:roc}
-\end{table*}
-
 In addition to the proposed mixed-membership models, we consider here two standard link prediction models, the stochastic block model, referred to as SBM, and its weighted extension, referred to as WSBM. We use the most recent version of these two models, namely the microcanonical stochastic block model implementation of \cite{peixoto2018nonparametric}, which relies on an efficient MCMC inference method. In all models, the number of classes is set to $K=10$ (as illustrated below, the choice of the number of latent classes, in between 10 and 50, does not have an important impact on these models).
 
 As usual, the missing link prediction task is evaluated with the AUC-ROC score. For weighted models, we simply predict here a link through the probability that an edge exists between two unobserved nodes $(i,j)$ belonging to the test set, namely:
@@ -37,6 +38,18 @@ p(y_{ij} \geq 1 | \Bs{\Thetah}, \Bs{\Phih}) = 1 - \sum_{1 \le k,k' \le K} \theta
 %Variational inference, used here for MMSB models, and MCMC, used for SBM models, lead to different performance, the latter usually yielding better models than the former \cite{asuncion2009smoothing}. Indeed, despite the fact that the MMSB models considered here rely on more realistic assumptions regarding the distribution of nodes over latent classes, the approximations made on the likelihood for scalable inference purposes penalize MMSB models when it comes to prediction accuracy. This said, the strong averaging step of the stochastic gradient descent allows for faster convergence so that, as the models are more realistic, they may yield better performance when the amount of training data is limited. This is indeed what we observe in practice.
 
 Table ~\ref{table:roc} summarizes the results obtained with the afore-mentioned models when using 10\% and 100\% of the training data to fit the model. As one can note, when the complete training set is used (100 \%), SBM outperforms WSBM on 5 datasets and is overall the best performing model. This can be attributed to the fact that SBM directly aims at predicting links, unlike the weighted models, and does so via MCMC inference, which is known to yield accurate estimate when there is sufficient data. The mixed-membership family does not yield good results in this setting (100\%) and is only interesting, in particular via WMMSB-bg, on four datasets (astro\_ph, digg\_reply, enron, and prosper\_loans). Within this family, WMMSB-bg outperforms the other models on seven datasets (hep-th, moreno\_names, fb\_uc, digg\_reply, slashdot, wiki-link and prosper\_loans). For this reason, we will not use its simpler version, WMMSB, in the remainder of this study. Lastly, there is however an important degradation for SBM models when only 10\% of the training set is used. Mixed-membership stochastic block models are more stable in this case (except on enron and wiki-link), indicating that the stochastic variational inference used in these models is appropriate with relatively few data. %Lastly, among the models proposed in this study, WMMSB-bg outperforms WMMSB. We rely, for this reason, on the former in the remainder of the study.
+
+\begin{table*}[ht]
+\centering
+	\input{fig2/wsim3_training100}
+\label{table:mse}
+\end{table*}
+
+\begin{figure*}[ht]
+\centering
+	\input{fig2/wsim_k_evo-1}
+   \label{fig:k_evolv}
+\end{figure*}
 
 \subsection{Weight prediction}
 
@@ -66,17 +79,6 @@ where $i \in k$ means that node $i$ was assigned to class $k$ by the model and $
  
 The same method is used for the weighted stochastic block models WSBM, WSBM-ai, WSBM-ai-n and WSBM-ai-p as this method yielded even better results than the one directly making use of the expectation of $y_{ij}$ as in Eq.~\ref{eq:assign}.
 
-\begin{table*}[ht]
-\centering
-	\input{fig2/wsim3_training100}
-\label{table:mse}
-\end{table*}
-
-\begin{figure*}[ht]
-\centering
-	\input{fig2/wsim_k_evo-1}
-   \label{fig:k_evolv}
-\end{figure*}
 
 
 \subsubsection{Inference time} 
