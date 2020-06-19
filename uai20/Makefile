@@ -27,6 +27,10 @@ test:
 appendix:
 	pdflatex wmmsb_appendix.tex
 
+fix_pdf:
+	pdf2ps wmmsb.pdf
+	pkfix wmmsb.ps out.ps
+	ps2pdf out.ps
 
 
 pandoc:
